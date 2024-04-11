@@ -2,7 +2,7 @@
 import { useRef, ChangeEvent } from "react";
 import { useRecoilState } from "recoil";
 import { photoPreviewState } from "@/states/photoPreviewState";
-import Image from "next/image";
+import Image from "next/legacy/image";
 
 const PhotoUpload: React.FC = () => {
 	const [photoPreview, setPhotoPreview] = useRecoilState<string | null>(
