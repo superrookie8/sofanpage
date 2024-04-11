@@ -1,18 +1,8 @@
 "use client";
-
-import { useRouter } from "next/navigation";
 import Opening from "../components/opening";
+import Link from "next/link";
 
-interface Props {
-	children: React.ReactNode;
-}
-
-const Home: React.FC<Props> = ({ children }) => {
-	const router = useRouter();
-	const handleSonicClick = () => {
-		router.push("/sonic/");
-	};
-
+export default function Page() {
 	return (
 		<main className="min-h-screen flex justify-center items-center">
 			<div className="flex flex-col items-center justify-center min-h-screen">
@@ -20,19 +10,14 @@ const Home: React.FC<Props> = ({ children }) => {
 				{/* 전체 화면을 가운데 정렬하는 컨테이너 */}
 				<div className="mt-8 h-[580px] w-[1440px]">
 					<Opening />
-					{children}
 				</div>
 				<div className="mt-8">
 					{/* 버튼을 포함할 컨테이너 */}
-					<button
-						className="w-[150px] bg-red-500 text-white font-bold py-2 px-4 rounded mr-2 mr-[100px]"
-						onClick={handleSonicClick}
-					>
-						Sonic
+					<button className="w-[150px] bg-red-500 text-white font-bold py-2 px-4 rounded">
+						<Link href="/sonic">Sonic</Link>
 					</button>
 				</div>
 			</div>
 		</main>
 	);
-};
-export default Home;
+}

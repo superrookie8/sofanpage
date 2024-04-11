@@ -5,11 +5,7 @@ import Carousel from "../../components/carousel";
 import images from "../../components/images";
 import Header from "@/components/header";
 
-interface Props {
-	currentCategory: string;
-}
-
-const Sonic: React.FC<Props> = () => {
+const Sonic: React.FC = () => {
 	return (
 		<div>
 			<Header pathname="" />

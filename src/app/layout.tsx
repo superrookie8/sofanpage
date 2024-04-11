@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import RecoilRootProvider from "@/utils/recoilRootProvider";
 import ScriptProvider from "@/utils/scriptProvider";
-import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,9 +31,6 @@ export default async function RootLayout({
 }) {
 	return (
 		<html lang="en">
-			<Head>
-				<title>SuperSonic</title>
-			</Head>
 			<ScriptProvider />
 			<body className={inter.className}>
 				<RecoilRootProvider>{children}</RecoilRootProvider>
