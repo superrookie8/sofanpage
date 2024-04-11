@@ -22,7 +22,7 @@ const Schedule: React.FC = () => {
 				<div className="bg-red-500  min-h-screen w-full flex justify-center p-8 relative">
 					<Sidebar />
 					<div className=" min-w-[1200px] flex">
-						<div className="bg-red-300">
+						<div className="bg-red-300 h-[580px]">
 							<Calendar />
 						</div>
 						<div className="bg-white w-[500px] h-[580px] relative">
