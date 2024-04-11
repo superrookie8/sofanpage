@@ -5,8 +5,8 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ./app:/usr/src/app
-      - /usr/src/app/node_modules
+      - ./src:/usr/src
+      - /usr/node_modules
     command: npm run dev
     ports:
       - "3000:3000"
