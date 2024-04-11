@@ -14,10 +14,10 @@ const Header: React.FC<Props> = () => {
 	const linkStyle = (path: string) => {
 		const isActive =
 			path === "/sonic" ? pathname === path : pathname.startsWith(path);
-		return isActive ? "bg-gray-400 rounded px-2 py-1" : "";
+		return isActive ? "bg-red-400 rounded px-2 py-1" : "";
 	};
 	return (
-		<header className="bg-gray-500 text-white p-4 mt-32">
+		<header className="bg-red-500 text-white p-4 mt-32">
 			<nav className="max-w-[600px] container mx-auto flex justify-between mr-4 ">
 				<Link href="/">Intro</Link>
 				<Link href="/sonic" className={linkStyle("/sonic")}>
