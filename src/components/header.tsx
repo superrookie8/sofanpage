@@ -1,8 +1,4 @@
-import { useRouter, usePathname } from "next/navigation";
-
-import useGoPage from "@/hooks/useGoPage";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { pageState } from "@/states/pageState";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 interface Props {

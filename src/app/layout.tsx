@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+// import { Inter } from "next/font/google";
 import "./globals.css";
 import RecoilRootProvider from "@/utils/recoilRootProvider";
 import ScriptProvider from "@/utils/scriptProvider";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
 	title: { default: "BNK NO6.Lee Sohee", template: "%s | Lee Sohee" },
@@ -32,7 +30,7 @@ export default async function RootLayout({
 	return (
 		<html lang="en">
 			<ScriptProvider />
-			<body className={inter.className}>
+			<body>
 				<RecoilRootProvider>{children}</RecoilRootProvider>
 			</body>
 		</html>
