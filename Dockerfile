@@ -1,6 +1,6 @@
 FROM node:20.11.1
 
-WORKDIR /src/app
+WORKDIR /src
 
 COPY package.json package-lock.json ./
 
