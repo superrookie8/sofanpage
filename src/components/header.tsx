@@ -14,7 +14,7 @@ const Header: React.FC<Props> = () => {
 	};
 	return (
 		<>
-			<div className="bg-red-500 text-white text-center py-4 text-2xl font-bold h-[100px]">
+			<div className="bg-red-500 text-white text-center flex justify-center items-center py-4 text-6xl font-bold h-[100px]">
 				BNK NO6.이소희
 			</div>
 

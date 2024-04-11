@@ -11,9 +11,9 @@ const Events: React.FC<Props> = (props) => {
 		<div>
 			<Header pathname="" />
 			<div className="flex justify-center items-center">
-				<div className="bg-red-500 max-w-[1440px]  w-full flex justify-center  relative">
+				<div className="bg-red-500 min-h-screen  w-full flex justify-center p-8 relative">
 					<Sidebar />
-					<div className="w-[1200px] h-auto flex flex-col  p-8">
+					<div className="w-[1200px] h-auto flex flex-col ">
 						<div className=" w-full  overflow-x-auto flex flex-col justify-center items-center">
 							{events.map((event, index) => (
 								<div

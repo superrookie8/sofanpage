@@ -9,12 +9,12 @@ const Sonic: React.FC = () => {
 	return (
 		<div>
 			<Header pathname="" />
-			<div className="flex justify-center items-center ">
-				<div className="bg-red-500 max-w-[1440px]  w-full flex justify-center relative">
+			<div className="flex justify-center items-center  ">
+				<div className="bg-red-500 min-h-screen  w-full flex justify-center p-8 relative">
 					<Sidebar />
-					<div className=" w-[1200px]  p-8 flex justify-center  ">
+					<div className=" w-[1200px]  flex justify-between ">
 						<Carousel images={images} />
-						<div className=" bg-white w-[500px] h-[500px] flex flex-col justify-center items-center ml-4 relative">
+						<div className=" bg-white w-[550px] h-[500px] flex flex-col justify-center items-center relative">
 							<div className="bg-pink-300 w-[400px] h-[400px] flex flex-col absolute ">
 								<p className="ml-8 mt-8">Name : 이소희</p>
 								<p className="ml-8 mt-4">

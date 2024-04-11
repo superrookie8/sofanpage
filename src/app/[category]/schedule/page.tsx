@@ -19,7 +19,7 @@ const Schedule: React.FC = () => {
 		<div>
 			<Header pathname="" />
 			<div className="flex justify-center items-center">
-				<div className="bg-red-500 max-w-[1440px] max-h-[580px] w-full flex justify-center  relative">
+				<div className="bg-red-500  min-h-screen w-full flex justify-center p-8 relative">
 					<Sidebar />
 					<div className=" min-w-[1200px] flex">
 						<div className="bg-red-300">

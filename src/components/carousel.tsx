@@ -16,7 +16,7 @@ const Carousel: React.FC<ImageCarouselProps> = ({ images }) => {
 		setPicture((prevIndex) => (prevIndex - 1 + images.length) % images.length);
 	};
 	return (
-		<div className="bg-white w-[500px] h-[500px] flex justify-center items-center">
+		<div className="bg-white w-[550px] h-[500px] flex justify-center items-center">
 			<button onClick={prevImage} className="mr-[10px]">
 				Prev
 			</button>

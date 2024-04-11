@@ -24,7 +24,7 @@ const GuestBookCreate: React.FC<Props> = () => {
 		<div>
 			<Header pathname="" />
 			<div className="flex justify-center items-center ">
-				<div className="bg-red-500 max-w-[1440px] max-h-[580px] w-full flex justify-center items-center relative ">
+				<div className="bg-red-500 min-h-screen w-full flex justify-center p-8 relative ">
 					<div className=" w-[200px] h-[580px] flex flex-col justify-center items-center relative ">
 						<button
 							onClick={() => {
