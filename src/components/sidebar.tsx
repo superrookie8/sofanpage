@@ -15,7 +15,7 @@ const Sidebar: React.FC<Props> = (props) => {
 				}}
 				className="bg-green-500 text-white font-bold py-2 px-4 rounded w-[100px] mr-2 absolute top-0 left-0 m-3"
 			>
-				Home
+				Intro
 			</button>
 			<button
 				onClick={goBack}

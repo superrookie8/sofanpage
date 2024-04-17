@@ -14,7 +14,7 @@ export default function Page() {
 				<div className="mt-8">
 					{/* 버튼을 포함할 컨테이너 */}
 					<button className="w-[150px] bg-red-500 text-white font-bold py-2 px-4 rounded">
-						<Link href="/sonic">Sonic</Link>
+						<Link href="/profile">Go!</Link>
 					</button>
 				</div>
 			</div>

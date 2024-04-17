@@ -9,7 +9,7 @@ const Header: React.FC<Props> = () => {
 	const pathname = usePathname();
 	const linkStyle = (path: string) => {
 		const isActive =
-			path === "/sonic" ? pathname === path : pathname.startsWith(path);
+			path === "/profile" ? pathname === path : pathname.startsWith(path);
 		return isActive ? "bg-red-400 rounded px-2 py-1" : "";
 	};
 	return (
@@ -20,23 +20,20 @@ const Header: React.FC<Props> = () => {
 
 			<header className="bg-red-500 text-white p-4 ">
 				<nav className="max-w-[600px] container mx-auto flex justify-between mr-4 ">
-					<Link href="/">Intro</Link>
-					<Link href="/sonic" className={linkStyle("/sonic")}>
+					{/* <Link href="/">Intro</Link> */}
+					<Link href="/profile" className={linkStyle("/profile")}>
 						Profile
 					</Link>
-					<Link href="/sonic/news" className={linkStyle("/sonic/news")}>
+					<Link href="/news" className={linkStyle("/news")}>
 						News
 					</Link>
-					<Link href="/sonic/events" className={linkStyle("/sonic/events")}>
+					<Link href="/events" className={linkStyle("/events")}>
 						Events
 					</Link>
-					<Link href="/sonic/schedule" className={linkStyle("/sonic/schedule")}>
+					<Link href="/schedule" className={linkStyle("/schedule")}>
 						Schedule
 					</Link>
-					<Link
-						href="/sonic/guestbooks/read"
-						className={linkStyle("/sonic/guestbooks/")}
-					>
+					<Link href="/guestbooks/read" className={linkStyle("/guestbooks/")}>
 						Guestbooks
 					</Link>
 				</nav>
