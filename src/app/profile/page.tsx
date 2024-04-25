@@ -16,7 +16,7 @@ const Sonic: React.FC = () => {
 						<Carousel images={images} />
 						<div className=" bg-white w-[550px] h-[500px] flex flex-col justify-center items-center relative">
 							<div className="bg-pink-300 w-[400px] h-[400px] flex flex-col absolute ">
-								<p className="ml-8 mt-8">Name : 이소희</p>
+								<p className="ml-8 mt-8">Name : Lee Sohee</p>
 								<p className="ml-8 mt-4">
 									Position : Guard / Shooting Guard / Dual Guard
 								</p>

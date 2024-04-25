@@ -8,8 +8,12 @@ import { pageState } from "@/states/pageState";
 import PhotoUpload from "@/components/photoUpload";
 import Header from "@/components/header";
 
-interface Props {}
-const GuestBookCreate: React.FC<Props> = () => {
+interface PostData {
+	user: string;
+	text: string;
+	tags: string[];
+}
+const GuestBookCreate: React.FC = () => {
 	const params = useParams<{ category: string }>();
 	const router = useRouter();
 	const [write, setWrite] = useState("");
@@ -20,6 +24,36 @@ const GuestBookCreate: React.FC<Props> = () => {
 	const handlerOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setWrite(e.target.value);
 	};
+
+	const postData = async (): Promise<void> => {
+		const data: PostData = {
+			user: "하나",
+			text: "방명록 테스트",
+			tags: ["소히", "팬페이지", "방명록"],
+		};
+
+		try {
+			const response = await fetch("http://localhost:5000/insert", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(data),
+			});
+
+			if (!response.ok) {
+				throw new Error("Network response was not ok");
+			}
+
+			const responseData = await response.json();
+			console.log(responseData);
+		} catch (error) {
+			console.error("There was a problem with the fetch operation:", error);
+		}
+	};
+
+	postData();
+
 	return (
 		<div>
 			<Header pathname="" />
