@@ -63,9 +63,9 @@ export const GuestBookButtons: React.FC<Props> = () => {
 
 export const GoCreateButtons: React.FC<Props> = () => {
 	const router = useRouter();
-	const params = useParams<{ category: string }>();
+	// const params = useParams<{ category: string }>();
 	const goToPage = (pageName: string) => {
-		router.push(`/${params.category}/${pageName}`);
+		router.push(`/${pageName}`);
 	};
 	return (
 		<div className="bg-green-500 min-h-[100px] min-w-[1200px] flex absolute flex justify-center items-center bottom-0">
