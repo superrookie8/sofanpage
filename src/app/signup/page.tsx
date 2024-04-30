@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useRecoilState } from "recoil";
 import { nicknameState } from "@/states/nicknameState";
 import { passwordState } from "@/states/passwordState";
-import EyeIcon from "@/icons/eyeicon"; // 경로는 실제 아이콘 컴포넌트의 위치에 맞게 조정하세요.
+import EyeIcon from "@/icons/eyeicon";
 
 interface ValidationState {
 	message: string;

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
 	if (request.method === "POST") {
-		const { username, password } = await request.json();
+		const { nickname, password } = await request.json();
 
 		try {
 			const backendResponse = await fetch("http://127.0.0.1:5000/api/login", {
@@ -10,21 +10,27 @@ export async function POST(request: NextRequest) {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ username, password }),
+				body: JSON.stringify({ nickname, password }),
 			});
 
 			const backendData = await backendResponse.json();
 			if (!backendResponse.ok) {
-				throw new Error(backendData.message || "로그인에 실패했습니다.");
+				throw new Error(backendData.msg || "로그인에 실패했습니다.");
+			}
+
+			const token = backendData.access_token;
+			if (!token) {
+				throw new Error("서버로부터 토큰을 받지 못했습니다.");
 			}
 
 			// 백엔드에서 로그인 성공 응답을 받으면 클라이언트에도 성공 메시지 전송
 			return new NextResponse(
-				JSON.stringify({ message: "로그인 성공!", user: backendData.user }),
+				JSON.stringify({ message: "로그인 성공!", access_token: token }),
 				{
 					status: 200,
 					headers: {
 						"Content-Type": "application/json",
+						// "Authorization" : `Bearer ${token}`,
 					},
 				}
 			);
