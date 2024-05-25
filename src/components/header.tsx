@@ -1,5 +1,6 @@
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 interface Props {
 	pathname: string;
@@ -20,34 +21,40 @@ const Header: React.FC<Props> = () => {
 	};
 	return (
 		<>
-			<div className="bg-red-500 text-white text-center flex justify-center items-center py-4 text-6xl font-bold h-[100px]">
-				BNK NO6.이소희
-			</div>
-
-			<header className="bg-red-500 text-white p-4 ">
-				<nav className="max-w-[600px] container mx-auto flex items-center justify-between mr-4 ">
-					{/* <Link href="/">Intro</Link> */}
-					<Link href="/profile" className={linkStyle("/profile")}>
-						Profile
-					</Link>
-					<Link href="/news" className={linkStyle("/news")}>
-						News
-					</Link>
-					<Link href="/events" className={linkStyle("/events")}>
-						Events
-					</Link>
-					<Link href="/schedule" className={linkStyle("/schedule")}>
-						Schedule
-					</Link>
-					<Link href="/guestbooks/read" className={linkStyle("/guestbooks/")}>
-						Guestbooks
-					</Link>
-					<button
-						onClick={handleLogout}
-						className="px-2 py-1 rounded hover:bg-red-400 active:bg-red-600 focus:outline-none"
-					>
-						Logout
-					</button>
+			<header className="bg-red-500 text-white p-4">
+				<nav className="max-w-[1200px] container mx-auto flex items-front justify-end">
+					<div className="relative w-[1200px] h-[400px]">
+						<Image
+							src="/images/supersoheeheader.png"
+							alt="Header"
+							fill
+							style={{ objectFit: "contain" }}
+							className="absolute"
+						/>
+					</div>
+					<div className="flex items-center space-x-8 absolute pt-8 pr-4">
+						<Link href="/home" className={linkStyle("/home")}>
+							Home
+						</Link>
+						<Link href="/news" className={linkStyle("/news")}>
+							News
+						</Link>
+						<Link href="/events" className={linkStyle("/events")}>
+							Events
+						</Link>
+						<Link href="/schedule" className={linkStyle("/schedule")}>
+							Schedule
+						</Link>
+						<Link href="/guestbooks/read" className={linkStyle("/guestbooks/")}>
+							Guestbooks
+						</Link>
+						<button
+							onClick={handleLogout}
+							className="px-2 py-1 rounded hover:bg-red-400 active:bg-red-600 focus:outline-none"
+						>
+							Logout
+						</button>
+					</div>
 				</nav>
 			</header>
 		</>

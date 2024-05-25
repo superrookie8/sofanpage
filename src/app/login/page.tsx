@@ -89,7 +89,7 @@ const Login: React.FC = () => {
 
 		if (response.ok) {
 			localStorage.setItem("token", data.access_token);
-			router.push("/profile");
+			router.push("/home");
 		} else {
 			setMessage(data.msg);
 		}

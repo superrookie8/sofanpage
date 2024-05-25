@@ -30,7 +30,6 @@ export async function POST(request: NextRequest) {
 					status: 200,
 					headers: {
 						"Content-Type": "application/json",
-						// "Authorization" : `Bearer ${token}`,
 					},
 				}
 			);
