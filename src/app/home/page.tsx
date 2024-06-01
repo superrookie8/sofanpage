@@ -4,6 +4,7 @@ import Sidebar from "@/components/sidebar";
 import Carousel from "@/components/carousel";
 import images from "@/components/images";
 import Profile from "@/components/profile";
+import Stats from "@/components/stats";
 import Photos from "@/components/photos";
 import Header from "@/components/header";
 import Image from "next/image";
@@ -80,7 +81,7 @@ const MainPage: React.FC = () => {
 							)}
 							{activePage === "stats" && (
 								<div className="p-4 bg-white rounded shadow-md w-full h-full">
-									<div>Stats Component</div>
+									<Stats />
 								</div>
 							)}
 							{activePage === "photos" && (
