@@ -17,18 +17,10 @@ const Profile: React.FC = () => {
 	useEffect(() => {
 		const fetchProfile = async () => {
 			try {
-				const token = localStorage.getItem("admin-token");
-
-				if (!token) {
-					setError("You are not authorized to perform this action.");
-					return;
-				}
-
 				const response = await fetch("/api/admin/getprofile", {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
-						Authorization: `Bearer ${token}`,
 					},
 				});
 
