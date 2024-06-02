@@ -2,34 +2,39 @@
 
 import React, { useState, useEffect } from "react";
 
+interface AverageData {
+	G: number;
+	MPG: string;
+	"2P%": number;
+	"3P%": number;
+	FT: number;
+	OFF: number;
+	DEF: number;
+	TOT: number;
+	APG: number;
+	SPG: number;
+	BPG: number;
+	TO: number;
+	PF: number;
+	PPG: number;
+}
+
+interface TotalData {
+	MIN: string;
+	"FGM-A": string;
+	"3PM-A": string;
+	"FTM-A": string;
+	AST: number;
+	STL: number;
+	BLK: number;
+	PTS: number;
+}
+
 interface StatsData {
+	_id?: string;
 	season: string;
-	average: {
-		G: number;
-		MPG: string;
-		"2P%": number;
-		"3P%": number;
-		FT: number;
-		OFF: number;
-		DEF: number;
-		TOT: number;
-		APG: number;
-		SPG: number;
-		BPG: number;
-		TO: number;
-		PF: number;
-		PPG: number;
-	};
-	total: {
-		MIN: string;
-		"FGM-A": string;
-		"3PM-A": string;
-		"FTM-A": string;
-		AST: number;
-		STL: number;
-		BLK: number;
-		PTS: number;
-	};
+	average: AverageData;
+	total: TotalData;
 }
 
 const StatsForm: React.FC = () => {
@@ -67,9 +72,18 @@ const StatsForm: React.FC = () => {
 	const [message, setMessage] = useState<string | null>(null);
 
 	const fetchStats = async () => {
-		const response = await fetch("/api/admin/getstats");
-		const data = await response.json();
-		setStats(data);
+		try {
+			const response = await fetch("/api/admin/getstats");
+			if (!response.ok) {
+				throw new Error("Failed to fetch stats from backend");
+			}
+			const data = await response.json();
+			console.log("Fetched data:", data); // 데이터 확인을 위한 로그
+			setStats(data);
+		} catch (error) {
+			console.error("Error fetching stats:", error);
+			setError("An error occurred while fetching the stats.");
+		}
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -172,10 +186,28 @@ const StatsForm: React.FC = () => {
 		});
 	};
 
+	const handleSeasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		const selectedSeason = e.target.value;
+		const selectedStat = stats.find((stat) => stat.season === selectedSeason);
+		if (selectedStat) {
+			setCurrentStat(selectedStat);
+		}
+	};
+
 	return (
 		<div>
 			<h1>Manage Stats</h1>
 			<form onSubmit={handleSubmit}>
+				<div>
+					<select onChange={handleSeasonChange} value={currentStat.season}>
+						<option value="">Select a season</option>
+						{stats.map((stat) => (
+							<option key={stat._id} value={stat.season}>
+								{stat.season}
+							</option>
+						))}
+					</select>
+				</div>
 				<div>
 					<label>Season:</label>
 					<input
@@ -219,7 +251,7 @@ const StatsForm: React.FC = () => {
 			<h2>Existing Stats</h2>
 			<ul>
 				{stats.map((stat) => (
-					<li key={stat.season} onClick={() => setCurrentStat(stat)}>
+					<li key={stat._id} onClick={() => setCurrentStat(stat)}>
 						{stat.season}
 					</li>
 				))}
