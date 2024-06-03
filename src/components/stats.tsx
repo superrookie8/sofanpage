@@ -24,9 +24,14 @@ interface TotalStats {
 	"FGM-A": string;
 	"3PM-A": string;
 	"FTM-A": string;
+	OFF: number;
+	DEF: number;
+	TOT: number;
 	AST: number;
 	STL: number;
 	BLK: number;
+	TO: number;
+	PF: number;
 	PTS: number;
 }
 
@@ -49,6 +54,7 @@ const Stats: React.FC = () => {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
+						"Cache-Control": "no-cache",
 					},
 				});
 
@@ -57,9 +63,11 @@ const Stats: React.FC = () => {
 					throw new Error(errorData.message || "Failed to load stats.");
 				}
 
-				const data = await response.json();
+				const data: StatsData[] = await response.json();
+				console.log("Fetched data:", data); // 데이터 확인을 위한 로그
 				setStats(data);
 			} catch (error: any) {
+				console.error("Error fetching stats:", error);
 				setError("An error occurred while fetching the stats.");
 			}
 		};
@@ -86,10 +94,10 @@ const Stats: React.FC = () => {
 					</th>
 					{keys.map((key) => (
 						<th
-							key={String(key as string)}
+							key={String(key)}
 							className="py-2 px-4 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
 						>
-							{String(key as string)}
+							{String(key).replace(/^(Average|Total)/, "")}
 						</th>
 					))}
 				</tr>
@@ -102,7 +110,7 @@ const Stats: React.FC = () => {
 						</td>
 						{keys.map((key) => (
 							<td
-								key={String(key as string)}
+								key={String(key)}
 								className="py-2 px-4 border-b border-gray-200"
 							>
 								{(stat[type] as any)[key]}
@@ -144,9 +152,14 @@ const Stats: React.FC = () => {
 		"FGM-A",
 		"3PM-A",
 		"FTM-A",
+		"OFF",
+		"DEF",
+		"TOT",
 		"AST",
 		"STL",
 		"BLK",
+		"TO",
+		"PF",
 		"PTS",
 	];
 
@@ -154,7 +167,7 @@ const Stats: React.FC = () => {
 
 	return (
 		<div className="p-4">
-			<div className="mb-4">
+			<div className="mb-4 flex items-center space-x-4">
 				<select
 					onChange={handleSeasonChange}
 					className="py-2 px-4 border rounded"
@@ -166,29 +179,30 @@ const Stats: React.FC = () => {
 						</option>
 					))}
 				</select>
-			</div>
-			<div className="mb-4">
+
 				<button
 					onClick={() => setSelectedTab("average")}
 					className={`py-2 px-4 border ${
 						selectedTab === "average"
-							? "bg-blue-500 text-white"
-							: "bg-white text-blue-500"
+							? "bg-red-500 text-white"
+							: "bg-white text-red-500"
 					} rounded-l`}
 				>
 					Average Stats
 				</button>
+
 				<button
 					onClick={() => setSelectedTab("total")}
 					className={`py-2 px-4 border ${
 						selectedTab === "total"
-							? "bg-blue-500 text-white"
-							: "bg-white text-blue-500"
+							? "bg-red-500 text-white"
+							: "bg-white text-red-500"
 					} rounded-r`}
 				>
 					Total Stats
 				</button>
 			</div>
+
 			{selectedTab === "average" && (
 				<div>
 					<h3 className="text-xl font-semibold mb-2">Average Stats</h3>
