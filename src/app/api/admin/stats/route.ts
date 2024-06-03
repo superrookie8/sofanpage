@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 		}
 
 		const backendResponse = await fetch(
-			"http://127.0.0.1:5000/api/admin/create_or_update/stats",
+			"http://127.0.0.1:5000/api/admin/create_update_stats",
 			{
 				method: "POST",
 				headers: {

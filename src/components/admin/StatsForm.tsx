@@ -24,9 +24,14 @@ interface TotalData {
 	"FGM-A": string;
 	"3PM-A": string;
 	"FTM-A": string;
+	OFF: number;
+	DEF: number;
+	TOT: number;
 	AST: number;
 	STL: number;
 	BLK: number;
+	TO: number;
+	PF: number;
 	PTS: number;
 }
 
@@ -62,9 +67,14 @@ const StatsForm: React.FC = () => {
 			"FGM-A": "0-0",
 			"3PM-A": "0-0",
 			"FTM-A": "0-0",
+			OFF: 0,
+			DEF: 0,
+			TOT: 0,
 			AST: 0,
 			STL: 0,
 			BLK: 0,
+			TO: 0,
+			PF: 0,
 			PTS: 0,
 		},
 	});
@@ -132,9 +142,14 @@ const StatsForm: React.FC = () => {
 						"FGM-A": "0-0",
 						"3PM-A": "0-0",
 						"FTM-A": "0-0",
+						OFF: 0,
+						DEF: 0,
+						TOT: 0,
 						AST: 0,
 						STL: 0,
 						BLK: 0,
+						TO: 0,
+						PF: 0,
 						PTS: 0,
 					},
 				});
