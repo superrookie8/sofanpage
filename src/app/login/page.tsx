@@ -132,6 +132,7 @@ const Login: React.FC = () => {
 							type={showPassword ? "text" : "password"}
 							name="password"
 							onChange={handlePasswordChange}
+							autoComplete="current-password"
 							placeholder="비밀번호"
 						/>
 						<button
