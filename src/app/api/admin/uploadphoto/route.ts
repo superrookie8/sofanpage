@@ -1,25 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import multiparty from "multiparty";
-import { promises as fsPromises } from "fs";
-import path from "path";
-import { v4 as uuidv4 } from "uuid";
 import { FormData as NodeFormData } from "formdata-node";
-import { fileFromPathSync } from "formdata-node/file-from-path";
+import { promises as fsPromises } from "fs";
+import { v4 as uuidv4 } from "uuid";
 
 export const config = {
 	api: {
 		bodyParser: false,
 	},
-};
-
-const parseForm = (req: any): Promise<{ fields: any; files: any }> => {
-	return new Promise((resolve, reject) => {
-		const form = new multiparty.Form({ uploadDir: "/tmp" });
-		form.parse(req, (err, fields, files) => {
-			if (err) reject(err);
-			else resolve({ fields, files });
-		});
-	});
 };
 
 export async function POST(req: NextRequest) {
@@ -42,31 +29,27 @@ export async function POST(req: NextRequest) {
 		const buffer = Buffer.concat(buffers);
 		console.log("Buffer length:", buffer.length);
 
-		const tempDir = path.join("/tmp", `upload-${Date.now()}`);
-		await fsPromises.mkdir(tempDir, { recursive: true });
-		console.log("Temporary directory created:", tempDir);
+		const boundary = req.headers.get("content-type")?.split("boundary=")[1];
+		if (!boundary) {
+			throw new Error("Boundary not found");
+		}
 
 		const formData = new NodeFormData();
-		const parts = buffer.toString().split("boundary");
+		const parts = buffer.toString().split(`--${boundary}`);
+		const files = [];
 
-		const files: string[] = [];
 		for (const part of parts) {
 			if (part.includes("filename")) {
-				const match = part.match(/filename="([^"]+)"/);
-				if (match) {
-					const filename = match[1];
-					const filePath = path.join(tempDir, filename);
-					const fileContent = part.split("\r\n\r\n")[1].split("\r\n--")[0];
-					await fsPromises.writeFile(filePath, fileContent, "binary");
-					console.log(`File written to: ${filePath}`);
-					files.push(filePath);
-					formData.append("photos", fileFromPathSync(filePath));
-					formData.append("photo_ids", uuidv4());
-					formData.append("upload_times", new Date().toISOString());
-				}
+				const filenameMatch = part.match(/filename="([^"]+)"/);
+				const filename = filenameMatch ? filenameMatch[1] : `file-${uuidv4()}`;
+				const fileContent = part.split("\r\n\r\n")[1].split("\r\n--")[0];
+				formData.append("photos", new Blob([fileContent]), filename);
+				formData.append("photo_ids", uuidv4());
+				formData.append("upload_times", new Date().toISOString());
 			}
-			console.log("good", formData);
 		}
+
+		console.log("FormData prepared:", formData);
 
 		const token = req.headers.get("authorization") || "";
 		console.log("Authorization token:", token);
@@ -86,11 +69,6 @@ export async function POST(req: NextRequest) {
 			console.error("Backend response error", data);
 			throw new Error(data.message || "Failed to upload photos to backend");
 		}
-
-		for (const filePath of files) {
-			await fsPromises.unlink(filePath);
-		}
-		await fsPromises.rmdir(tempDir);
 
 		console.log("Photos uploaded successfully", data);
 		return NextResponse.json({ message: "Photos uploaded successfully", data });
