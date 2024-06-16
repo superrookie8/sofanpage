@@ -5,8 +5,10 @@ import Header from "@/components/header";
 import PhotoCard from "@/components/photoCard";
 import Sidebar from "@/components/sidebar";
 import TextCard from "@/components/textCard";
+import useAuth from "@/hooks/useAuth";
 
 const GuestBookList: React.FC = (props) => {
+	useAuth();
 	return (
 		<div>
 			<Header pathname="" />

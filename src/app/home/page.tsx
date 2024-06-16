@@ -8,9 +8,12 @@ import Stats from "@/components/stats";
 import Photos from "@/components/photos";
 import Header from "@/components/header";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import useAuth from "@/hooks/useAuth";
 
 const MainPage: React.FC = () => {
+	useAuth();
 	const [activePage, setActivePage] = useState<string | null>(null);
 
 	const togglePage = (page: string) => {

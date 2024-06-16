@@ -7,7 +7,7 @@ export default function Page() {
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 	useEffect(() => {
-		const token = localStorage.getItem("token");
+		const token = sessionStorage.getItem("token");
 		if (token) {
 			setIsLoggedIn(true);
 		} else {

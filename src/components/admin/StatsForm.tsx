@@ -1,5 +1,6 @@
 "use client";
 
+import useAdminAuth from "@/hooks/useAdminAuth";
 import React, { useState, useEffect } from "react";
 
 interface AverageData {
@@ -43,6 +44,7 @@ interface StatsData {
 }
 
 const StatsForm: React.FC = () => {
+	useAdminAuth();
 	const [stats, setStats] = useState<StatsData[]>([]);
 	const [currentStat, setCurrentStat] = useState<StatsData>({
 		season: "",
