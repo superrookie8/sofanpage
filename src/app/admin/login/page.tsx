@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const AdminLogin: React.FC = () => {
@@ -8,6 +8,13 @@ const AdminLogin: React.FC = () => {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [message, setMessage] = useState("");
+
+	useEffect(() => {
+		const token = sessionStorage.getItem("admin-token");
+		if (token) {
+			router.push("/admin");
+		}
+	}, [router]);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -24,7 +31,7 @@ const AdminLogin: React.FC = () => {
 			const data = await response.json();
 
 			if (response.ok) {
-				localStorage.setItem("admin-token", data.access_token);
+				sessionStorage.setItem("admin-token", data.access_token);
 				router.push("/admin");
 			} else {
 				setMessage(data.message);

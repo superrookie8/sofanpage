@@ -16,7 +16,7 @@ const Header: React.FC<Props> = () => {
 	};
 
 	const handleLogout = () => {
-		localStorage.removeItem("token"); // 토큰을 로컬 스토리지에서 제거
+		sessionStorage.removeItem("token"); // 토큰을 세션 스토리지에서 제거
 		router.push("/login"); // 로그인 페이지로 리디렉션
 	};
 	return (

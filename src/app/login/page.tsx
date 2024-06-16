@@ -88,7 +88,7 @@ const Login: React.FC = () => {
 		const data = await response.json();
 
 		if (response.ok) {
-			localStorage.setItem("token", data.access_token);
+			sessionStorage.setItem("token", data.access_token);
 			router.push("/home");
 		} else {
 			setMessage(data.msg);

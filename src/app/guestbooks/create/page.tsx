@@ -7,6 +7,7 @@ import { useRecoilValue } from "recoil";
 import { pageState } from "@/states/pageState";
 import PhotoUpload from "@/components/photoUpload";
 import Header from "@/components/header";
+import useAuth from "@/hooks/useAuth";
 
 interface PostData {
 	user: string;
@@ -14,6 +15,7 @@ interface PostData {
 	tags: string[];
 }
 const GuestBookCreate: React.FC = () => {
+	useAuth();
 	const params = useParams<{ category: string }>();
 	const router = useRouter();
 	const [write, setWrite] = useState("");

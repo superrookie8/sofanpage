@@ -10,7 +10,7 @@ const Admin: React.FC<Props> = (props) => {
 	const router = useRouter();
 
 	useEffect(() => {
-		const token = localStorage.getItem("admin-token");
+		const token = sessionStorage.getItem("admin-token");
 		if (!token) {
 			router.push("/admin/login");
 		}

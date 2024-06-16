@@ -3,10 +3,12 @@ import Link from "next/link";
 import Header from "@/components/header";
 import { events } from "@/data/events";
 import Sidebar from "@/components/sidebar";
+import useAuth from "@/hooks/useAuth";
 
 interface Props {}
 
 const Events: React.FC<Props> = (props) => {
+	useAuth();
 	return (
 		<div>
 			<Header pathname="" />
