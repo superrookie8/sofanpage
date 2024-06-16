@@ -1,8 +1,10 @@
 "use client";
 import Header from "@/components/header";
 import Sidebar from "@/components/sidebar";
+import useAuth from "@/hooks/useAuth";
 
 export default function News() {
+	useAuth();
 	// const resp = await fetch(`localhost:3000/${props.params.news}`, {
 	// 	cache: "no-store",
 	// });

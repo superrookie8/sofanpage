@@ -20,7 +20,7 @@ const ProfileForm: React.FC = () => {
 	useEffect(() => {
 		const fetchProfile = async () => {
 			try {
-				const token = localStorage.getItem("admin-token");
+				const token = sessionStorage.getItem("admin-token");
 
 				if (!token) {
 					setError("You are not authorized to perform this action.");

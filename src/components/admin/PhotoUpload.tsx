@@ -4,6 +4,7 @@ import { useRecoilState } from "recoil";
 import { photoPreviewState } from "@/states/photoPreviewState";
 import Image from "next/legacy/image";
 import imageCompression from "browser-image-compression";
+import useAdminAuth from "@/hooks/useAdminAuth";
 
 interface PhotoData {
 	id: string;
@@ -19,6 +20,7 @@ const PREVIEW_MAX_WIDTH = 360;
 const UPLOAD_MAX_WIDTH = 500;
 
 const AdminPhotoUpload: React.FC = () => {
+	useAdminAuth();
 	const [photoPreviews, setPhotoPreviews] =
 		useRecoilState<PhotoData[]>(photoPreviewState);
 	const [error, setError] = useState<string | null>(null);

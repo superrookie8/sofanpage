@@ -7,8 +7,10 @@ import { locations } from "@/data/schedule";
 import Map from "@/components/kakaoMap";
 import { useSetRecoilState } from "recoil";
 import { selectedLocationState } from "@/states/locationState";
+import useAuth from "@/hooks/useAuth";
 
 const Schedule: React.FC = () => {
+	useAuth();
 	const setSelectedLocation = useSetRecoilState(selectedLocationState);
 
 	useEffect(() => {
