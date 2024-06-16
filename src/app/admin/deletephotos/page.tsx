@@ -1,18 +1,18 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import useAdminAuth from "@/hooks/useAdminAuth";
+import AdminHomeButton from "@/components/admin/\bAdminHomeButton";
 
 interface Photo {
 	_id: string;
 	filename: string;
+	base64: string;
 	url: string;
 }
 
 const AdminDeletePhotos: React.FC = () => {
 	useAdminAuth();
-	const router = useRouter();
 	const [adminPhotos, setAdminPhotos] = useState<Photo[]>([]);
 	const [userPhotos, setUserPhotos] = useState<Photo[]>([]);
 	const [selectedPhotos, setSelectedPhotos] = useState<Set<string>>(new Set());
@@ -26,11 +26,14 @@ const AdminDeletePhotos: React.FC = () => {
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
+					cache: "no-store",
 				});
 				const data = await response.json();
 				if (response.ok) {
 					setAdminPhotos(data.admin_photos);
 					setUserPhotos(data.user_photos);
+
+					console.log("data", data);
 				} else {
 					console.error("Failed to fetch photos", data);
 				}
@@ -94,7 +97,7 @@ const AdminDeletePhotos: React.FC = () => {
 				{adminPhotos.map((photo) => (
 					<div key={photo._id} className="relative">
 						<img
-							src={photo.url} // Correct URL to fetch the image
+							src={photo.base64} // Correct URL to fetch the image
 							alt={photo.filename}
 							className="w-full h-auto"
 						/>
@@ -112,7 +115,7 @@ const AdminDeletePhotos: React.FC = () => {
 				{userPhotos.map((photo) => (
 					<div key={photo._id} className="relative">
 						<img
-							src={photo.url} // Correct URL to fetch the image
+							src={photo.base64} // Correct URL to fetch the image
 							alt={photo.filename}
 							className="w-full h-auto"
 						/>
@@ -133,6 +136,7 @@ const AdminDeletePhotos: React.FC = () => {
 					Delete Selected Photos
 				</button>
 			)}
+			<AdminHomeButton />
 		</div>
 	);
 };
