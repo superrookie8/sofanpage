@@ -1,11 +1,8 @@
 "use client";
 
-import Sidebar from "@/components/sidebar";
-import Carousel from "@/components/carousel";
-import images from "@/components/images";
 import Profile from "@/components/profile";
 import Stats from "@/components/stats";
-import Photos from "@/components/photos";
+import GetPhotos from "@/components/photos";
 import Header from "@/components/header";
 import Image from "next/image";
 import { useState, useEffect } from "react";
@@ -76,20 +73,20 @@ const MainPage: React.FC = () => {
 								</button>
 							</div>
 						</div>
-						<div className="mt-4 w-full h-[600px]">
+						<div className="mt-4 w-full h-[500px]">
 							{activePage === "profile" && (
 								<div className="p-4 bg-white rounded shadow-md w-full h-full">
 									<Profile />
 								</div>
 							)}
 							{activePage === "stats" && (
-								<div className="p-4 bg-white rounded shadow-md w-full h-full">
+								<div className="p-4 bg-white rounded shadow-md w-full h-full flex justify-center items-center">
 									<Stats />
 								</div>
 							)}
 							{activePage === "photos" && (
-								<div className="p-4 bg-white rounded shadow-md w-full h-full">
-									<Photos />
+								<div className="p-4 bg-white rounded shadow-md w-full h-full flex justify-center items-center">
+									<GetPhotos />
 								</div>
 							)}
 						</div>

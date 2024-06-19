@@ -29,6 +29,9 @@ const Admin: React.FC<Props> = (props) => {
 					<Link href="/admin/photos">Upload Photos</Link>
 				</li>
 				<li>
+					<Link href="/admin/deletephotos">Delete Photos</Link>
+				</li>
+				<li>
 					<Link href="/admin/news">Manage News</Link>
 				</li>
 				<li>
