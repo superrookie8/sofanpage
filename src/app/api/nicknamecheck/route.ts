@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
 		const nickname = requestBody.nickname;
 
 		const flaskResponse = await fetch(
-			"http://127.0.0.1:5000/api/nickname_check",
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/nickname_check`,
 			{
 				method: "POST",
 				headers: {

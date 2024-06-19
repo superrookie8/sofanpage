@@ -17,13 +17,16 @@ export async function POST(request: NextRequest) {
 		}
 
 		try {
-			const backendResponse = await fetch("http://127.0.0.1:5000/api/sign_up", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ nickname, password, passwordConfirm }),
-			});
+			const backendResponse = await fetch(
+				`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/sign_up`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ nickname, password, passwordConfirm }),
+				}
+			);
 
 			const backendData = await backendResponse.json();
 			if (!backendResponse.ok) {

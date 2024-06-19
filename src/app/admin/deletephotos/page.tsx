@@ -93,13 +93,13 @@ const AdminDeletePhotos: React.FC = () => {
 		<div className="container mx-auto">
 			<h1 className="text-2xl mb-4">Delete Photos</h1>
 			<h2 className="text-xl mb-2">Admin Photos</h2>
-			<div className="grid grid-cols-3 gap-4">
+			<div className="grid grid-cols-6 gap-2">
 				{adminPhotos.map((photo) => (
 					<div key={photo._id} className="relative">
 						<img
 							src={photo.base64} // Correct URL to fetch the image
 							alt={photo.filename}
-							className="w-full h-auto"
+							className="w-[200px] h-auto"
 						/>
 						<input
 							type="checkbox"
