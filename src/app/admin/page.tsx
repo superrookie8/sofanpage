@@ -38,6 +38,9 @@ const Admin: React.FC<Props> = (props) => {
 					<Link href="/admin/schedule">Manage Schedule</Link>
 				</li>
 				<li>
+					<Link href="/admin/events">Manage Events</Link>
+				</li>
+				<li>
 					<Link href="/admin/guestbooks">Manage Guestbook</Link>
 				</li>
 			</ul>

@@ -5,7 +5,7 @@ export async function GET(req: NextRequest) {
 		console.log("Starting GET request to backend");
 
 		const backendResponse = await fetch(
-			"http://127.0.0.1:5000/api/admin/get/stats",
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get/stats`,
 			{
 				method: "GET",
 				headers: {

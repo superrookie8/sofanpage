@@ -3,14 +3,17 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
 	try {
 		const token = req.headers.get("authorization") || "";
+		// if (!token) {
+		// 	throw new Error("Authorization header missing");
+		// }
 
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get/photos`,
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get/events`,
 			{
 				method: "GET",
 				headers: {
-					Authorization: token,
 					"Content-Type": "application/json",
+					Authorization: token,
 					Pragma: "no-cache",
 					"Cache-Control": "no-cache, no-store, must-revalidate",
 				},
@@ -19,17 +22,14 @@ export async function GET(req: NextRequest) {
 		);
 
 		if (!response.ok) {
-			const data = await response.json();
-			throw new Error(data.message || "Failed to fetch photos.");
+			const errorData = await response.json();
+			throw new Error(errorData.message || "Failed to fetch events.");
 		}
 
 		const data = await response.json();
 		return NextResponse.json(data, { status: 200 });
 	} catch (error: any) {
-		console.error("Error fetching photos:", error);
-		return NextResponse.json(
-			{ message: error.message || "Failed to fetch photos" },
-			{ status: 500 }
-		);
+		console.error("Error fetching events:", error);
+		return NextResponse.json({ message: error.message }, { status: 500 });
 	}
 }

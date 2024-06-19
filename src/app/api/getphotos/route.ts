@@ -4,15 +4,18 @@ export async function GET(req: NextRequest) {
 	try {
 		const token = req.headers.get("authorization") || "";
 
-		const response = await fetch("http://127.0.0.1:5000/api/get/photos", {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-				Pragma: "no-cache",
-				"Cache-Control": "no-cache, no-store, must-revalidate",
-			},
-			cache: "no-store",
-		});
+		const response = await fetch(
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/get/photos`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Pragma: "no-cache",
+					"Cache-Control": "no-cache, no-store, must-revalidate",
+				},
+				cache: "no-store",
+			}
+		);
 
 		if (!response.ok) {
 			const data = await response.json();

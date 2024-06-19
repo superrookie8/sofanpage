@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 		const token = req.headers.get("authorization") || "";
 
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/postphoto`,
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/postevents`,
 			{
 				method: "POST",
 				headers: {
@@ -33,14 +33,17 @@ export async function POST(req: NextRequest) {
 		const data = await response.json();
 
 		if (!response.ok) {
-			throw new Error(data.message || "Failed to upload photos to backend");
+			throw new Error(data.message || "Failed to upload event data to backend");
 		}
 
-		return NextResponse.json({ message: "Photos uploaded successfully", data });
+		return NextResponse.json({
+			message: "Event data uploaded successfully",
+			data,
+		});
 	} catch (error: any) {
-		console.error("Error uploading photos:", error);
+		console.error("Error uploading event data:", error);
 		return NextResponse.json(
-			{ message: error.message || "Failed to upload photos" },
+			{ message: error.message || "Failed to upload event data" },
 			{ status: 500 }
 		);
 	}

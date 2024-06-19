@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
 		const { username, password } = await req.json();
 
 		const backendResponse = await fetch(
-			"http://127.0.0.1:5000/api/admin/login",
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/login`,
 			{
 				method: "POST",
 				headers: {
