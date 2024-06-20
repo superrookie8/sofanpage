@@ -2,18 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
 	try {
-		const token = req.headers.get("authorization");
-		if (!token) {
-			throw new Error("Authorization header missing");
-		}
-
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get/events`,
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/get/events`,
 			{
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: token,
 					Pragma: "no-cache",
 					"Cache-Control": "no-cache, no-store, must-revalidate",
 				},
