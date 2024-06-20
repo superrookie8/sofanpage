@@ -116,6 +116,7 @@ const Login: React.FC = () => {
 							value={nickname}
 							onChange={handleNicknameChange}
 							placeholder="닉네임"
+							autoComplete="username"
 						></input>
 						<div
 							className="w-[400px] bg-yellow-300"

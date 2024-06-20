@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 interface Event {
 	_id: string;
@@ -17,7 +17,7 @@ const EventList: React.FC = () => {
 		photoIndex: number;
 	} | null>(null);
 
-	const fetchEvents = async () => {
+	const fetchEvents = useCallback(async () => {
 		try {
 			const token = sessionStorage.getItem("admin-token") || "";
 			const response = await fetch("/api/admin/getevents", {
@@ -37,9 +37,9 @@ const EventList: React.FC = () => {
 		} catch (error) {
 			console.error("Error fetching events:", error);
 		}
-	};
+	}, []);
 
-	const deletePhoto = async () => {
+	const deletePhoto = useCallback(async () => {
 		if (!photoToDelete) return;
 
 		const { eventId, photoIndex } = photoToDelete;
@@ -64,9 +64,9 @@ const EventList: React.FC = () => {
 		} finally {
 			setPhotoToDelete(null);
 		}
-	};
+	}, [photoToDelete, fetchEvents]);
 
-	const deleteEvent = async () => {
+	const deleteEvent = useCallback(async () => {
 		if (!eventToDelete) return;
 
 		try {
@@ -90,16 +90,16 @@ const EventList: React.FC = () => {
 		} finally {
 			setEventToDelete(null);
 		}
-	};
+	}, [eventToDelete, fetchEvents]);
 
 	useEffect(() => {
 		fetchEvents();
-	}, []);
+	}, [fetchEvents]);
 
 	return (
 		<div>
 			<h2 className="text-xl mb-4">Events List</h2>
-			{events.map((event, index) => (
+			{events.map((event) => (
 				<div key={event._id} className="mb-4 p-4 border rounded">
 					<h3 className="text-lg font-bold">{event.title}</h3>
 					<p className="text-gray-700">{event.description}</p>
@@ -155,51 +155,52 @@ const EventList: React.FC = () => {
 
 			{/* 사진 삭제 확인 모달 */}
 			{photoToDelete && (
-				<div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
-					<div className="bg-white p-4 rounded">
-						<p>Are you sure you want to delete this photo?</p>
-						<div className="mt-4 flex justify-end space-x-2">
-							<button
-								onClick={() => setPhotoToDelete(null)}
-								className="px-4 py-2 bg-gray-300 rounded"
-							>
-								Cancel
-							</button>
-							<button
-								onClick={deletePhoto}
-								className="px-4 py-2 bg-red-500 text-white rounded"
-							>
-								Delete
-							</button>
-						</div>
-					</div>
-				</div>
+				<ConfirmationModal
+					message="Are you sure you want to delete this photo?"
+					onCancel={() => setPhotoToDelete(null)}
+					onConfirm={deletePhoto}
+				/>
 			)}
 
 			{/* 이벤트 삭제 확인 모달 */}
 			{eventToDelete && (
-				<div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
-					<div className="bg-white p-4 rounded">
-						<p>
-							Are you sure you want to delete this event and all its photos?
-						</p>
-						<div className="mt-4 flex justify-end space-x-2">
-							<button
-								onClick={() => setEventToDelete(null)}
-								className="px-4 py-2 bg-gray-300 rounded"
-							>
-								Cancel
-							</button>
-							<button
-								onClick={deleteEvent}
-								className="px-4 py-2 bg-red-500 text-white rounded"
-							>
-								Delete
-							</button>
-						</div>
-					</div>
-				</div>
+				<ConfirmationModal
+					message="Are you sure you want to delete this event and all its photos?"
+					onCancel={() => setEventToDelete(null)}
+					onConfirm={deleteEvent}
+				/>
 			)}
+		</div>
+	);
+};
+
+interface ConfirmationModalProps {
+	message: string;
+	onCancel: () => void;
+	onConfirm: () => void;
+}
+
+const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
+	message,
+	onCancel,
+	onConfirm,
+}) => {
+	return (
+		<div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
+			<div className="bg-white p-4 rounded">
+				<p>{message}</p>
+				<div className="mt-4 flex justify-end space-x-2">
+					<button onClick={onCancel} className="px-4 py-2 bg-gray-300 rounded">
+						Cancel
+					</button>
+					<button
+						onClick={onConfirm}
+						className="px-4 py-2 bg-red-500 text-white rounded"
+					>
+						Delete
+					</button>
+				</div>
+			</div>
 		</div>
 	);
 };

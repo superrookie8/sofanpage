@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface ImageSliderProps {
 	images: string[];
@@ -7,33 +7,72 @@ interface ImageSliderProps {
 const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const sliderRef = useRef<HTMLDivElement>(null);
+	const intervalRef = useRef<NodeJS.Timeout | null>(null);
+	const startX = useRef(0);
+	const scrollLeft = useRef(0);
+
+	useEffect(() => {
+		intervalRef.current = setInterval(() => {
+			setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+		}, 3000);
+
+		return () => {
+			if (intervalRef.current) {
+				clearInterval(intervalRef.current);
+			}
+		};
+	}, [images.length]);
 
 	const nextImage = () => {
-		setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, images.length - 3));
+		setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
 	};
 
 	const prevImage = () => {
-		setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+		setCurrentIndex(
+			(prevIndex) => (prevIndex - 1 + images.length) % images.length
+		);
 	};
 
 	const handleMouseDown = (e: React.MouseEvent) => {
-		const startX = e.pageX;
-		const scrollLeft = sliderRef.current?.scrollLeft ?? 0;
-
-		const handleMouseMove = (e: MouseEvent) => {
-			if (sliderRef.current) {
-				const x = e.pageX - startX;
-				sliderRef.current.scrollLeft = scrollLeft - x;
-			}
-		};
-
-		const handleMouseUp = () => {
-			window.removeEventListener("mousemove", handleMouseMove);
-			window.removeEventListener("mouseup", handleMouseUp);
-		};
-
+		startX.current = e.pageX;
+		scrollLeft.current = sliderRef.current?.scrollLeft ?? 0;
 		window.addEventListener("mousemove", handleMouseMove);
 		window.addEventListener("mouseup", handleMouseUp);
+	};
+
+	const handleMouseMove = (e: MouseEvent) => {
+		if (sliderRef.current) {
+			const x = e.pageX - startX.current;
+			sliderRef.current.scrollLeft = scrollLeft.current - x;
+		}
+	};
+
+	const handleMouseUp = () => {
+		window.removeEventListener("mousemove", handleMouseMove);
+		window.removeEventListener("mouseup", handleMouseUp);
+	};
+
+	const handleTouchStart = (e: React.TouchEvent) => {
+		startX.current = e.touches[0].pageX;
+		scrollLeft.current = sliderRef.current?.scrollLeft ?? 0;
+	};
+
+	const handleTouchMove = (e: React.TouchEvent) => {
+		if (sliderRef.current) {
+			const x = e.touches[0].pageX - startX.current;
+			sliderRef.current.scrollLeft = scrollLeft.current - x;
+		}
+	};
+
+	const handleTouchEnd = () => {
+		const diff = startX.current - (sliderRef.current?.scrollLeft ?? 0);
+		if (Math.abs(diff) > 50) {
+			if (diff > 0) {
+				nextImage();
+			} else {
+				prevImage();
+			}
+		}
 	};
 
 	return (
@@ -43,6 +82,9 @@ const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
 				style={{ transform: `translateX(-${(currentIndex * 100) / 3}%)` }}
 				ref={sliderRef}
 				onMouseDown={handleMouseDown}
+				onTouchStart={handleTouchStart}
+				onTouchMove={handleTouchMove}
+				onTouchEnd={handleTouchEnd}
 			>
 				{images.map((image, index) => (
 					<div
