@@ -1,15 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const isDevelopment = process.env.NODE_ENV === "development";
+
 export async function GET(req: NextRequest) {
 	try {
+		const { searchParams } = new URL(req.url);
+		const season = searchParams.get("season");
+
 		const backendResponse = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get/profile`,
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get/schedule?season=${season}`,
 			{
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				cache: "no-store",
+				cache: isDevelopment ? "no-store" : "default",
 			}
 		);
 

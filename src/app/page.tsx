@@ -18,7 +18,7 @@ export default function Page() {
 	return (
 		<main className="min-h-screen flex justify-center items-center">
 			<div className="flex flex-col items-center justify-center min-h-screen">
-				BNK NO 6. 이소희
+				BNK NO 36. 이소희
 				{/* 전체 화면을 가운데 정렬하는 컨테이너 */}
 				<div className="mt-8 h-[580px] w-[1440px]">
 					<Opening />

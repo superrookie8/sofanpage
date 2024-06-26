@@ -57,6 +57,7 @@ const AdminLogin: React.FC = () => {
 						value={username}
 						onChange={(e) => setUsername(e.target.value)}
 						className="w-full px-3 py-2 border rounded"
+						autoComplete="username"
 					/>
 				</div>
 				<div className="mb-4">

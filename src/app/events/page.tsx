@@ -1,22 +1,54 @@
 "use client";
 import Link from "next/link";
 import Header from "@/components/header";
-import { events } from "@/data/events";
-import Sidebar from "@/components/sidebar";
 import useAuth from "@/hooks/useAuth";
+import { useEffect, useState } from "react";
+import VerticalCarousel from "@/components/vertialCarousel";
 
-interface Props {}
+interface Event {
+	_id: string;
+	title: string;
+	url: string;
+	description: string;
+	checkFields: {
+		check_1: string;
+		check_2: string;
+		check_3: string;
+	};
+	photos: string[];
+}
 
-const Events: React.FC<Props> = (props) => {
+const Events: React.FC = () => {
+	const [events, setEvents] = useState<Event[]>([]);
 	useAuth();
+
+	useEffect(() => {
+		const fetchEvents = async () => {
+			try {
+				const response = await fetch("/api/getevents", {
+					method: "GET",
+					cache: "no-store",
+				});
+				const data = await response.json();
+				if (response.ok) {
+					setEvents(data.events);
+				} else {
+					console.error("Failed to fetch data", data);
+				}
+			} catch (error) {
+				console.error("Error fetching data", error);
+			}
+		};
+		fetchEvents();
+	}, []);
+
 	return (
 		<div>
 			<Header pathname="" />
 			<div className="flex justify-center items-center">
-				<div className="bg-red-500 min-h-screen  w-full flex justify-center p-8 relative">
-					<Sidebar />
-					<div className="w-[1200px] h-auto flex flex-col ">
-						<div className=" w-full  overflow-x-auto flex flex-col justify-center items-center">
+				<div className="bg-red-500 min-h-screen w-full flex justify-center p-8 relative">
+					<div className="w-[1200px] h-auto flex flex-col">
+						<div className="w-full overflow-x-auto flex flex-col justify-center items-center">
 							{events.map((event, index) => (
 								<div
 									key={index}
@@ -27,7 +59,7 @@ const Events: React.FC<Props> = (props) => {
 											{event.title}
 										</div>
 										<div
-											className="mt-2 mb-4 flex  text-center justify-center items-center italic"
+											className="mt-2 mb-4 flex text-center justify-center items-center italic"
 											style={{ whiteSpace: "pre-line" }}
 										>
 											{event.description}
@@ -35,7 +67,7 @@ const Events: React.FC<Props> = (props) => {
 										<div className="flex justify-center items-center">
 											{event.url ? (
 												<Link href={event.url}>
-													<button className="w-auto bg-blue-500 text-white font-bold py-2 px-4 rounded ">
+													<button className="w-auto bg-blue-500 text-white font-bold py-2 px-4 rounded">
 														{event.title}
 													</button>
 												</Link>
@@ -44,25 +76,34 @@ const Events: React.FC<Props> = (props) => {
 											)}
 										</div>
 										<div className="flex justify-center items-center flex-col">
-											{event.check_one ? (
-												<div className="mt-8 ml-2">✓{event.check_one}</div>
-											) : (
-												<span></span>
+											{event.checkFields.check_1 && (
+												<div className="mt-8 ml-2">
+													✓{event.checkFields.check_1}
+												</div>
 											)}
-											{event.check_two ? (
-												<div className="mt-8 ml-2">✓{event.check_two}</div>
-											) : (
-												<span></span>
+											{event.checkFields.check_2 && (
+												<div className="mt-8 ml-2">
+													✓{event.checkFields.check_2}
+												</div>
 											)}
-											{event.check_three ? (
-												<div className="mt-8 ml-2">✓{event.check_three}</div>
-											) : (
-												<span></span>
+											{event.checkFields.check_3 && (
+												<div className="mt-8 ml-2">
+													✓{event.checkFields.check_3}
+												</div>
 											)}
 										</div>
 									</div>
 									<div className="bg-green-200 w-[500px] h-[400px] flex flex-col justify-center items-center">
-										여기에 캐로셀
+										{event.photos.length > 0 ? (
+											<div className="w-full h-full overflow-hidden">
+												<VerticalCarousel
+													photos={event.photos}
+													altText={event.title}
+												/>
+											</div>
+										) : (
+											<span>No photos</span>
+										)}
 									</div>
 								</div>
 							))}
