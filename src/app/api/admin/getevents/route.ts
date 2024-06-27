@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const isDevelopment = process.env.NODE_ENV === "development";
+
 export async function GET(req: NextRequest) {
 	try {
 		const token = req.headers.get("authorization");
@@ -17,7 +19,7 @@ export async function GET(req: NextRequest) {
 					Pragma: "no-cache",
 					"Cache-Control": "no-cache, no-store, must-revalidate",
 				},
-				cache: "no-store",
+				cache: isDevelopment ? "no-store" : "default",
 			}
 		);
 
