@@ -5,7 +5,7 @@ const isDevelopment = process.env.NODE_ENV === "development";
 export async function GET(req: NextRequest) {
 	try {
 		const backendResponse = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get/profile`,
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/get_schedules`,
 			{
 				method: "GET",
 				headers: {
@@ -19,9 +19,8 @@ export async function GET(req: NextRequest) {
 		console.log("backendData", backendData);
 
 		if (!backendResponse.ok) {
-			throw new Error(backendData.message || "Failed to get profile.");
+			throw new Error(backendData.message || "Failed to get schedule.");
 		}
-
 		return NextResponse.json(backendData, { status: 200 });
 	} catch (error: any) {
 		console.error("Error:", error);
