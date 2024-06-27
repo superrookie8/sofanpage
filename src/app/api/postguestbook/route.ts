@@ -2,16 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
 	try {
-		const { name, message, photo, date } = await req.json();
-
+		const formData = await req.formData();
 		const response = await fetch(
 			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/post_guestbook`,
 			{
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ name, message, photo, date }),
+				body: formData,
 			}
 		);
 

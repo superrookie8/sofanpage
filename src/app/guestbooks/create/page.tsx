@@ -21,7 +21,7 @@ const GuestBookCreate: React.FC = () => {
 	const params = useParams<{ category: string }>();
 	const router = useRouter();
 	const [write, setWrite] = useState("");
-	const [photo, setPhoto] = useState("");
+	const [photo, setPhoto] = useState<string | null>(null);
 	const currentPage = useRecoilValue(pageState);
 
 	const handlerOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -38,29 +38,34 @@ const GuestBookCreate: React.FC = () => {
 			return;
 		}
 
-		const data: PostData = {
-			name: user.nickname,
-			message: write,
-			photo: currentPage === "photoAndText" ? photo : undefined,
-			date: new Date().toISOString(),
-		};
+		const formData = new FormData();
+		formData.append("name", user.nickname);
+		formData.append("message", write);
+		formData.append("date", new Date().toISOString());
+		if (currentPage === "photoAndText" && photo) {
+			const response = await fetch(photo);
+			const blob = await response.blob();
+			const file = new File([blob], "photo.jpg", { type: blob.type });
+			formData.append("photo", file);
+		}
 
 		try {
 			const response = await fetch("/api/postguestbook", {
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(data),
+				body: formData,
 			});
 
 			if (!response.ok) {
-				throw new Error("Network response was not ok");
+				const errorData = await response.json();
+				throw new Error(errorData.message || "Network response was not ok");
 			}
 
 			const responseData = await response.json();
 			console.log(responseData);
 			alert("Guestbook entry added successfully");
+			// 사진 업로드 후 미리보기 상태 초기화
+			setPhoto(null);
+			setWrite("");
 			router.push(`/guestbooks/read`);
 		} catch (error) {
 			console.error("There was a problem with the fetch operation:", error);
@@ -85,6 +90,7 @@ const GuestBookCreate: React.FC = () => {
 											<textarea
 												className="w-[350px] h-[300px] overflow-auto"
 												onChange={handlerOnChange}
+												value={write}
 											></textarea>
 										</div>
 									</div>
@@ -104,6 +110,7 @@ const GuestBookCreate: React.FC = () => {
 								<textarea
 									className="w-[450px] h-[300px] mt-[32px] p-2 overflow-auto"
 									onChange={handlerOnChange}
+									value={write}
 								></textarea>
 							</div>
 							<div className=" flex flex-row justify-center  ">
