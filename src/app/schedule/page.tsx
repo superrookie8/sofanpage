@@ -22,7 +22,6 @@ const Schedule: React.FC = () => {
 			<Header pathname="" />
 			<div className="flex justify-center items-center">
 				<div className="bg-red-500  min-h-screen w-full flex justify-center p-8 relative">
-					<Sidebar />
 					<div className=" min-w-[1200px] flex">
 						<div className="bg-red-300 h-[660px]">
 							<Calendar />
