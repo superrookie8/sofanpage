@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const isDevelopment = process.env.NODE_ENV === "development";
+
 export async function GET(req: NextRequest) {
 	try {
 		const response = await fetch(
@@ -9,6 +11,7 @@ export async function GET(req: NextRequest) {
 				headers: {
 					"Content-Type": "application/json",
 				},
+				cache: isDevelopment ? "no-store" : "default",
 			}
 		);
 
@@ -17,7 +20,9 @@ export async function GET(req: NextRequest) {
 		}
 
 		const data = await response.json();
-		return NextResponse.json(data, { status: 200 });
+		return new NextResponse(JSON.stringify(data), {
+			status: 200,
+		});
 	} catch (error: any) {
 		return NextResponse.json({ message: error.message }, { status: 500 });
 	}

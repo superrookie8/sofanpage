@@ -33,7 +33,7 @@ const useAuth = () => {
 		};
 
 		fetchUser();
-	}, [user, router]);
+	}, [router]);
 
 	return user;
 };

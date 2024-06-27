@@ -1,13 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import Image from "next/image";
 
 interface GuestBookEntry {
+	_id: string;
 	name: string;
 	message: string;
-	photo?: string;
 	date: string;
+	photo_data?: string;
 }
 
 const fetchGuestbookEntries = async (): Promise<GuestBookEntry[]> => {
@@ -34,6 +34,7 @@ const GuestBookCardList: React.FC = () => {
 			try {
 				const data = await fetchGuestbookEntries();
 				setGuestbookEntries(data);
+				console.log(data);
 			} catch (error) {
 				console.error("Failed to fetch guestbook entries:", error);
 			}
@@ -44,19 +45,18 @@ const GuestBookCardList: React.FC = () => {
 
 	return (
 		<div className="p-8 bg-red-300 w-full">
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-				{guestbookEntries.map((entry, index) => (
+			<div className="bg-blue-300 w-full h-[401px] place-items-center grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4  h-screen overflow-y-auto">
+				{guestbookEntries.map((entry) => (
 					<div
-						key={index}
-						className="w-[280px] h-[400px] bg-white shadow-md rounded-lg overflow-hidden flex flex-col"
+						key={entry._id}
+						className="w-[260px] h-[400px] bg-white shadow-md rounded-lg overflow-hidden flex flex-col"
 					>
-						{entry.photo && (
+						{entry.photo_data && (
 							<div className="relative w-full h-[70%] overflow-hidden">
-								<Image
-									src={entry.photo}
+								<img
+									src={`data:image/jpeg;base64,${entry.photo_data}`}
 									alt="Guestbook entry"
-									fill
-									style={{ objectFit: "cover" }}
+									className="object-cover w-full h-full"
 								/>
 							</div>
 						)}
