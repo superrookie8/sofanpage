@@ -1,20 +1,28 @@
-"use client";
-import { useRef, ChangeEvent } from "react";
+import React, { useRef, ChangeEvent } from "react";
 import { useRecoilState } from "recoil";
 import { photoPreviewState } from "@/states/photoPreviewState";
-import Image from "next/legacy/image";
+import Image from "next/image";
 
-const PhotoUpload: React.FC = () => {
+interface PhotoUploadProps {
+	onPhotoUpload: (photoUrl: string) => void;
+}
+
+const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotoUpload }) => {
 	const [photoPreview, setPhotoPreview] = useRecoilState<string | null>(
 		photoPreviewState
 	);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+	const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
 		if (file) {
-			const previewUrl = URL.createObjectURL(file);
-			setPhotoPreview(previewUrl);
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				const base64String = reader.result as string;
+				setPhotoPreview(base64String);
+				onPhotoUpload(base64String);
+			};
+			reader.readAsDataURL(file);
 		}
 	};
 
@@ -29,26 +37,23 @@ const PhotoUpload: React.FC = () => {
 				ref={fileInputRef}
 				onChange={handleFileChange}
 				accept="image/*"
-				className="hidden" // Tailwind CSS에서는 `display: none;`을 `hidden` 클래스로 적용합니다.
+				className="hidden"
 			/>
 			{photoPreview ? (
 				<div className="w-[350px] h-[300px] relative rounded-lg overflow-hidden">
 					<Image
 						src={photoPreview}
 						alt="Preview"
-						layout="fill"
-						objectFit="contain"
+						fill
+						style={{ objectFit: "contain" }}
 					/>
 				</div>
 			) : (
 				<div
 					onClick={handleUploadClick}
-					className=" relative flex justify-center items-center text-center space-y-2"
+					className="relative flex justify-center items-center text-center space-y-2"
 				>
-					{/* SVG 아이콘 및 텍스트 */}
-					<svg
-						className="w-[350px] h-[300px] mx-auto" /* SVG 내용 생략 */
-					></svg>
+					<svg className="w-[350px] h-[300px] mx-auto"></svg>
 					<p className="absolute">사진 업로드</p>
 				</div>
 			)}

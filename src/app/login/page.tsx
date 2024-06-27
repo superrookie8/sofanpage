@@ -100,8 +100,10 @@ const Login: React.FC = () => {
 				<Image
 					src="/images/supersohee2.png"
 					alt="LOGO Image"
-					layout="fill"
-					objectFit="contain"
+					fill
+					sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 500px"
+					style={{ objectFit: "contain" }}
+					priority
 				/>
 			</div>
 			<form

@@ -27,9 +27,11 @@ const Header: React.FC<Props> = () => {
 						<Image
 							src="/images/supersoheeheader.png"
 							alt="Header"
-							fill
+							width={1920}
+							height={1080}
 							style={{ objectFit: "contain" }}
 							className="absolute"
+							priority
 						/>
 					</div>
 					<div className="flex items-center space-x-8 absolute pt-8 pr-4">
