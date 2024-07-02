@@ -1,5 +1,5 @@
 "use client";
-import Opening from "../components/opening";
+import Opening from "../components/Opening";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 

@@ -1,12 +1,12 @@
 "use client";
 import { useRouter, useParams } from "next/navigation";
 import { useState } from "react";
-import { GuestBookButtons } from "@/components/buttons";
-import DateTimeDisplay from "@/components/date";
+import { GuestBookButtons } from "@/components/Buttons";
+import DateTimeDisplay from "@/components/Date";
 import { useRecoilValue } from "recoil";
 import { pageState } from "@/states/pageState";
-import PhotoUpload from "@/components/photoUpload";
-import Header from "@/components/header";
+import PhotoUpload from "@/components/PhotoUpload";
+import Header from "@/components/Header";
 import useAuth from "@/hooks/useAuth";
 
 interface PostData {

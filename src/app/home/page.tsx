@@ -1,9 +1,9 @@
 "use client";
 
-import Profile from "@/components/profile";
-import Stats from "@/components/stats";
-import GetPhotos from "@/components/photos";
-import Header from "@/components/header";
+import Profile from "@/components/Profile";
+import Stats from "@/components/Stats";
+import GetPhotos from "@/components/Photos";
+import Header from "@/components/Header";
 import Image from "next/image";
 import { useState } from "react";
 import useAuth from "@/hooks/useAuth";

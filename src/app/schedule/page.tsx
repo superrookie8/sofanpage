@@ -1,10 +1,10 @@
 "use client";
 import { useEffect } from "react";
-import Header from "@/components/header";
-import Sidebar from "@/components/sidebar";
-import Calendar from "@/components/calender";
+import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
+import Calendar from "@/components/Calender";
 import { locations } from "@/data/schedule";
-import Map from "@/components/kakaoMap";
+import Map from "@/components/KakaoMap";
 import { useSetRecoilState } from "recoil";
 import { selectedLocationState } from "@/states/locationState";
 import useAuth from "@/hooks/useAuth";
