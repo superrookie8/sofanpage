@@ -7,7 +7,7 @@ export interface PhotoData {
 	uploadTime: string;
 }
 
-export const photoPreviewState = atom<string | null>({
+export const photoPreviewState = atom<PhotoData[]>({
 	key: "photoPreviewState",
-	default: null,
+	default: [],
 });

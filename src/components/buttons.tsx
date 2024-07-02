@@ -52,7 +52,7 @@ export const GoCreateButtons: React.FC<Props> = () => {
 		router.push(`/${pageName}`);
 	};
 	return (
-		<div className="bg-green-500 min-h-[100px] min-w-[1200px] flex absolute flex justify-center items-center bottom-0">
+		<div className="bg-green-500 min-h-[80px] min-w-[1200px] flex absolute flex justify-center items-center bottom-0">
 			<button
 				onClick={() => {
 					goToPage("guestbooks/create");

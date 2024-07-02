@@ -47,12 +47,12 @@ const AdminPhotoUpload: React.FC = () => {
 				}
 
 				// Compress the image for preview
-				const previewFile = imageCompression(file, {
+				const previewFile = await imageCompression(file, {
 					maxSizeMB: 0.2,
 					maxWidthOrHeight: PREVIEW_MAX_WIDTH,
 					useWebWorker: true,
 				});
-				const preview = URL.createObjectURL(await previewFile);
+				const preview = URL.createObjectURL(previewFile);
 
 				// Compress the image for upload
 				const uploadFile = await imageCompression(file, {
@@ -96,13 +96,8 @@ const AdminPhotoUpload: React.FC = () => {
 				);
 				formData.append("photo_ids", photo.id);
 				formData.append("upload_times", photo.uploadTime);
-
-				formData.forEach((value, key) => {
-					console.log(key, value);
-				});
 			});
 
-			console.log("good", formData);
 			const response = await fetch("/api/admin/uploadphoto", {
 				method: "POST",
 				headers: {
@@ -138,7 +133,7 @@ const AdminPhotoUpload: React.FC = () => {
 					multiple
 					className="hidden"
 				/>
-				{photoPreviews.length > 0 ? (
+				{photoPreviews && photoPreviews.length > 0 ? (
 					<div className="grid grid-cols-3 gap-4">
 						{photoPreviews.map((photo, index) => (
 							<div
@@ -156,16 +151,13 @@ const AdminPhotoUpload: React.FC = () => {
 					</div>
 				) : (
 					<div className="relative flex justify-center items-center text-center space-y-2">
-						<svg
-							className="w-[350px] h-[300px] mx-auto"
-							/* SVG 내용 생략 */
-						></svg>
+						<svg className="w-[350px] h-[300px] mx-auto"></svg>
 						<p className="absolute">사진 업로드</p>
 					</div>
 				)}
 			</div>
 			<AdminHomeButton />
-			{photoPreviews.length > 0 && (
+			{photoPreviews && photoPreviews.length > 0 && (
 				<button
 					onClick={handleUploadSubmit}
 					className="mt-4 py-2 px-4 bg-blue-500 text-white rounded"

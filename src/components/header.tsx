@@ -23,13 +23,13 @@ const Header: React.FC<Props> = () => {
 		<>
 			<header className="bg-red-500 text-white p-4">
 				<nav className="max-w-[1200px] container mx-auto flex items-front justify-end">
-					<div className="relative w-[1200px] h-[400px]">
+					<div className="relative w-[1200px] h-[200px]">
 						<Image
 							src="/images/supersoheeheader.png"
 							alt="Header"
 							width={1920}
 							height={1080}
-							style={{ objectFit: "contain" }}
+							style={{ objectFit: "fill" }}
 							className="absolute"
 							priority
 						/>
