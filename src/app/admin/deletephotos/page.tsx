@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import useAdminAuth from "@/hooks/useAdminAuth";
-import AdminHomeButton from "@/components/admin/\bAdminHomeButton";
+import AdminHomeButton from "@/components/admin/AdminHomeButton";
 
 interface Photo {
 	_id: string;

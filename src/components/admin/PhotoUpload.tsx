@@ -5,7 +5,7 @@ import { photoPreviewState } from "@/states/photoPreviewState";
 import Image from "next/legacy/image";
 import imageCompression from "browser-image-compression";
 import useAdminAuth from "@/hooks/useAdminAuth";
-import AdminHomeButton from "./\bAdminHomeButton";
+import AdminHomeButton from "./AdminHomeButton";
 
 interface PhotoData {
 	id: string;
