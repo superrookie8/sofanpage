@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function DELETE(req: NextRequest) {
 	const token = req.headers.get("Authorization")?.split(" ")[1];
 
 	if (!token) {
@@ -8,10 +8,20 @@ export async function GET(req: NextRequest) {
 	}
 
 	try {
+		const { searchParams } = new URL(req.url);
+		const entryId = searchParams.get("entry_id");
+
+		if (!entryId) {
+			return NextResponse.json(
+				{ message: "Entry ID is required" },
+				{ status: 400 }
+			);
+		}
+
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/get/userinfo`,
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/delete/guestbook?entry_id=${entryId}`,
 			{
-				method: "GET",
+				method: "DELETE",
 				headers: {
 					Authorization: `Bearer ${token}`,
 					"Content-Type": "application/json",
@@ -20,7 +30,8 @@ export async function GET(req: NextRequest) {
 		);
 
 		if (!response.ok) {
-			throw new Error("Failed to fetch user info");
+			const errorData = await response.json();
+			throw new Error(errorData.message);
 		}
 
 		const data = await response.json();

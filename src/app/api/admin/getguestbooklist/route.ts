@@ -12,10 +12,11 @@ export async function GET(req: NextRequest) {
 	const { searchParams } = new URL(req.url);
 	const page = searchParams.get("page") || "1";
 	const pageSize = searchParams.get("page_size") || "10";
+	const name = searchParams.get("name") || ""; // 추가된 검색 파라미터
 
 	try {
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get_guestbook_entries?page=${page}&page_size=${pageSize}`,
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get_guestbook_entries?page=${page}&page_size=${pageSize}&name=${name}`,
 			{
 				method: "GET",
 				headers: {
