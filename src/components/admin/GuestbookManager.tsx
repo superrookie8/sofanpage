@@ -8,7 +8,8 @@ import { useRouter } from "next/navigation";
 
 const fetchGuestbookLists = async (
 	page: number,
-	pageSize: number
+	pageSize: number,
+	name?: string
 ): Promise<{ entries: GuestBookEntry[]; total_entries: number }> => {
 	const token = sessionStorage.getItem("admin-token");
 
@@ -16,16 +17,22 @@ const fetchGuestbookLists = async (
 		throw new Error("You are not authorized to perform this action.");
 	}
 
-	const response = await fetch(
-		`/api/admin/getguestbooklist?page=${page}&page_size=${pageSize}`,
-		{
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${token}`,
-			},
-		}
+	const url = new URL(
+		`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get_guestbook_entries`
 	);
+	url.searchParams.append("page", page.toString());
+	url.searchParams.append("page_size", pageSize.toString());
+	if (name) {
+		url.searchParams.append("name", name);
+	}
+
+	const response = await fetch(url.toString(), {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+	});
 
 	if (!response.ok) {
 		throw new Error("Network response was not ok");
@@ -76,24 +83,27 @@ const GuestBookLists: React.FC = () => {
 	const [error, setError] = useState<string | null>(null);
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 	const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
+	const [searchName, setSearchName] = useState<string>("");
+
+	const fetchData = async (name?: string) => {
+		try {
+			const { entries, total_entries } = await fetchGuestbookLists(
+				page,
+				pageSize,
+				name
+			);
+			setGuestBookLists(entries || []);
+			setTotalEntries(total_entries || 0);
+			console.log(entries);
+		} catch (error: any) {
+			setError(error.message);
+			console.error("Failed to fetch guestbook entries:", error);
+		}
+	};
 
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const { entries, total_entries } = await fetchGuestbookLists(
-					page,
-					pageSize
-				);
-				setGuestBookLists(entries || []);
-				setTotalEntries(total_entries || 0);
-				console.log(entries);
-			} catch (error: any) {
-				setError(error.message);
-				console.error("Failed to fetch guestbook entries:", error);
-			}
-		};
-		fetchData();
-	}, [page, pageSize]);
+		fetchData(searchName);
+	}, [page, pageSize, searchName]);
 
 	const handleDelete = async (entryId: string) => {
 		try {
@@ -138,9 +148,30 @@ const GuestBookLists: React.FC = () => {
 		}
 	};
 
+	const handleSearch = (event: React.FormEvent) => {
+		event.preventDefault();
+		setPage(1);
+		fetchData(searchName);
+	};
+
 	return (
 		<div className="relative h-screen bg-blue-200 p-4">
 			{error && <div className="text-red-500 mb-4">{error}</div>}
+			<form onSubmit={handleSearch} className="mb-4">
+				<input
+					type="text"
+					value={searchName}
+					onChange={(e) => setSearchName(e.target.value)}
+					placeholder="Search by name"
+					className="p-2 border rounded"
+				/>
+				<button
+					type="submit"
+					className="ml-2 px-4 py-2 bg-blue-500 text-white rounded"
+				>
+					Search
+				</button>
+			</form>
 			<div className="overflow-y-auto h-[calc(100%-4rem)] mb-4">
 				<ul>
 					{guestbooklists.map((guestbook) => (
@@ -158,7 +189,7 @@ const GuestBookLists: React.FC = () => {
 										<img
 											src={`data:image/jpeg;base64,${guestbook.photo_data}`}
 											alt="Guestbook entry"
-											className="w-12" // or style={{ width: "300px" }}
+											className="w-12"
 										/>
 									) : (
 										"사진없음"

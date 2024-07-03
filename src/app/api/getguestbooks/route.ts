@@ -7,9 +7,10 @@ export async function GET(req: NextRequest) {
 		const { searchParams } = new URL(req.url);
 		const page = searchParams.get("page") || "1";
 		const pageSize = searchParams.get("page_size") || "10";
+		const user = searchParams.get("user") || "";
 
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/get_guestbook_entries?page=${page}&page_size=${pageSize}`,
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/get_guestbook_entries?user=${user}&page=${page}&page_size=${pageSize}`,
 			{
 				method: "GET",
 				headers: {

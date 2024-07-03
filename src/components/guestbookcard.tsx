@@ -132,7 +132,7 @@ const GuestBookCardList: React.FC = () => {
 
 	const renderNoPhotoEntries = () => (
 		<div className="bg-red-300 w-full flex items-start">
-			<div className="bg-blue-300 w-full place-items-center overflow-y-auto">
+			<div className="bg-blue-300 w-full h-[350px] overflow-y-auto place-items-center">
 				{noPhotoEntries.map((entry, index) => (
 					<div
 						key={entry._id}

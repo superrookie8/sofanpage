@@ -1,6 +1,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 interface Props {
 	pathname: string;
@@ -9,6 +10,13 @@ interface Props {
 const Header: React.FC<Props> = () => {
 	const router = useRouter();
 	const pathname = usePathname();
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+	useEffect(() => {
+		const token = sessionStorage.getItem("token");
+		setIsLoggedIn(!!token);
+	}, []);
+
 	const linkStyle = (path: string) => {
 		const isActive =
 			path === "/profile" ? pathname === path : pathname.startsWith(path);
@@ -19,6 +27,7 @@ const Header: React.FC<Props> = () => {
 		sessionStorage.removeItem("token"); // 토큰을 세션 스토리지에서 제거
 		router.push("/login"); // 로그인 페이지로 리디렉션
 	};
+
 	return (
 		<>
 			<header className="bg-red-500 text-white p-4">
@@ -50,12 +59,19 @@ const Header: React.FC<Props> = () => {
 						<Link href="/guestbooks/read" className={linkStyle("/guestbooks/")}>
 							Guestbooks
 						</Link>
-						<button
-							onClick={handleLogout}
-							className="px-2 py-1 rounded hover:bg-red-400 active:bg-red-600 focus:outline-none"
-						>
-							Logout
-						</button>
+						{isLoggedIn && (
+							<Link href="/mypage" className={linkStyle("/mypage")}>
+								Mypage
+							</Link>
+						)}
+						{isLoggedIn && (
+							<button
+								onClick={handleLogout}
+								className="px-2 py-1 rounded hover:bg-red-400 active:bg-red-600 focus:outline-none"
+							>
+								Logout
+							</button>
+						)}
 					</div>
 				</nav>
 			</header>
