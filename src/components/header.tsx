@@ -30,20 +30,9 @@ const Header: React.FC<Props> = () => {
 
 	return (
 		<>
-			<header className="bg-red-500 text-white p-4">
-				<nav className="max-w-[1200px] container mx-auto flex items-front justify-end">
-					<div className="relative w-[1200px] h-[200px]">
-						<Image
-							src="/images/supersoheeheader.png"
-							alt="Header"
-							width={1920}
-							height={1080}
-							style={{ objectFit: "fill" }}
-							className="absolute"
-							priority
-						/>
-					</div>
-					<div className="flex items-center space-x-8 absolute pt-8 pr-4">
+			<header className="w-full bg-white text-red p-4">
+				<nav className="container mx-auto flex justify-between items-center">
+					<div className="flex items-center space-x-8 ml-auto">
 						<Link href="/home" className={linkStyle("/home")}>
 							Home
 						</Link>

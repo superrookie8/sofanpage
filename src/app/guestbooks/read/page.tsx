@@ -1,9 +1,9 @@
 "use client";
 
-import { GoCreateButtons } from "@/components/Buttons";
-import Header from "@/components/Header";
+import { GoCreateButtons } from "@/components/buttons";
+import Header from "@/components/header";
 import Sidebar from "@/components/Sidebar";
-import GuestBookCardList from "@/components/GuestBookCard";
+import GuestBookCardList from "@/components/guestbookcard";
 import useAuth from "@/hooks/useAuth";
 
 const GuestBookList: React.FC = (props) => {

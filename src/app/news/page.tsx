@@ -1,10 +1,7 @@
 "use client";
-import Header from "@/components/Header";
-import Sidebar from "@/components/Sidebar";
-import useAuth from "@/hooks/useAuth";
+import Header from "@/components/header";
 
 export default function News() {
-	useAuth();
 	// const resp = await fetch(`localhost:3000/${props.params.news}`, {
 	// 	cache: "no-store",
 	// });

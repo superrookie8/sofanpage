@@ -28,7 +28,6 @@ const Calendar: React.FC = () => {
 			try {
 				const response = await fetch("/api/getschedule");
 				const data = await response.json();
-				// 반환된 데이터가 배열인지 확인
 				if (Array.isArray(data)) {
 					setSchedules(data);
 				} else {
@@ -43,7 +42,7 @@ const Calendar: React.FC = () => {
 	}, []);
 
 	const weekDayHeader = weekDays.map((day) => (
-		<div key={day} className="text-center font-bold">
+		<div key={day} className="text-center font-bold text-xs md:text-sm">
 			{day}
 		</div>
 	));
@@ -81,9 +80,9 @@ const Calendar: React.FC = () => {
 		return todaySchedules.map((schedule, index) => (
 			<div
 				key={index}
-				className={`mt-2 text-us ${
+				className={`mt-1 text-[10px] ${
 					schedule.isHome ? "bg-red-200" : "bg-blue-200"
-				}`}
+				} rounded p-1`}
 			>
 				<span
 					className="cursor-pointer"
@@ -97,27 +96,38 @@ const Calendar: React.FC = () => {
 	};
 
 	return (
-		<div className="w-[700px] flex flex-col items-center p-5">
+		<div className="w-full max-w-[700px] flex flex-col items-center p-5">
 			<div className="flex justify-between w-full mb-5">
-				<button onClick={previousMonth} className="text-xl font-semibold">
+				<button
+					onClick={previousMonth}
+					className="bg-transparent border-none text-xl font-semibold cursor-pointer"
+				>
 					{"<"}
 				</button>
-				<span>{format(currentMonth, "MMMM yyyy")}</span>
-				<button onClick={nextMonth} className="text-xl font-semibold">
+				<span className="text-xl font-semibold">
+					{format(currentMonth, "MMMM yyyy")}
+				</span>
+				<button
+					onClick={nextMonth}
+					className="bg-transparent border-none text-xl font-semibold cursor-pointer"
+				>
 					{">"}
 				</button>
 			</div>
 			<div className="grid grid-cols-7 gap-1 w-full">
 				{weekDayHeader}
 				{emptyDays.map((_, index) => (
-					<div key={`empty-${index}`} className="bg-gray-200 h-20"></div>
+					<div
+						key={`empty-${index}`}
+						className="bg-gray-200 h-20 md:h-24 lg:h-28"
+					></div>
 				))}
 				{daysInCurrentMonth.map((day) => (
 					<div
 						key={day.toString()}
-						className="bg-gray-200 h-20 flex flex-col p-1"
+						className="bg-gray-200 flex flex-col p-1 h-20 md:h-24 lg:h-28"
 					>
-						<span className="text-sm">{format(day, "d")}</span>
+						<span className="text-xs md:text-sm">{format(day, "d")}</span>
 						{renderGameSchedule(day)}
 					</div>
 				))}

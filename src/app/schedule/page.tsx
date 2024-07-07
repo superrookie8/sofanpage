@@ -1,32 +1,30 @@
 "use client";
 import { useEffect } from "react";
-import Header from "@/components/Header";
-import Sidebar from "@/components/Sidebar";
-import Calendar from "@/components/Calender";
+import Header from "@/components/header";
+import Calendar from "@/components/calender";
 import { locations } from "@/data/schedule";
 import Map from "@/components/KakaoMap";
 import { useSetRecoilState } from "recoil";
 import { selectedLocationState } from "@/states/locationState";
-import useAuth from "@/hooks/useAuth";
 
 const Schedule: React.FC = () => {
-	useAuth();
 	const setSelectedLocation = useSetRecoilState(selectedLocationState);
 
 	useEffect(() => {
 		const location = locations["부산 사직실내체육관"];
 		setSelectedLocation(location);
 	}, [setSelectedLocation]);
+
 	return (
 		<div>
 			<Header pathname="" />
 			<div className="flex justify-center items-center">
-				<div className="bg-red-500  min-h-screen w-full flex justify-center p-8 relative">
-					<div className=" min-w-[1200px] flex">
-						<div className="bg-red-300 h-[660px]">
+				<div className="bg-red-500 min-h-screen w-full flex flex-col justify-center p-8">
+					<div className="flex flex-col md:flex-row md:min-w-[1200px] md:space-x-4">
+						<div className="bg-red-300 md:w-1/2 mb-4 md:mb-0 p-4 rounded-lg shadow-lg">
 							<Calendar />
 						</div>
-						<div className="bg-white w-[500px] h-[660px] relative">
+						<div className="relative bg-white md:w-1/2 h-[400px] md:h-auto p-4 rounded-lg shadow-lg">
 							<Map />
 						</div>
 					</div>

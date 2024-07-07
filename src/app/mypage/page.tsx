@@ -1,5 +1,5 @@
 "use client";
-import Header from "@/components/Header";
+import Header from "@/components/header";
 import MyPageComp from "@/components/MyPageComponent";
 import useAuth from "@/hooks/useAuth";
 

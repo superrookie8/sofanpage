@@ -1,19 +1,19 @@
 "use client";
-import Opening from "../components/Opening";
+import Opening from "@/components/opening";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Page() {
-	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	// const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-	useEffect(() => {
-		const token = sessionStorage.getItem("token");
-		if (token) {
-			setIsLoggedIn(true);
-		} else {
-			setIsLoggedIn(false);
-		}
-	}, []);
+	// useEffect(() => {
+	// 	const token = sessionStorage.getItem("token");
+	// 	if (token) {
+	// 		setIsLoggedIn(true);
+	// 	} else {
+	// 		setIsLoggedIn(false);
+	// 	}
+	// }, []);
 
 	return (
 		<main className="min-h-screen flex justify-center items-center">
@@ -26,7 +26,7 @@ export default function Page() {
 				<div className="mt-8">
 					{/* 버튼을 포함할 컨테이너 */}
 					<button className="w-[150px] bg-red-500 text-white font-bold py-2 px-4 rounded">
-						<Link href={isLoggedIn ? "/home" : "/login"}>Go!</Link>
+						<Link href={"/home"}>Go!</Link>
 					</button>
 				</div>
 			</div>
