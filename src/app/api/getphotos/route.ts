@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
 	try {
-		const token = req.headers.get("authorization") || "";
+		const url = new URL(req.url);
+		const page = url.searchParams.get("page") || "1";
+		const pageSize = url.searchParams.get("page_size") || "10";
 
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/get/photos`,
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/get/photos?page=${page}&page_size=${pageSize}`,
 			{
 				method: "GET",
 				headers: {

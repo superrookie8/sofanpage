@@ -44,23 +44,3 @@ export const GuestBookButtons: React.FC<Props> = ({ onSubmit }) => {
 		</div>
 	);
 };
-
-export const GoCreateButtons: React.FC<Props> = () => {
-	const router = useRouter();
-	// const params = useParams<{ category: string }>();
-	const goToPage = (pageName: string) => {
-		router.push(`/${pageName}`);
-	};
-	return (
-		<div className="bg-green-500 min-h-[60px] min-w-[1200px] flex absolute flex justify-center items-center bottom-0">
-			<button
-				onClick={() => {
-					goToPage("guestbooks/create");
-				}}
-				className="bg-blue-500 text-white fond-bold py-2 px-4 rounded  w-[100px] mr-2 absolute m-4"
-			>
-				create
-			</button>
-		</div>
-	);
-};

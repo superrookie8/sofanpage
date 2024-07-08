@@ -1,31 +1,8 @@
 "use client";
-import Link from "next/link";
-import Header from "@/components/header";
 import { useEffect, useState } from "react";
-import EventCarousel from "@/components/eventCarousel";
-
-interface Event {
-	_id: string;
-	title: string;
-}
-
-interface EventDetails extends Event {
-	url: string;
-	description: string;
-	checkFields: {
-		check_1: string;
-		check_2: string;
-		check_3: string;
-	};
-	photos: string[];
-}
-
-interface PhotosResponse {
-	photos: string[];
-	total_pages: number;
-	page: number;
-	page_size: number;
-}
+import EventDetail from "@/components/eventDetail";
+import EventPhotos from "@/components/eventPhotos";
+import { Event, EventDetails, PhotosResponse } from "@/data/events";
 
 const Events: React.FC = () => {
 	const [events, setEvents] = useState<Event[]>([]);
@@ -39,6 +16,7 @@ const Events: React.FC = () => {
 	const [eventPhotos, setEventPhotos] = useState<Record<string, string[]>>({});
 	const [page, setPage] = useState<number>(1);
 	const [totalPages, setTotalPages] = useState<number>(0);
+	const [modalPhoto, setModalPhoto] = useState<string | null>(null);
 
 	useEffect(() => {
 		const fetchEvents = async () => {
@@ -90,13 +68,10 @@ const Events: React.FC = () => {
 	const fetchEventPhotos = async (eventId: string, page: number) => {
 		setLoadingPhotos(true);
 		try {
-			const response = await fetch(
-				`/api/geteventphotos?id=${eventId}&page=${page}`,
-				{
-					method: "GET",
-					cache: "no-store",
-				}
-			);
+			const response = await fetch(`/api/geteventphotos?id=${eventId}&page=${page}`, {
+				method: "GET",
+				cache: "no-store",
+			});
 			const data: PhotosResponse = await response.json();
 			if (response.ok) {
 				setEventPhotos((prevPhotos) => ({
@@ -128,16 +103,27 @@ const Events: React.FC = () => {
 			return;
 		}
 		setActiveEvent(eventId);
-		await fetchEventDetails(eventId);
-		await fetchEventPhotos(eventId, 1);
+		if (!eventDetails[eventId]) {
+			await fetchEventDetails(eventId);
+		}
+		if (!eventPhotos[eventId] || eventPhotos[eventId].length === 0) {
+			await fetchEventPhotos(eventId, 1);
+		}
 		setPage(1); // Reset page for new event
+	};
+
+	const openModal = (photo: string) => {
+		setModalPhoto(photo);
+	};
+
+	const closeModal = () => {
+		setModalPhoto(null);
 	};
 
 	return (
 		<div>
-			<Header pathname="" />
-			<div className="flex justify-center items-center">
-				<div className="bg-red-500 min-h-screen w-full flex flex-col justify-center p-8 relative">
+			<div className="flex justify-center items-center bg-black bg-opacity-75">
+				<div className="min-h-screen w-full flex flex-col justify-center p-8 relative">
 					<div className="w-full max-w-[1200px] mx-auto">
 						{loading ? (
 							<div className="flex justify-center items-center">
@@ -148,91 +134,26 @@ const Events: React.FC = () => {
 								<div key={event._id} className="mb-4">
 									<button
 										onClick={() => toggleEvent(event._id)}
-										className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded mb-2"
+										className="w-full bg-red-500 text-white font-bold py-2 px-4 rounded mb-2"
 									>
 										{event.title}
 									</button>
 									{activeEvent === event._id && (
-										<div className="bg-white p-4 rounded shadow-md">
-											{loadingDetails ? (
-												<div className="flex justify-center items-center">
-													<p>Loading details...</p>
-												</div>
-											) : (
-												eventDetails[event._id] && (
-													<>
-														<div className="text-lg font-bold">
-															{eventDetails[event._id].title}
-														</div>
-														<div
-															className="mt-2 mb-4 italic"
-															style={{ whiteSpace: "pre-line" }}
-														>
-															{eventDetails[event._id].description}
-														</div>
-														<div className="flex justify-center items-center">
-															{eventDetails[event._id].url && (
-																<Link href={eventDetails[event._id].url}>
-																	<button className="w-auto bg-blue-500 text-white font-bold py-2 px-4 rounded">
-																		데뷔 5주년 이벤트 사이트
-																	</button>
-																</Link>
-															)}
-														</div>
-														<div className="mt-4 flex flex-col items-start">
-															{eventDetails[event._id].checkFields.check_1 && (
-																<div className="mt-2">
-																	✓{" "}
-																	{eventDetails[event._id].checkFields.check_1}
-																</div>
-															)}
-															{eventDetails[event._id].checkFields.check_2 && (
-																<div className="mt-2">
-																	✓{" "}
-																	{eventDetails[event._id].checkFields.check_2}
-																</div>
-															)}
-															{eventDetails[event._id].checkFields.check_3 && (
-																<div className="mt-2">
-																	✓{" "}
-																	{eventDetails[event._id].checkFields.check_3}
-																</div>
-															)}
-														</div>
-														<div className="mt-4">
-															{loadingPhotos ? (
-																<div className="flex justify-center items-center">
-																	<p>Loading photos...</p>
-																</div>
-															) : (
-																<>
-																	{eventPhotos[event._id] &&
-																	eventPhotos[event._id].length > 0 ? (
-																		<div className="w-full h-auto overflow-hidden">
-																			<EventCarousel
-																				photos={eventPhotos[event._id]}
-																				altText={eventDetails[event._id].title}
-																			/>
-																			{page < totalPages && (
-																				<button
-																					onClick={() =>
-																						loadMorePhotos(event._id)
-																					}
-																					className="mt-4 bg-blue-500 text-white font-bold py-2 px-4 rounded"
-																				>
-																					Load More Photos
-																				</button>
-																			)}
-																		</div>
-																	) : (
-																		<span>No photos</span>
-																	)}
-																</>
-															)}
-														</div>
-													</>
-												)
-											)}
+										<div className="bg-white p-4 rounded shadow-md flex flex-col lg:flex-row lg:space-x-4">
+											<EventDetail
+												eventDetails={eventDetails[event._id]}
+												loadingDetails={loadingDetails}
+											/>
+											<EventPhotos
+												eventId={event._id}
+												eventPhotos={eventPhotos[event._id] || []}
+												loadingPhotos={loadingPhotos}
+												loadMorePhotos={() => loadMorePhotos(event._id)}
+												totalPages={totalPages}
+												page={page}
+												eventTitle={eventDetails[event._id]?.title || ""}
+												openModal={openModal}
+											/>
 										</div>
 									)}
 								</div>
@@ -241,8 +162,39 @@ const Events: React.FC = () => {
 					</div>
 				</div>
 			</div>
+			{modalPhoto && (
+				<div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-75 z-50">
+					<div className="relative bg-white p-4 rounded max-w-full max-h-full md:max-w-3xl md:max-h-[80%] overflow-auto">
+						<button
+							className="absolute top-2 right-2 bg-white text-black rounded-full p-1"
+							onClick={closeModal}
+						>
+							X
+						</button>
+						<img
+							src={modalPhoto}
+							alt="Modal"
+							className="w-full h-auto object-contain"
+						/>
+					</div>
+				</div>
+			)}
+			<style jsx>{`
+                @media (max-width: 700px) {
+                    .flex {
+                        flex-direction: column;
+                    }
+                    .lg\\:w-2\\/3 {
+                        width: 100%;
+                    }
+                    .lg\\:w-1\\/3 {
+                        width: 100%;
+                    }
+                }
+            `}</style>
 		</div>
 	);
 };
 
 export default Events;
+

@@ -1,11 +1,10 @@
 "use client";
-
 import Profile from "@/components/profile";
 import Stats from "@/components/stats";
 import GetPhotos from "@/components/photos";
-import Header from "@/components/header";
 import { useState } from "react";
 import BrickBreakerGame from "@/components/brickbreakergame";
+import Background from "@/components/background";
 
 const MainPage: React.FC = () => {
 	const [showGame, setShowGame] = useState(false);
@@ -40,12 +39,12 @@ const MainPage: React.FC = () => {
 	};
 
 	return (
-		<div className="bg-white min-h-screen flex flex-col items-center">
-			<Header pathname="" />
-			<div className="bg-yellow-300 h-[400px] w-full mb-4">여기 메인 사진</div>
+		<div className="bg-transparent min-h-screen flex flex-col items-center relative ">
+			<div className="bg-yellow-300 h-[400px] w-full mb-4 z-10">
+				여기 메인 사진
+			</div>
 
-			{/* Profile Section */}
-			<div className="bg-white w-full flex justify-center">
+			<div className=" w-full flex justify-center z-10">
 				<div className="w-full max-w-6xl">
 					<div className="bg-white text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
 						프로필
@@ -56,8 +55,7 @@ const MainPage: React.FC = () => {
 				</div>
 			</div>
 
-			{/* Stats Section */}
-			<div className="bg-white w-full flex justify-center">
+			<div className=" w-full flex justify-center z-10">
 				<div className="w-full max-w-6xl">
 					<div className="bg-white text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
 						기록
@@ -68,8 +66,7 @@ const MainPage: React.FC = () => {
 				</div>
 			</div>
 
-			{/* Photos Section */}
-			<div className="bg-white w-full flex justify-center">
+			<div className=" w-full flex justify-center z-10">
 				<div className="w-full max-w-6xl">
 					<div className="bg-white text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
 						사진
@@ -82,8 +79,7 @@ const MainPage: React.FC = () => {
 				</div>
 			</div>
 
-			{/* Game Section */}
-			<div className="bg-white w-full flex justify-center">
+			<div className=" w-full flex justify-center z-10">
 				<div className="w-full max-w-6xl">
 					<div className="bg-white text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
 						게임

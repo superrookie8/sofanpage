@@ -74,7 +74,6 @@ const GuestBookCreate: React.FC = () => {
 
 	return (
 		<div>
-			<Header pathname="" />
 			<div className="flex justify-center items-center ">
 				<div className="bg-red-500 min-h-screen w-full flex justify-center p-8 relative ">
 					{currentPage === "photoAndText" ? (

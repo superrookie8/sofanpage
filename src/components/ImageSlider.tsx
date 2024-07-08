@@ -5,7 +5,7 @@ interface ImageSliderProps {
 }
 
 const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
-	const [currentIndex, setCurrentIndex] = useState(0);
+	const [currentIndex, setCurrentIndex] = useState(1);
 	const sliderRef = useRef<HTMLDivElement>(null);
 	const intervalRef = useRef<NodeJS.Timeout | null>(null);
 	const startX = useRef(0);
@@ -13,7 +13,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
 
 	useEffect(() => {
 		intervalRef.current = setInterval(() => {
-			setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+			nextImage();
 		}, 3000);
 
 		return () => {
@@ -21,16 +21,42 @@ const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
 				clearInterval(intervalRef.current);
 			}
 		};
-	}, [images.length]);
+	}, []);
+
+	useEffect(() => {
+		if (sliderRef.current) {
+			const handleTransitionEnd = () => {
+				if (currentIndex === 0) {
+					if (sliderRef.current) {
+						sliderRef.current.style.transition = "none";
+						setCurrentIndex(images.length);
+					}
+				} else if (currentIndex === images.length + 1) {
+					if (sliderRef.current) {
+						sliderRef.current.style.transition = "none";
+						setCurrentIndex(1);
+					}
+				}
+			};
+
+			sliderRef.current.addEventListener("transitionend", handleTransitionEnd);
+			return () => {
+				if (sliderRef.current) {
+					sliderRef.current.removeEventListener(
+						"transitionend",
+						handleTransitionEnd
+					);
+				}
+			};
+		}
+	}, [currentIndex, images.length]);
 
 	const nextImage = () => {
-		setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+		setCurrentIndex((prevIndex) => prevIndex + 1);
 	};
 
 	const prevImage = () => {
-		setCurrentIndex(
-			(prevIndex) => (prevIndex - 1 + images.length) % images.length
-		);
+		setCurrentIndex((prevIndex) => prevIndex - 1);
 	};
 
 	const handleMouseDown = (e: React.MouseEvent) => {
@@ -65,31 +91,44 @@ const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
 	};
 
 	const handleTouchEnd = () => {
-		const diff = startX.current - (sliderRef.current?.scrollLeft ?? 0);
-		if (Math.abs(diff) > 50) {
-			if (diff > 0) {
-				nextImage();
-			} else {
-				prevImage();
+		if (sliderRef.current) {
+			const diff = startX.current - (sliderRef.current.scrollLeft ?? 0);
+			if (Math.abs(diff) > 50) {
+				if (diff > 0) {
+					nextImage();
+				} else {
+					prevImage();
+				}
 			}
 		}
 	};
 
 	return (
-		<div className="relative w-[1100px] h-[400px] overflow-hidden flex justify-center">
+		<div className="relative w-full h-[400px] overflow-hidden flex justify-center">
 			<div
-				className="flex transition-transform duration-300"
-				style={{ transform: `translateX(-${(currentIndex * 100) / 3}%)` }}
+				className="flex transition-transform duration-300 ease-in-out"
+				style={{
+					transform: `translateX(-${currentIndex * 100}%)`,
+					width: `${(images.length + 2) * 100}%`,
+				}}
 				ref={sliderRef}
 				onMouseDown={handleMouseDown}
 				onTouchStart={handleTouchStart}
 				onTouchMove={handleTouchMove}
 				onTouchEnd={handleTouchEnd}
 			>
+				<div className="w-full flex-shrink-0 flex justify-center items-center bg-gray-200">
+					<img
+						src={images[images.length - 1]}
+						alt={`Slide ${images.length}`}
+						className="max-w-full max-h-full object-contain"
+						style={{ width: "350px", height: "350px" }}
+					/>
+				</div>
 				{images.map((image, index) => (
 					<div
 						key={index}
-						className="w-1/3 flex-shrink-0 flex justify-center items-center bg-gray-200"
+						className="w-full flex-shrink-0 flex justify-center items-center bg-gray-200"
 					>
 						<img
 							src={image}
@@ -99,6 +138,14 @@ const ImageSlider: React.FC<ImageSliderProps> = ({ images }) => {
 						/>
 					</div>
 				))}
+				<div className="w-full flex-shrink-0 flex justify-center items-center bg-gray-200">
+					<img
+						src={images[0]}
+						alt={`Slide 0`}
+						className="max-w-full max-h-full object-contain"
+						style={{ width: "350px", height: "350px" }}
+					/>
+				</div>
 			</div>
 			<button
 				className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-gray-800 text-white p-2"

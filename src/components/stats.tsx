@@ -167,10 +167,10 @@ const Stats: React.FC = () => {
 
 	return (
 		<div className="p-4">
-			<div className="mb-4 flex items-center space-x-4">
+			<div className="mb-4 flex items-center space-x-4 justify-end">
 				<select
 					onChange={handleSeasonChange}
-					className="py-2 px-4 border border-red-200 text-red-500 rounded"
+					className="py-2 px-4 border border-red-200 text-red-500 rounded focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
 				>
 					<option value="">Select a season</option>
 					{stats.map((stat) => (
