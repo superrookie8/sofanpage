@@ -20,7 +20,7 @@ const Header: React.FC<Props> = () => {
 	const linkStyle = (path: string) => {
 		const isActive =
 			path === "/profile" ? pathname === path : pathname.startsWith(path);
-		return isActive ? "bg-red-400 rounded px-2 py-1" : "";
+		return isActive ? "bg-red-200 rounded px-2 py-1" : "";
 	};
 
 	const handleLogout = () => {
@@ -30,7 +30,7 @@ const Header: React.FC<Props> = () => {
 
 	return (
 		<>
-			<header className="w-full bg-white text-red p-4">
+			<header className="w-full bg-white text-red-500 p-4">
 				<nav className="container mx-auto flex justify-between items-center">
 					<div className="flex items-center space-x-8 ml-auto">
 						<Link href="/home" className={linkStyle("/home")}>
@@ -56,7 +56,7 @@ const Header: React.FC<Props> = () => {
 						{isLoggedIn && (
 							<button
 								onClick={handleLogout}
-								className="px-2 py-1 rounded hover:bg-red-400 active:bg-red-600 focus:outline-none"
+								className="px-2 py-1 rounded hover:bg-red-200 active:bg-red-600 focus:outline-none"
 							>
 								Logout
 							</button>

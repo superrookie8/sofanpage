@@ -49,13 +49,13 @@ const Profile: React.FC = () => {
 
 	return (
 		<div className="p-4 w-[500px] bg-white">
-			<p className="ml-8 mt-4">Name : {profile.name}</p>
-			<p className="ml-8 mt-4">Team : {profile.team}</p>
-			<p className="ml-8 mt-4">Position : {profile.position}</p>
-			<p className="ml-8 mt-4">Number : {profile.number}</p>
-			<p className="ml-8 mt-4">Height : {profile.height}</p>
-			<p className="ml-8 mt-4">Nickname : {profile.nickname}</p>
-			<p className="ml-8 mt-4">Features : {profile.features}</p>
+			<p className="ml-8 mt-4 text-gray-500">Name : {profile.name}</p>
+			<p className="ml-8 mt-4 text-gray-500">Team : {profile.team}</p>
+			<p className="ml-8 mt-4 text-gray-500">Position : {profile.position}</p>
+			<p className="ml-8 mt-4 text-gray-500">Number : {profile.number}</p>
+			<p className="ml-8 mt-4 text-gray-500">Height : {profile.height}</p>
+			<p className="ml-8 mt-4 text-gray-500">Nickname : {profile.nickname}</p>
+			<p className="ml-8 mt-4 text-gray-500">Features : {profile.features}</p>
 		</div>
 	);
 };
