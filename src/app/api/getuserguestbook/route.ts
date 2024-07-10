@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
 		const pageSize = parseInt(searchParams.get("page_size") || "10", 10);
 		const user = searchParams.get("user");
 
-		let url = `${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/get_guestbook_entries?page=${page}&page_size=${pageSize}`;
+		let url = `${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/get_user_guestbook_entries?page=${page}&page_size=${pageSize}`;
 		if (user) {
 			url += `&user=${user}`;
 		}

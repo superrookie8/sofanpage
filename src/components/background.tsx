@@ -7,8 +7,8 @@ const Background: React.FC = () => {
 			<Image
 				src="/images/supersohee.png"
 				alt="Background"
-				layout="fill"
-				objectFit="contain"
+				fill
+				style={{ objectFit: "contain" }}
 				quality={100}
 				className="object-contain"
 				priority // 페이지 로드 시 백그라운드 이미지를 우선 로드하도록 설정

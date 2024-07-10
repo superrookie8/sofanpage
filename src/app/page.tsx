@@ -1,18 +1,30 @@
 "use client";
 import Opening from "@/components/opening";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Page() {
+	const pathname = usePathname();
+
+	useEffect(() => {
+		if (typeof document !== "undefined" && pathname === "/") {
+			document.body.classList.add("hide-header");
+			return () => {
+				document.body.classList.remove("hide-header");
+			};
+		}
+	}, [pathname]);
+
 	// const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 	// useEffect(() => {
-	// 	const token = sessionStorage.getItem("token");
-	// 	if (token) {
-	// 		setIsLoggedIn(true);
-	// 	} else {
-	// 		setIsLoggedIn(false);
-	// 	}
+	//  const token = sessionStorage.getItem("token");
+	//  if (token) {
+	//      setIsLoggedIn(true);
+	//  } else {
+	//      setIsLoggedIn(false);
+	//  }
 	// }, []);
 
 	return (

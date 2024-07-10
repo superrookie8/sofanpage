@@ -36,8 +36,7 @@ export default function RootLayout({
 			<body>
 				<RecoilRootProvider>
 					<Background />
-					<Header pathname="" />
-
+					<Header />
 					<ClientWrapper>{children}</ClientWrapper>
 				</RecoilRootProvider>
 			</body>

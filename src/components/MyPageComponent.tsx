@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProfileModal from "@/components/ProfileModal";
 import { GuestBookEntry } from "@/data/guestbook";
+import { format } from "date-fns";
 
 export const fetchUserInfo = async (): Promise<{
 	nickname: string;
@@ -24,7 +25,7 @@ export const fetchGuestbookEntries = async (filter: {
 	pageSize: number;
 }): Promise<{ entries: GuestBookEntry[]; total_entries: number }> => {
 	const response = await fetch(
-		`/api/getguestbooks?user=${filter.user}&page=${filter.page}&page_size=${filter.pageSize}`,
+		`/api/getuserguestbook?user=${filter.user}&page=${filter.page}&page_size=${filter.pageSize}`,
 		{
 			headers: {
 				Authorization: `Bearer ${sessionStorage.getItem("token")}`,
@@ -48,6 +49,11 @@ export const deleteGuestbookEntry = async (entryId: string): Promise<void> => {
 	}
 };
 
+const formatDate = (dateString: string): string => {
+	const date = new Date(dateString);
+	return format(date, "yyyy.MM.dd HH:mm");
+};
+
 const MyPageComp: React.FC = () => {
 	const router = useRouter();
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,7 +69,8 @@ const MyPageComp: React.FC = () => {
 		GuestBookEntry[]
 	>([]);
 	const [scrapNews, setScrapNews] = useState<any[]>([]); // 뉴스 스크랩 기능 추가 후 타입 지정
-	const [page, setPage] = useState(1);
+	const [photoPage, setPhotoPage] = useState(1);
+	const [noPhotoPage, setNoPhotoPage] = useState(1);
 	const pageSize = 10;
 
 	useEffect(() => {
@@ -84,18 +91,31 @@ const MyPageComp: React.FC = () => {
 
 	useEffect(() => {
 		if (profile.nickname) {
-			fetchGuestbookEntries({ user: profile.nickname, page, pageSize }).then(
-				(data) => {
-					const photoEntries = data.entries.filter((entry) => entry.photo_data);
-					const noPhotoEntries = data.entries.filter(
-						(entry) => !entry.photo_data
-					);
-					setPhotoGuestbookEntries(photoEntries);
-					setNoPhotoGuestbookEntries(noPhotoEntries);
-				}
-			);
+			fetchGuestbookEntries({
+				user: profile.nickname,
+				page: photoPage,
+				pageSize,
+			}).then((data) => {
+				const photoEntries = data.entries.filter((entry) => entry.photo_data);
+				setPhotoGuestbookEntries(photoEntries);
+			});
 		}
-	}, [profile.nickname, page]);
+	}, [profile.nickname, photoPage]);
+
+	useEffect(() => {
+		if (profile.nickname) {
+			fetchGuestbookEntries({
+				user: profile.nickname,
+				page: noPhotoPage,
+				pageSize,
+			}).then((data) => {
+				const noPhotoEntries = data.entries.filter(
+					(entry) => !entry.photo_data
+				);
+				setNoPhotoGuestbookEntries(noPhotoEntries);
+			});
+		}
+	}, [profile.nickname, noPhotoPage]);
 
 	const handleSaveProfile = async (newProfile: {
 		nickname?: string;
@@ -170,79 +190,136 @@ const MyPageComp: React.FC = () => {
 	};
 
 	return (
-		<div className="p-4">
-			<h1 className="text-2xl mb-4">My Page</h1>
-			<div className="mb-4">
-				<h2 className="text-xl mb-2">Profile</h2>
-				{profile.photoUrl && (
-					<img
-						src={profile.photoUrl}
-						alt="Profile"
-						className="w-24 h-24 rounded-full mb-2"
-					/>
-				)}
-				<div>Nickname: {profile.nickname}</div>
-				<div>Description: {profile.description}</div>
+		<div className=" w-full p-4">
+			<div className="bg-white w-full h-[250px] flex flex-col items-center pt-8 mb-4">
+				<div className="flex space-x-4">
+					<div>
+						{profile.photoUrl ? (
+							<img
+								src={profile.photoUrl}
+								alt="Profile"
+								className="w-24 h-24 rounded-full mb-2"
+							/>
+						) : (
+							<img
+								src="/images/ci_2023_default.png"
+								alt="Default Profile"
+								className="W-24 h-24 rounded-full mb-2"
+							/>
+						)}
+					</div>
+					<div className=" flex flex-col mt-2">
+						<div> {profile.nickname}</div>
+						<div> {profile.description}</div>
+					</div>
+				</div>
 				<button
 					onClick={() => setIsModalOpen(true)}
-					className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+					className="mt-auto mb-4 px-4 py-2 text-red-500 border border-red-500 rounded hover:bg-red-500 hover:text-white"
 				>
 					Edit Profile
 				</button>
 			</div>
-			<div className="mb-4">
-				<h2 className="text-xl mb-2">My Guestbooks</h2>
-				<div className="flex">
-					<div className="w-1/2 pr-2">
+			<div className="mb-4 bg-white flex flex-col pl-2 pr-2">
+				<div className="flex flex-col space-y-8">
+					<h2 className="text-xl mb-2">My GuestBooks</h2>
+					<div className="h-1/2 pl-2 pr-2 ">
 						<h3 className="text-lg mb-2">With Photos</h3>
-						<ul>
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 max-h-96 overflow-y-scroll">
 							{photoGuestbookEntries.map((entry) => (
-								<li key={entry._id} className="border p-2 mb-2">
-									<div>{entry.message}</div>
-									<div className="text-sm text-gray-600">{entry.date}</div>
+								<div
+									key={entry._id}
+									className="flex flex-col space-y-2 p-4 border rounded shadow-md w-[220px] h-[350px]"
+								>
 									{entry.photo_data && (
-										<img
-											src={`data:image/jpeg;base64,${entry.photo_data}`}
-											alt="Guestbook entry"
-											className="w-12 h-12"
-										/>
+										<div className="h-1/2 overflow-hidden">
+											<img
+												src={`data:image/jpeg;base64,${entry.photo_data}`}
+												alt="Guestbook entry"
+												className="w-full h-full object-cover object-top"
+											/>
+										</div>
 									)}
+									<div className="text-center text-sm text-gray-500 font-bold mt-2">
+										{entry.name}
+									</div>
+									<div className="flex-1 text-sm overflow-y-auto">
+										{entry.message}
+									</div>
+									<div className="text-sm text-gray-400 text-center mt-2">
+										{formatDate(entry.date)}
+									</div>
 									<button
 										onClick={() => handleDeleteEntry(entry._id)}
-										className="px-2 py-1 bg-red-500 text-white rounded mt-2"
+										className="px-2 py-1 text-red-500 border border-red-500 rounded hover:bg-red-500 hover:text-white rounded mt-2"
 									>
 										Delete
 									</button>
-								</li>
+								</div>
 							))}
-						</ul>
+						</div>
+						<div className="flex justify-between">
+							<div className="mt-4 text-gray-400 hover:bg-red-500 hover:text-white rounded p-1 mb-2">
+								<button
+									disabled={photoPage === 1}
+									onClick={() => setPhotoPage(photoPage - 1)}
+								>
+									Previous
+								</button>
+							</div>
+							<div className="mt-4 text-gray-400 hover:bg-red-500 hover:text-white rounded p-1 mb-2">
+								<button onClick={() => setPhotoPage(photoPage + 1)}>
+									Next
+								</button>
+							</div>
+						</div>
 					</div>
-					<div className="w-1/2 pl-2">
+					<div className="h-1/2 pl-2 pr-2">
 						<h3 className="text-lg mb-2">Without Photos</h3>
-						<ul>
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 max-h-96 overflow-y-scroll">
 							{noPhotoGuestbookEntries.map((entry) => (
-								<li key={entry._id} className="border p-2 mb-2">
-									<div>{entry.message}</div>
-									<div className="text-sm text-gray-600">{entry.date}</div>
+								<div
+									key={entry._id}
+									className="flex flex-col space-y-2 p-4 border rounded shadow-md w-[220px] h-[350px]"
+								>
+									<div className="text-center text-sm text-gray-500 font-bold">
+										{entry.name}
+									</div>
+									<div className="flex-1 text-sm overflow-y-auto">
+										{entry.message}
+									</div>
+									<div className="text-sm text-gray-400 text-center">
+										{formatDate(entry.date)}
+									</div>
 									<button
 										onClick={() => handleDeleteEntry(entry._id)}
-										className="px-2 py-1 bg-red-500 text-white rounded mt-2"
+										className="px-2 py-1 text-red-500 border border-red-500 rounded hover:bg-red-500 hover:text-white rounded mt-2"
 									>
 										Delete
 									</button>
-								</li>
+								</div>
 							))}
-						</ul>
+						</div>
+						<div className="flex justify-between">
+							<div className="mt-4 text-gray-400 hover:bg-red-500 hover:text-white rounded p-1 mb-2">
+								<button
+									disabled={noPhotoPage === 1}
+									onClick={() => setNoPhotoPage(noPhotoPage - 1)}
+								>
+									Previous
+								</button>
+							</div>
+							<div className="mt-4 text-gray-400 hover:bg-red-500 hover:text-white rounded p-1 mb-2">
+								<button onClick={() => setNoPhotoPage(noPhotoPage + 1)}>
+									Next
+								</button>
+							</div>
+						</div>
 					</div>
-				</div>
-				<div className="flex justify-between mt-4">
-					<button disabled={page === 1} onClick={() => setPage(page - 1)}>
-						Previous
-					</button>
-					<button onClick={() => setPage(page + 1)}>Next</button>
 				</div>
 			</div>
-			<div className="mb-4">
+
+			<div className="mb-4 flex pl-2">
 				<h2 className="text-xl mb-2">Scrap News</h2>
 				<ul>
 					{scrapNews.map((news) => (
