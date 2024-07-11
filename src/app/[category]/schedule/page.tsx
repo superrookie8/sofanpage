@@ -1,7 +1,5 @@
 "use client";
 import { useEffect } from "react";
-import Header from "@/components/header";
-import Sidebar from "@/components/sidebar";
 import Calendar from "@/components/calender";
 import { locations } from "@/data/schedule";
 import Map from "@/components/kakaoMap";
@@ -17,10 +15,8 @@ const Schedule: React.FC = () => {
 	}, [setSelectedLocation]);
 	return (
 		<div>
-			<Header pathname="" />
 			<div className="flex justify-center items-center">
 				<div className="bg-red-500  min-h-screen w-full flex justify-center p-8 relative">
-					<Sidebar />
 					<div className=" min-w-[1200px] flex">
 						<div className="bg-red-300 h-[660px]">
 							<Calendar />
