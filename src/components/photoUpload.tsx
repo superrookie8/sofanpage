@@ -52,6 +52,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotoUpload }) => {
 						src={latestPhoto}
 						alt="Preview"
 						fill
+						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 350px"
 						style={{ objectFit: "contain" }}
 					/>
 				</div>
