@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 
 interface Event {
 	_id: string;
@@ -122,16 +123,18 @@ const EventList: React.FC = () => {
 									className="relative flex-shrink-0"
 									style={{ width: "200px", height: "200px" }}
 								>
-									<img
-										src={photo}
-										alt={event.title}
-										className="object-cover w-full h-full"
-										style={{
-											maxWidth: "100%",
-											maxHeight: "100%",
-											objectFit: "contain",
-										}}
-									/>
+									<div
+										className="relative w-full h-full"
+										style={{ maxWidth: "100%", maxHeight: "100%" }}
+									>
+										<Image
+											src={photo}
+											alt={event.title}
+											fill
+											style={{ objectFit: "contain" }}
+											className="object-cover"
+										/>
+									</div>
 									<button
 										onClick={() =>
 											setPhotoToDelete({ eventId: event._id, photoIndex })

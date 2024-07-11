@@ -1,10 +1,11 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { format } from "date-fns";
 import { GuestBookEntry } from "@/data/guestbook";
 import useAdminAuth from "@/hooks/useAdminAuth";
 import ConfirmDialog from "../confirmDialog";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const fetchGuestbookLists = async (
 	page: number,
@@ -85,25 +86,28 @@ const GuestBookLists: React.FC = () => {
 	const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
 	const [searchName, setSearchName] = useState<string>("");
 
-	const fetchData = async (name?: string) => {
-		try {
-			const { entries, total_entries } = await fetchGuestbookLists(
-				page,
-				pageSize,
-				name
-			);
-			setGuestBookLists(entries || []);
-			setTotalEntries(total_entries || 0);
-			console.log(entries);
-		} catch (error: any) {
-			setError(error.message);
-			console.error("Failed to fetch guestbook entries:", error);
-		}
-	};
+	const fetchData = useCallback(
+		async (name?: string) => {
+			try {
+				const { entries, total_entries } = await fetchGuestbookLists(
+					page,
+					pageSize,
+					name
+				);
+				setGuestBookLists(entries || []);
+				setTotalEntries(total_entries || 0);
+				console.log(entries);
+			} catch (error: any) {
+				setError(error.message);
+				console.error("Failed to fetch guestbook entries:", error);
+			}
+		},
+		[page, pageSize]
+	);
 
 	useEffect(() => {
 		fetchData(searchName);
-	}, [page, pageSize, searchName]);
+	}, [page, pageSize, searchName, fetchData]);
 
 	const handleDelete = async (entryId: string) => {
 		try {
@@ -186,11 +190,15 @@ const GuestBookLists: React.FC = () => {
 								<div>{guestbook.message}</div>
 								<div>
 									{guestbook.photo_data ? (
-										<img
-											src={`data:image/jpeg;base64,${guestbook.photo_data}`}
-											alt="Guestbook entry"
-											className="w-12"
-										/>
+										<div className="relative w-12 h-12">
+											<Image
+												src={`data:image/jpeg;base64,${guestbook.photo_data}`}
+												alt="Guestbook entry"
+												fill
+												style={{ objectFit: "contain" }}
+												className="w-12"
+											/>
+										</div>
 									) : (
 										"사진없음"
 									)}

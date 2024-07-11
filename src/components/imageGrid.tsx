@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 
 interface ImageGridProps {
 	initialPhotos: string[];
@@ -36,13 +37,15 @@ const ImageGrid: React.FC<ImageGridProps> = ({
 				{photos.map((photo, index) => (
 					<div
 						key={index}
-						className="w-full h-24 sm:h-32 md:h-48 lg:h-64 xl:h-80 cursor-pointer"
+						className="relative w-full h-24 sm:h-32 md:h-48 lg:h-64 xl:h-80 cursor-pointer"
 						onClick={() => onPhotoClick(photo)}
 					>
-						<img
+						<Image
 							src={photo}
 							alt={`Photo ${index}`}
-							className="object-cover w-full h-full"
+							fill
+							style={{ objectFit: "cover" }}
+							className="object-cover"
 							loading="lazy"
 						/>
 					</div>

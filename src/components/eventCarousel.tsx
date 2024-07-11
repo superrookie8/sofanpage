@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Image from "next/image";
 
 interface EventCarouselProps {
 	photos: string[];
@@ -20,25 +21,39 @@ const EventCarousel: React.FC<EventCarouselProps> = ({ photos, altText }) => {
 		<>
 			<div className="overflow-x-auto whitespace-nowrap">
 				{photos.map((photo, index) => (
-					<img
+					<div
 						key={index}
-						src={photo}
-						alt={`${altText} ${index + 1}`}
-						className="inline-block h-auto max-h-[150px] object-contain mr-2 cursor-pointer"
+						className="inline-block h-auto max-h-[150px] relative mr-2 cursor-pointer"
 						onClick={() => handlePhotoClick(photo)}
-						loading="lazy" // Add lazy loading attribute
-					/>
+					>
+						<Image
+							src={photo}
+							alt={`${altText} ${index + 1}`}
+							fill
+							sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 100vw"
+							style={{ objectFit: "contain" }}
+							className="object-contain"
+							loading="lazy" // Add lazy loading attribute
+							priority={false} // Ensure this is set to false as it conflicts with lazy loading
+						/>
+					</div>
 				))}
 			</div>
 
 			{selectedPhoto && (
 				<div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
 					<div className="relative bg-white p-4 rounded">
-						<img
-							src={selectedPhoto}
-							alt="Selected"
-							className="max-w-full max-h-[80vh] object-contain"
-						/>
+						<div className="relative max-w-full max-h-[80vh]">
+							<Image
+								src={selectedPhoto}
+								alt="Selected"
+								fill
+								sizes="100vw"
+								style={{ objectFit: "contain" }}
+								className="object-contain"
+								priority
+							/>
+						</div>
 						<button
 							className="absolute top-2 right-2 text-black bg-white rounded-full p-1"
 							onClick={closeModal}

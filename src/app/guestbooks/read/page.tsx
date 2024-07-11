@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { GuestBookEntry } from "@/data/guestbook";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const fetchGuestbookEntries = async (): Promise<{
 	photo_entries: GuestBookEntry[];
@@ -121,11 +122,17 @@ const GuestBookList: React.FC = () => {
 							>
 								{entry.photo_data && (
 									<div className="relative w-full h-[70%] overflow-hidden">
-										<img
-											src={`data:image/jpeg;base64,${entry.photo_data}`}
-											alt="Guestbook entry"
-											className="object-cover w-full h-full"
-										/>
+										<div className="w-full h-full relative">
+											<Image
+												src={`data:image/jpeg;base64,${entry.photo_data}`}
+												alt="Guestbook entry"
+												fill
+												sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 100vw"
+												style={{ objectFit: "cover" }}
+												className="object-cover"
+												priority
+											/>
+										</div>
 									</div>
 								)}
 								<div className="flex-1 flex flex-col h-[30%]">

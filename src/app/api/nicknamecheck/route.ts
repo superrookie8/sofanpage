@@ -1,6 +1,5 @@
 // /app/api/nickname-check.ts
 import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
 	try {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ImageGrid from "./imageGrid";
+import Image from "next/image";
 
 interface Photo {
 	_id: string;
@@ -50,7 +51,7 @@ const GetPhotos: React.FC = () => {
 	};
 
 	return (
-		<div className="p-4 relative">
+		<div className="w-full p-4 relative">
 			{initialPhotos.length > 0 && (
 				<ImageGrid
 					initialPhotos={initialPhotos}
@@ -65,16 +66,20 @@ const GetPhotos: React.FC = () => {
 					onClick={closeModal}
 				>
 					<div
-						className="relative bg-white p-4 rounded max-w-3xl max-h-[90vh] overflow-auto"
+						className="w-full relative bg-white p-4 rounded max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-3xl max-h-[90vh] overflow-auto mx-4 my-8 sm:my-16"
 						onClick={(e) => e.stopPropagation()}
 					>
-						<img
-							src={selectedPhoto}
-							alt="Selected"
-							className="w-full h-auto object-contain"
-						/>
+						<div className="relative w-full h-[60vh] sm:h-[70vh] md:h-[80vh]">
+							<Image
+								src={selectedPhoto}
+								alt="Selected"
+								fill
+								style={{ objectFit: "contain" }}
+								className="object-contain"
+							/>
+						</div>
 						<button
-							className="absolute top-2 right-2 text-black bg-white rounded-full p-1"
+							className="absolute top-4 right-2 text-black bg-white rounded-full p-1"
 							onClick={closeModal}
 						>
 							&times;

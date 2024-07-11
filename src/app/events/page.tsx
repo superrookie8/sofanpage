@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import EventDetail from "@/components/eventDetail";
 import EventPhotos from "@/components/eventPhotos";
 import { Event, EventDetails, PhotosResponse } from "@/data/events";
+import Image from "next/image";
 
 const Events: React.FC = () => {
 	const [events, setEvents] = useState<Event[]>([]);
@@ -68,10 +69,13 @@ const Events: React.FC = () => {
 	const fetchEventPhotos = async (eventId: string, page: number) => {
 		setLoadingPhotos(true);
 		try {
-			const response = await fetch(`/api/geteventphotos?id=${eventId}&page=${page}`, {
-				method: "GET",
-				cache: "no-store",
-			});
+			const response = await fetch(
+				`/api/geteventphotos?id=${eventId}&page=${page}`,
+				{
+					method: "GET",
+					cache: "no-store",
+				}
+			);
 			const data: PhotosResponse = await response.json();
 			if (response.ok) {
 				setEventPhotos((prevPhotos) => ({
@@ -163,38 +167,30 @@ const Events: React.FC = () => {
 				</div>
 			</div>
 			{modalPhoto && (
-				<div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-75 z-50">
-					<div className="relative bg-white p-4 rounded max-w-full max-h-full md:max-w-3xl md:max-h-[80%] overflow-auto">
+				<div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-75 z-50 p-4">
+					<div className="relative bg-white p-4 rounded w-full max-h-full md:max-w-3xl md:max-h-[80%] overflow-auto">
 						<button
 							className="absolute top-2 right-2 bg-white text-black rounded-full p-1"
 							onClick={closeModal}
 						>
-							X
+							&times;
 						</button>
-						<img
-							src={modalPhoto}
-							alt="Modal"
-							className="w-full h-auto object-contain"
-						/>
+						<div className="relative w-full h-[50vh] md:h-[60vh]">
+							<Image
+								src={modalPhoto}
+								alt="Modal"
+								fill
+								sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 100vw"
+								style={{ objectFit: "contain" }}
+								priority
+								className="object-contain"
+							/>
+						</div>
 					</div>
 				</div>
 			)}
-			<style jsx>{`
-                @media (max-width: 700px) {
-                    .flex {
-                        flex-direction: column;
-                    }
-                    .lg\\:w-2\\/3 {
-                        width: 100%;
-                    }
-                    .lg\\:w-1\\/3 {
-                        width: 100%;
-                    }
-                }
-            `}</style>
 		</div>
 	);
 };
 
 export default Events;
-

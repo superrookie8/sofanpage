@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import useAdminAuth from "@/hooks/useAdminAuth";
 import AdminHomeButton from "@/components/admin/AdminHomeButton";
+import Image from "next/image";
 
 interface Photo {
 	_id: string;
@@ -96,10 +97,13 @@ const AdminDeletePhotos: React.FC = () => {
 			<div className="grid grid-cols-6 gap-2">
 				{adminPhotos.map((photo) => (
 					<div key={photo._id} className="relative">
-						<img
+						<Image
 							src={photo.base64} // Correct URL to fetch the image
 							alt={photo.filename}
-							className="w-[200px] h-auto"
+							fill
+							sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 200px"
+							style={{ objectFit: "contain" }}
+							priority
 						/>
 						<input
 							type="checkbox"
@@ -114,11 +118,18 @@ const AdminDeletePhotos: React.FC = () => {
 			<div className="grid grid-cols-3 gap-4">
 				{userPhotos.map((photo) => (
 					<div key={photo._id} className="relative">
-						<img
-							src={photo.base64} // Correct URL to fetch the image
-							alt={photo.filename}
-							className="w-full h-auto"
-						/>
+						<div
+							style={{ position: "relative", width: "200px", height: "auto" }}
+						>
+							<Image
+								src={photo.base64} // Correct URL to fetch the image
+								alt={photo.filename}
+								fill
+								sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 200px"
+								style={{ objectFit: "contain" }}
+								priority
+							/>
+						</div>
 						<input
 							type="checkbox"
 							className="absolute top-2 left-2"

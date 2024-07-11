@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import Image from "next/image";
 
 interface VerticalCarouselProps {
 	photos: string[];
@@ -63,11 +64,15 @@ const VerticalCarousel: React.FC<VerticalCarouselProps> = ({
 			>
 				{photos.map((photo, index) => (
 					<div key={index} className="w-full h-full flex-shrink-0">
-						<img
-							src={photo}
-							alt={`${altText} - ${index + 1}`}
-							className="object-contain w-full h-full"
-						/>
+						<div className="relative w-full h-full">
+							<Image
+								src={photo}
+								alt={`${altText} - ${index + 1}`}
+								layout="fill"
+								objectFit="contain"
+								className="object-contain"
+							/>
+						</div>
 					</div>
 				))}
 			</div>

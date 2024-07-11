@@ -1,5 +1,5 @@
 // components/eventPhotos.tsx
-import { PhotosResponse } from "@/data/events";
+import Image from "next/image";
 
 interface EventPhotosProps {
 	eventId: string;
@@ -36,12 +36,18 @@ const EventPhotos: React.FC<EventPhotosProps> = ({
 							className="relative"
 							style={{ paddingBottom: "100%" }}
 						>
-							<img
-								src={photo}
-								alt={eventTitle}
-								className="absolute top-0 left-0 w-full h-full object-cover cursor-pointer"
+							<div
+								className="absolute top-0 left-0 w-full h-full cursor-pointer"
 								onClick={() => openModal(photo)}
-							/>
+							>
+								<Image
+									src={photo}
+									alt={eventTitle}
+									layout="fill"
+									objectFit="cover"
+									className="object-cover"
+								/>
+							</div>
 						</div>
 					))}
 				</div>

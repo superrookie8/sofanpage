@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import ProfileModal from "@/components/profileModal";
 import { GuestBookEntry } from "@/data/guestbook";
 import { format } from "date-fns";
+import Image from "next/image";
 
 export const fetchUserInfo = async (): Promise<{
 	nickname: string;
@@ -208,17 +209,25 @@ const MyPageComp: React.FC = () => {
 				<div className="flex space-x-4">
 					<div className="flex items-center">
 						{profile.photoUrl ? (
-							<img
-								src={profile.photoUrl}
-								alt="Profile"
-								className="w-24 h-24 rounded-full "
-							/>
+							<div className="relative w-24 h-24 rounded-full">
+								<Image
+									src={profile.photoUrl}
+									alt="Profile"
+									layout="fill"
+									className="rounded-full"
+									style={{ objectFit: "cover" }}
+								/>
+							</div>
 						) : (
-							<img
-								src="/images/ci_2023_default.png"
-								alt="Default Profile"
-								className="w-24 h-24 rounded-full "
-							/>
+							<div className="relative w-24 h-24 rounded-full">
+								<Image
+									src="/images/ci_2023_default.png"
+									alt="Default Profile"
+									fill
+									className="rounded-full"
+									style={{ objectFit: "cover" }}
+								/>
+							</div>
 						)}
 					</div>
 					<div className="flex flex-col mt-2">
@@ -240,7 +249,7 @@ const MyPageComp: React.FC = () => {
 					<h2 className="text-xl mb-2">My GuestBooks</h2>
 					<div className="h-1/2 pl-2 pr-2">
 						<h3 className="text-lg mb-2">With Photos</h3>
-						<div className="bg-green-200 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 max-h-96 overflow-y-scroll justify-center">
+						<div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 max-h-96 overflow-y-scroll justify-center">
 							{photoGuestbookEntries.map((entry) => (
 								<div
 									key={entry._id}
@@ -248,11 +257,15 @@ const MyPageComp: React.FC = () => {
 								>
 									{entry.photo_data && (
 										<div className="h-1/2 overflow-hidden">
-											<img
-												src={`data:image/jpeg;base64,${entry.photo_data}`}
-												alt="Guestbook entry"
-												className="w-full h-full object-cover object-top"
-											/>
+											<div className="relative w-full h-full">
+												<Image
+													src={`data:image/jpeg;base64,${entry.photo_data}`}
+													alt="Guestbook entry"
+													fill
+													style={{ objectFit: "cover", objectPosition: "top" }}
+													className="object-cover object-top"
+												/>
+											</div>
 										</div>
 									)}
 									<div className="text-center text-sm text-gray-500 font-bold mt-2">

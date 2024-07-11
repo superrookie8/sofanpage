@@ -1,7 +1,6 @@
-// components/Login.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { nicknameState } from "@/states/nicknameState";
@@ -32,13 +31,13 @@ const Login: React.FC = () => {
 	const [formValid, setFormValid] = useState(false);
 	const setIsLoggedIn = useSetRecoilState(loginState); // Set the login state
 
-	useEffect(() => {
-		setFormValid(checkFormValid());
+	const checkFormValid = useCallback(() => {
+		return nickname.trim() !== "" && password.trim() !== "";
 	}, [nickname, password]);
 
-	const checkFormValid = () => {
-		return nickname.trim() !== "" && password.trim() !== "";
-	};
+	useEffect(() => {
+		setFormValid(checkFormValid());
+	}, [nickname, password, checkFormValid]);
 
 	const togglePasswordVisibility = () => {
 		setShowPassword(!showPassword);
@@ -95,7 +94,7 @@ const Login: React.FC = () => {
 
 	return (
 		<div className="w-full h-screen flex flex-col justify-center items-center">
-			<div className="w-[500px] h-[60px] bg-red-500 flex justify-center items-center relative rounded-tl-md rounded-tr-md ">
+			<div className="w-[500px] h-[60px] bg-red-500 flex justify-center items-center relative rounded-tl-md rounded-tr-md">
 				<Image
 					src="/images/supersohee2.png"
 					alt="LOGO Image"
@@ -128,7 +127,7 @@ const Login: React.FC = () => {
 					</div>
 				</div>
 				<div className="w-[500px] h-[60px] bg-red-300 flex flex-col justify-center items-center p-8">
-					<div className="relative w-[400px] flex justify-center items-center ">
+					<div className="relative w-[400px] flex justify-center items-center">
 						<input
 							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md"
 							type={showPassword ? "text" : "password"}
@@ -153,7 +152,7 @@ const Login: React.FC = () => {
 						{passwordValid.message}
 					</div>
 				</div>
-				<div className="w-[500px] h-[50px]  flex justify-center items-center mt-4">
+				<div className="w-[500px] h-[50px] flex justify-center items-center mt-4">
 					<button
 						type="submit"
 						className={`w-[100px] h-[40px] flex justify-center items-center mr-8 rounded-md ${

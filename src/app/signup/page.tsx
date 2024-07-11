@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRecoilState } from "recoil";
@@ -39,18 +39,18 @@ const SignUp: React.FC = () => {
 
 	const [formValid, setFormValid] = useState(false);
 
-	useEffect(() => {
-		setFormValid(checkFormValid());
-	}, [nickname, password, passwordConfirm, nicknameChecked]);
-
-	const checkFormValid = () => {
+	const checkFormValid = useCallback(() => {
 		return (
 			nickname.trim() !== "" &&
 			password.trim() !== "" &&
 			password === passwordConfirm &&
 			nicknameChecked
 		);
-	};
+	}, [nickname, password, passwordConfirm, nicknameChecked]);
+
+	useEffect(() => {
+		setFormValid(checkFormValid());
+	}, [nickname, password, passwordConfirm, nicknameChecked, checkFormValid]);
 
 	const togglePasswordVisibility = () => {
 		setShowPassword(!showPassword);
@@ -64,7 +64,7 @@ const SignUp: React.FC = () => {
 		const { value } = event.target;
 		setNickname(value);
 		if (!value.trim()) {
-			setNicknameMessage({ message: "", color: "" }); // 닉네임 입력창이 비어있으면 메시지를 비웁니다.
+			setNicknameMessage({ message: "", color: "" });
 			setFormValid(false);
 		}
 	};
@@ -83,7 +83,6 @@ const SignUp: React.FC = () => {
 				const messageColor =
 					data.msg === "이미 존재하는 닉네임입니다" ? "red" : "blue";
 				setNicknameMessage({ message: data.msg, color: messageColor });
-				console.log(data);
 				if (data.msg === "가능한 닉네임입니다") {
 					setNicknameChecked(true);
 					setFormValid(checkFormValid());
@@ -93,9 +92,7 @@ const SignUp: React.FC = () => {
 				}
 			})
 			.catch((error) => {
-				setNicknameMessage(
-					{ message: "알수 없는 에러입니다", color: "red" } || error
-				);
+				setNicknameMessage({ message: "알 수 없는 에러입니다", color: "red" });
 				setNicknameChecked(false);
 			});
 	};
@@ -107,7 +104,7 @@ const SignUp: React.FC = () => {
 		setFormValid(checkFormValid());
 		if (!value.trim()) {
 			setPasswordValid({ message: "", color: "" });
-			setPasswordConfirmValid({ message: "", color: "" }); // 비밀번호 입력창이 비어있으면 검증 메시지를 비웁니다.
+			setPasswordConfirmValid({ message: "", color: "" });
 		} else {
 			const regex =
 				/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$^&*-]).{8,}$/;
@@ -135,10 +132,10 @@ const SignUp: React.FC = () => {
 		event: React.ChangeEvent<HTMLInputElement>
 	) => {
 		const { value } = event.target;
-		setPasswordConfirm(value); // 비밀번호 확인 입력 상태 업데이트
+		setPasswordConfirm(value);
 		setFormValid(checkFormValid());
 		if (!value.trim()) {
-			setPasswordConfirmValid({ message: "", color: "" }); // 비밀번호 확인 입력창이 비어있으면 검증 메시지를 비웁니다.
+			setPasswordConfirmValid({ message: "", color: "" });
 		} else {
 			setPasswordConfirmValid(
 				password === value
@@ -157,7 +154,6 @@ const SignUp: React.FC = () => {
 	const signUpHandler = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		// 실제 회원가입 처리 로직
 		const options = {
 			method: "POST",
 			headers: {
@@ -170,8 +166,7 @@ const SignUp: React.FC = () => {
 			.then((res) => res.json())
 			.then((data) => {
 				setMessage(data.message);
-				console.log(data);
-				router.push("/login"); // 회원가입 성공 후 로그인 페이지로 이동
+				router.push("/login");
 			})
 			.catch((error) => {
 				alert("회원가입 처리 중 오류가 발생했습니다");
