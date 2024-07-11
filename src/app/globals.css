@@ -14,25 +14,35 @@ body {
 	font-family: "GmarketSansMedium", sans-serif;
 }
 
-/* :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 214, 219, 220;
+.hide-header header {
+	display: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+@media (max-width: 768px) {
+	.fixed {
+		width: 100%;
+		height: 100%;
+	}
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-} */
+.page-enter {
+	opacity: 0;
+	transform: translateX(100%);
+}
+
+.page-enter-active {
+	opacity: 1;
+	transform: translateX(0);
+	transition: opacity 300ms, transform 300ms;
+}
+
+.page-exit {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+.page-exit-active {
+	opacity: 0;
+	transform: translateX(-100%);
+	transition: opacity 300ms, transform 300ms;
+}

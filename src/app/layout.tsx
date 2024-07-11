@@ -1,11 +1,15 @@
+// src/app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
 import RecoilRootProvider from "@/utils/recoilRootProvider";
 import ScriptProvider from "@/utils/scriptProvider";
+import ClientWrapper from "@/components/clientWrapper";
+import Header from "@/components/header";
+import Background from "@/components/background";
 
 export const metadata: Metadata = {
-	title: { default: "BNK NO6.Lee Sohee", template: "%s | Lee Sohee" },
-	description: "Welcome to the fan page of BNK NO6. Lee Sohee.",
+	title: { default: "BNK NO36.Lee Sohee", template: "%s | Lee Sohee" },
+	description: "Welcome to the fan page of BNK NO36. Lee Sohee.",
 	keywords: [
 		"WKBL",
 		"BNK SUM",
@@ -21,7 +25,7 @@ export const metadata: Metadata = {
 	],
 };
 
-export default async function RootLayout({
+export default function RootLayout({
 	children,
 }: {
 	children: React.ReactNode;
@@ -30,7 +34,11 @@ export default async function RootLayout({
 		<html lang="en">
 			<ScriptProvider />
 			<body>
-				<RecoilRootProvider>{children}</RecoilRootProvider>
+				<RecoilRootProvider>
+					<Background />
+					<Header />
+					<ClientWrapper>{children}</ClientWrapper>
+				</RecoilRootProvider>
 			</body>
 		</html>
 	);
