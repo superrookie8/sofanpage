@@ -26,13 +26,11 @@ export async function GET(req: NextRequest) {
 		const data = await response.json();
 		return NextResponse.json(data, { status: 200 });
 	} catch (error) {
+		let errorMessage = "An unknown error occurred";
 		if (error instanceof Error) {
-			return NextResponse.json({ message: error.message }, { status: 500 });
-		} else {
-			return NextResponse.json(
-				{ message: "An unknown error occurred" },
-				{ status: 500 }
-			);
+			errorMessage = error.message;
 		}
+		console.error("Error fetching user info:", errorMessage);
+		return NextResponse.json({ message: errorMessage }, { status: 500 });
 	}
 }

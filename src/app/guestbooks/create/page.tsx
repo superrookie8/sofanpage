@@ -1,28 +1,20 @@
 "use client";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { GuestBookButtons } from "@/components/buttons";
-import DateTimeDisplay from "@/components/Date";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { pageState } from "@/states/pageState";
+import { photoPreviewState } from "@/states/photoPreviewState";
 import PhotoUpload from "@/components/photoUpload";
-import Header from "@/components/header";
 import useAuth from "@/hooks/useAuth";
-
-interface PostData {
-	name: string;
-	message: string;
-	photo?: string;
-	date: string;
-}
 
 const GuestBookCreate: React.FC = () => {
 	const user = useAuth();
-	const params = useParams<{ category: string }>();
 	const router = useRouter();
 	const [write, setWrite] = useState("");
 	const [photo, setPhoto] = useState<string | null>(null);
 	const currentPage = useRecoilValue(pageState);
+	const setPage = useSetRecoilState(pageState);
+	const [photos, setPhotos] = useRecoilState(photoPreviewState);
 
 	const handlerOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setWrite(e.target.value);
@@ -66,6 +58,8 @@ const GuestBookCreate: React.FC = () => {
 			// 사진 업로드 후 미리보기 상태 초기화
 			setPhoto(null);
 			setWrite("");
+			setPhotos([]); // 추가된 부분: photoPreviewState를 초기화합니다.
+			setPage("default");
 			router.push(`/guestbooks/read`);
 		} catch (error) {
 			console.error("There was a problem with the fetch operation:", error);
@@ -74,49 +68,67 @@ const GuestBookCreate: React.FC = () => {
 
 	return (
 		<div>
-			<div className="flex justify-center items-center ">
-				<div className="bg-red-500 min-h-screen w-full flex justify-center p-8 relative ">
+			<div className="flex justify-center items-center">
+				<div className="bg-black bg-opacity-75 min-h-screen w-full flex justify-center p-8 relative">
 					{currentPage === "photoAndText" ? (
-						<div className="w-[1200px] min-h-[580px] flex flex-row justify-center ">
-							<div className=" w-full flex flex-row justify-center ">
-								<div className="bg-red-400  w-[800px] h-[450px] flex flex-col justify-between items-center">
-									<div className="mt-4">사진 방명록 남겨요!</div>
-									<div className="bg-pink-400 w-[800px] h-[400px] flex flex-row justify-center items-center ">
-										<div className="bg-gray-500 w-[400px] h-[400px] flex justify-center items-center">
+						<div className="w-full max-w-6xl flex flex-col lg:flex-row justify-center space-y-4 lg:space-y-0">
+							<div className="w-full flex flex-col lg:flex-row justify-center items-center space-y-4 lg:space-y-0">
+								<div className="border-red-400 w-full lg:w-[800px] h-auto lg:h-[410px] flex flex-col justify-between items-center space-y-4 lg:space-y-0">
+									<div className="text-white">사진 방명록 남겨요!</div>
+									<div className="w-full lg:w-[800px] h-auto lg:h-[300px] space-y-4 lg:space-y-0 flex flex-col lg:flex-row justify-center items-center">
+										<div className="w-full lg:w-[400px] h-auto lg:h-[400px] flex justify-center items-center">
 											<PhotoUpload onPhotoUpload={handlePhotoChange} />
 										</div>
-										<div className="bg-red-700 w-[400px] h-[400px] flex justify-center items-center">
+										<div className="w-full lg:w-[400px] h-auto lg:h-[420px] flex justify-center items-center lg:mt-0">
 											<textarea
-												className="w-[350px] h-[300px] overflow-auto"
+												className="w-[350px] h-[300px] overflow-auto rounded focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 mt-4 lg:mt-0"
 												onChange={handlerOnChange}
 												value={write}
 											></textarea>
 										</div>
 									</div>
-								</div>
-								<div className=" flex flex-row justify-center  ">
-									<GuestBookButtons
-										currentCategory="/guestbooks/create"
-										onSubmit={postData}
-									/>
+									<div className="flex flex-row w-full justify-center items-center space-x-4 lg:mt-4">
+										<button
+											className="w-[200px] bg-green-500 text-white font-bold py-2 px-4 rounded"
+											onClick={() => setPage("default")}
+										>
+											그냥 글
+										</button>
+										<button
+											className="w-[200px] bg-red-500 text-white font-bold py-2 px-4 rounded ml-0 lg:ml-4"
+											onClick={postData}
+										>
+											남기기
+										</button>
+									</div>
 								</div>
 							</div>
 						</div>
 					) : (
-						<div className="bg-yellow-500 min-h-[580px] min-w-[1200px] flex justify-center">
-							<div className="bg-red-400  w-[800px] h-[450px] flex flex-col justify-center items-center ">
-								<div className="mt-4">방명록 남겨요!</div>
-								<textarea
-									className="w-[450px] h-[300px] mt-[32px] p-2 overflow-auto"
-									onChange={handlerOnChange}
-									value={write}
-								></textarea>
-							</div>
-							<div className=" flex flex-row justify-center  ">
-								<GuestBookButtons
-									currentCategory="/guestbooks/create"
-									onSubmit={postData}
-								/>
+						<div className="w-full max-w-6xl flex flex-col lg:flex-row items-center justify-center space-y-4 lg:space-y-0">
+							<div className="w-full lg:w-[800px] h-auto lg:h-[420px] flex flex-col justify-center items-center space-y-4 lg:space-y-0">
+								<div className="text-white mb-4 lg:mb-0">방명록 남겨요!</div>
+								<div className="w-full lg:w-[800px] h-auto lg:h-[350px] space-y-4 lg:space-y-0 flex flex-col lg:flex-row justify-center items-center">
+									<textarea
+										className="w-full lg:w-[450px] h-[300px] overflow-auto rounded focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 mt-4 lg:mt-0"
+										onChange={handlerOnChange}
+										value={write}
+									></textarea>
+								</div>
+								<div className="flex flex-row w-full justify-center items-center space-x-4 lg:mt-4">
+									<button
+										className="w-[200px] bg-violet-500 text-white font-bold py-2 px-4 rounded"
+										onClick={() => setPage("photoAndText")}
+									>
+										사진과 글
+									</button>
+									<button
+										className="w-[200px] bg-red-500 text-white font-bold py-2 px-4 rounded"
+										onClick={postData}
+									>
+										남기기
+									</button>
+								</div>
 							</div>
 						</div>
 					)}

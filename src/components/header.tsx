@@ -1,17 +1,21 @@
+// components/Header.tsx
 "use client";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRecoilState } from "recoil";
+import { loginState } from "@/states/loginState"; // Import the login state
 
 const Header: React.FC = () => {
 	const pathname = usePathname();
-	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	const router = useRouter();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [isLoggedIn, setIsLoggedIn] = useRecoilState(loginState); // Use the login state
 
 	useEffect(() => {
 		const token = sessionStorage.getItem("token");
 		setIsLoggedIn(!!token);
-	}, []);
+	}, [setIsLoggedIn]);
 
 	const linkStyle = (path: string) => {
 		const isActive =
@@ -26,8 +30,9 @@ const Header: React.FC = () => {
 	};
 
 	const handleLogout = () => {
-		sessionStorage.removeItem("token"); // 토큰을 세션 스토리지에서 제거
-		setIsLoggedIn(false); // 로그아웃 시 상태 업데이트
+		sessionStorage.removeItem("token");
+		setIsLoggedIn(false);
+		router.push("/home");
 	};
 
 	const toggleMenu = () => {
@@ -129,7 +134,7 @@ const Header: React.FC = () => {
 											handleLogout();
 											toggleMenu();
 										}}
-										className="py-1rounded hover:bg-red-200 active:bg-red-600 focus:outline-none w-full text-left"
+										className="py-1 rounded hover:bg-red-200 active:bg-red-600 focus:outline-none w-full text-left"
 									>
 										Logout
 									</button>

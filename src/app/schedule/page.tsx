@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import Calendar from "@/components/calender";
 import { locations } from "@/data/schedule";
-import Map from "@/components/KakaoMap";
+import Map from "@/components/kakaoMap";
 import { useSetRecoilState } from "recoil";
 import { selectedLocationState } from "@/states/locationState";
 

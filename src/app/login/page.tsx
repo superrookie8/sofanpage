@@ -1,10 +1,12 @@
+// components/Login.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { nicknameState } from "@/states/nicknameState";
 import { passwordState } from "@/states/passwordState";
+import { loginState } from "@/states/loginState"; // Import the login state
 import EyeIcon from "@/icons/eyeicon";
 import Image from "next/image";
 
@@ -16,7 +18,6 @@ interface ValidationState {
 const Login: React.FC = () => {
 	const router = useRouter();
 	const [message, setMessage] = useState("");
-	// const [nicknameChecked, setNicknameChecked] = useState(false);
 	const [nicknameMessage, setNicknameMessage] = useState<ValidationState>({
 		message: "",
 		color: "red",
@@ -28,8 +29,8 @@ const Login: React.FC = () => {
 		message: "",
 		color: "black",
 	});
-
 	const [formValid, setFormValid] = useState(false);
+	const setIsLoggedIn = useSetRecoilState(loginState); // Set the login state
 
 	useEffect(() => {
 		setFormValid(checkFormValid());
@@ -47,14 +48,13 @@ const Login: React.FC = () => {
 		const { value } = event.target;
 		setNickname(value);
 		if (!value.trim()) {
-			setNicknameMessage({ message: "", color: "" }); // 닉네임 입력창이 비어있으면 메시지를 비웁니다.
+			setNicknameMessage({ message: "", color: "" });
 			setFormValid(false);
 		}
 	};
 
 	const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = event.target;
-
 		setPassword(value);
 		setFormValid(checkFormValid());
 		if (!value.trim()) {
@@ -76,7 +76,6 @@ const Login: React.FC = () => {
 
 	const LoginHandler = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-
 		const response = await fetch("/api/login", {
 			method: "POST",
 			headers: {
@@ -84,16 +83,16 @@ const Login: React.FC = () => {
 			},
 			body: JSON.stringify({ nickname, password }),
 		});
-
 		const data = await response.json();
-
 		if (response.ok) {
 			sessionStorage.setItem("token", data.access_token);
+			setIsLoggedIn(true); // Update the global login state
 			router.push("/home");
 		} else {
 			setMessage(data.msg);
 		}
 	};
+
 	return (
 		<div className="w-full h-screen flex flex-col justify-center items-center">
 			<div className="w-[500px] h-[60px] bg-red-500 flex justify-center items-center relative rounded-tl-md rounded-tr-md ">

@@ -1,6 +1,6 @@
 import React, { useRef, ChangeEvent } from "react";
 import { useRecoilState } from "recoil";
-import { photoPreviewState } from "@/states/photoPreviewState";
+import { photoPreviewState, PhotoData } from "@/states/photoPreviewState";
 import Image from "next/image";
 
 interface PhotoUploadProps {
@@ -8,9 +8,7 @@ interface PhotoUploadProps {
 }
 
 const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotoUpload }) => {
-	const [photoPreview, setPhotoPreview] = useRecoilState<string | null>(
-		photoPreviewState
-	);
+	const [photos, setPhotos] = useRecoilState(photoPreviewState);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -19,7 +17,14 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotoUpload }) => {
 			const reader = new FileReader();
 			reader.onloadend = () => {
 				const base64String = reader.result as string;
-				setPhotoPreview(base64String);
+				const newPhoto: PhotoData = {
+					id: new Date().toISOString(),
+					preview: base64String,
+					originalFile: file,
+					compressedFile: file, // 여기서는 원본 파일을 사용, 압축 처리는 필요에 따라 추가
+					uploadTime: new Date().toISOString(),
+				};
+				setPhotos([newPhoto]); // 이전 사진 대신 새 사진을 추가하여 상태를 업데이트합니다.
 				onPhotoUpload(base64String);
 			};
 			reader.readAsDataURL(file);
@@ -30,6 +35,8 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotoUpload }) => {
 		fileInputRef.current?.click();
 	};
 
+	const latestPhoto = photos[photos.length - 1]?.preview || null;
+
 	return (
 		<div className="relative w-200 h-200 border-2 border-dashed border-gray-300 rounded-lg flex justify-center items-center cursor-pointer">
 			<input
@@ -39,10 +46,10 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotoUpload }) => {
 				accept="image/*"
 				className="hidden"
 			/>
-			{photoPreview ? (
+			{latestPhoto ? (
 				<div className="w-[350px] h-[300px] relative rounded-lg overflow-hidden">
 					<Image
-						src={photoPreview}
+						src={latestPhoto}
 						alt="Preview"
 						fill
 						style={{ objectFit: "contain" }}
@@ -54,7 +61,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotoUpload }) => {
 					className="relative flex justify-center items-center text-center space-y-2"
 				>
 					<svg className="w-[350px] h-[300px] mx-auto"></svg>
-					<p className="absolute">사진 업로드</p>
+					<p className="absolute text-white">사진 업로드 (클릭)</p>
 				</div>
 			)}
 		</div>

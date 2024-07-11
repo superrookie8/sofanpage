@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { GuestBookEntry } from "@/data/guestbook";
 import useAdminAuth from "@/hooks/useAdminAuth";
-import ConfirmDialog from "../ConfirmDialog";
+import ConfirmDialog from "../confirmDialog";
 import { useRouter } from "next/navigation";
 
 const fetchGuestbookLists = async (

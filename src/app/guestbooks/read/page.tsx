@@ -76,36 +76,48 @@ const GuestBookList: React.FC = () => {
 		<div className="bg-white w-full flex justify-center items-center p-4 rounded-lg shadow-lg">
 			<div className="relative p-4 w-full flex flex-col">
 				{/* Tabs */}
-				<div className="flex space-x-4 mb-4">
-					<button
-						onClick={() => handleTabChange("photos")}
-						className={`px-4 py-2 rounded ${
-							activeTab === "photos"
-								? "bg-red-500 text-white"
-								: "bg-gray-200 text-gray-700"
-						}`}
-					>
-						With Photos
-					</button>
-					<button
-						onClick={() => handleTabChange("noPhotos")}
-						className={`px-4 py-2 rounded ${
-							activeTab === "noPhotos"
-								? "bg-red-500 text-white"
-								: "bg-gray-200 text-gray-700"
-						}`}
-					>
-						Without Photos
-					</button>
+				<div className="flex justify-between space-x-4 mb-4">
+					<div className="flex space-x-2 flex wrap">
+						<button
+							onClick={() => handleTabChange("photos")}
+							className={`px-4 py-2 rounded ${
+								activeTab === "photos"
+									? "bg-red-500 text-white"
+									: "bg-gray-200 text-gray-700"
+							}`}
+						>
+							With Photos
+						</button>
+						<button
+							onClick={() => handleTabChange("noPhotos")}
+							className={`px-4 py-2 rounded ${
+								activeTab === "noPhotos"
+									? "bg-red-500 text-white"
+									: "bg-gray-200 text-gray-700"
+							}`}
+						>
+							Without Photos
+						</button>
+					</div>
+					<div className="flex ">
+						<button
+							onClick={() => {
+								router.push("/guestbooks/create");
+							}}
+							className="border-red-500 border-2 text-red-500 font-bold py-2 px-4 rounded top-4 right-4 hover:bg-red-500 hover:text-white "
+						>
+							Create
+						</button>
+					</div>
 				</div>
 
 				{/* Tab Content */}
-				<div className="w-full min-h-screen flex items-start">
+				<div className="w-full min-h-screen flex items-start justify-center">
 					<div className="w-full min-h-screen grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 overflow-y-auto">
 						{displayEntries.map((entry) => (
 							<div
 								key={entry._id}
-								className="w-[260px] h-[350px] bg-white shadow-md rounded-lg overflow-hidden flex flex-col"
+								className="w-[260px] h-[350px] bg-white shadow-md rounded-lg overflow-hidden flex flex-col mx-auto"
 							>
 								{entry.photo_data && (
 									<div className="relative w-full h-[70%] overflow-hidden">
@@ -151,15 +163,6 @@ const GuestBookList: React.FC = () => {
 						Next
 					</button>
 				</div>
-
-				<button
-					onClick={() => {
-						router.push("/guestbooks/create");
-					}}
-					className="border-red-500 border-2 text-red-500 font-bold py-2 px-4 rounded absolute top-4 right-4 hover:bg-red-500 hover:text-white"
-				>
-					Create
-				</button>
 			</div>
 		</div>
 	);

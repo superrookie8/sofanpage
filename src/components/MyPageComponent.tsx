@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import ProfileModal from "@/components/ProfileModal";
+import ProfileModal from "@/components/profileModal";
 import { GuestBookEntry } from "@/data/guestbook";
 import { format } from "date-fns";
 
@@ -15,7 +15,11 @@ export const fetchUserInfo = async (): Promise<{
 			Authorization: `Bearer ${sessionStorage.getItem("token")}`,
 		},
 	});
+	if (!response.ok) {
+		throw new Error("Failed to fetch user info");
+	}
 	const data = await response.json();
+	console.log("Fetched user info:", data); // 디버깅을 위한 로그 추가
 	return data;
 };
 
@@ -32,6 +36,9 @@ export const fetchGuestbookEntries = async (filter: {
 			},
 		}
 	);
+	if (!response.ok) {
+		throw new Error("Failed to fetch guestbook entries");
+	}
 	const data = await response.json();
 	return data;
 };
@@ -78,14 +85,17 @@ const MyPageComp: React.FC = () => {
 		if (!token) {
 			router.push("/login");
 		} else {
-			// 프로필 정보와 guestbookEntries를 가져오는 로직 추가
-			fetchUserInfo().then((data) => {
-				setProfile({
-					nickname: data.nickname,
-					description: data.description || "",
-					photoUrl: data.photoUrl || "",
+			fetchUserInfo()
+				.then((data) => {
+					setProfile({
+						nickname: data.nickname,
+						description: data.description || "",
+						photoUrl: data.photoUrl || "",
+					});
+				})
+				.catch((error) => {
+					console.error("Error fetching user info:", error);
 				});
-			});
 		}
 	}, [router]);
 
@@ -95,10 +105,14 @@ const MyPageComp: React.FC = () => {
 				user: profile.nickname,
 				page: photoPage,
 				pageSize,
-			}).then((data) => {
-				const photoEntries = data.entries.filter((entry) => entry.photo_data);
-				setPhotoGuestbookEntries(photoEntries);
-			});
+			})
+				.then((data) => {
+					const photoEntries = data.entries.filter((entry) => entry.photo_data);
+					setPhotoGuestbookEntries(photoEntries);
+				})
+				.catch((error) => {
+					console.error("Error fetching guestbook entries:", error);
+				});
 		}
 	}, [profile.nickname, photoPage]);
 
@@ -108,25 +122,24 @@ const MyPageComp: React.FC = () => {
 				user: profile.nickname,
 				page: noPhotoPage,
 				pageSize,
-			}).then((data) => {
-				const noPhotoEntries = data.entries.filter(
-					(entry) => !entry.photo_data
-				);
-				setNoPhotoGuestbookEntries(noPhotoEntries);
-			});
+			})
+				.then((data) => {
+					const noPhotoEntries = data.entries.filter(
+						(entry) => !entry.photo_data
+					);
+					setNoPhotoGuestbookEntries(noPhotoEntries);
+				})
+				.catch((error) => {
+					console.error("Error fetching guestbook entries:", error);
+				});
 		}
 	}, [profile.nickname, noPhotoPage]);
 
 	const handleSaveProfile = async (newProfile: {
-		nickname?: string;
 		description?: string;
 		photo?: File | null;
 	}) => {
-		// 프로필 저장 API 요청 추가
 		const formData = new FormData();
-		if (newProfile.nickname) {
-			formData.append("nickname", newProfile.nickname);
-		}
 		if (newProfile.description) {
 			formData.append("description", newProfile.description);
 		}
@@ -157,11 +170,11 @@ const MyPageComp: React.FC = () => {
 			}
 
 			const data = await response.json();
-			setProfile({
-				nickname: data.nickname || profile.nickname,
-				description: data.description || profile.description,
-				photoUrl: data.photoUrl || profile.photoUrl,
-			});
+			setProfile((prevProfile) => ({
+				...prevProfile,
+				description: data.description || prevProfile.description,
+				photoUrl: data.photoUrl || prevProfile.photoUrl,
+			}));
 		} catch (error) {
 			let errorMessage = "An unknown error occurred";
 			if (error instanceof Error) {
@@ -190,27 +203,29 @@ const MyPageComp: React.FC = () => {
 	};
 
 	return (
-		<div className=" w-full p-4">
+		<div className="w-full p-4">
 			<div className="bg-white w-full h-[250px] flex flex-col items-center pt-8 mb-4">
 				<div className="flex space-x-4">
-					<div>
+					<div className="flex items-center">
 						{profile.photoUrl ? (
 							<img
 								src={profile.photoUrl}
 								alt="Profile"
-								className="w-24 h-24 rounded-full mb-2"
+								className="w-24 h-24 rounded-full "
 							/>
 						) : (
 							<img
 								src="/images/ci_2023_default.png"
 								alt="Default Profile"
-								className="W-24 h-24 rounded-full mb-2"
+								className="w-24 h-24 rounded-full "
 							/>
 						)}
 					</div>
-					<div className=" flex flex-col mt-2">
-						<div> {profile.nickname}</div>
-						<div> {profile.description}</div>
+					<div className="flex flex-col mt-2">
+						<div className="text-gray-500 text-sm mt-4">
+							@{profile.nickname}
+						</div>
+						<div>{profile.description}</div>
 					</div>
 				</div>
 				<button
@@ -223,13 +238,13 @@ const MyPageComp: React.FC = () => {
 			<div className="mb-4 bg-white flex flex-col pl-2 pr-2">
 				<div className="flex flex-col space-y-8">
 					<h2 className="text-xl mb-2">My GuestBooks</h2>
-					<div className="h-1/2 pl-2 pr-2 ">
+					<div className="h-1/2 pl-2 pr-2">
 						<h3 className="text-lg mb-2">With Photos</h3>
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 max-h-96 overflow-y-scroll">
+						<div className="bg-green-200 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 max-h-96 overflow-y-scroll justify-center">
 							{photoGuestbookEntries.map((entry) => (
 								<div
 									key={entry._id}
-									className="flex flex-col space-y-2 p-4 border rounded shadow-md w-[220px] h-[350px]"
+									className="flex flex-col space-y-2 p-4 border rounded shadow-md w-[220px] h-[350px] mx-auto"
 								>
 									{entry.photo_data && (
 										<div className="h-1/2 overflow-hidden">
@@ -251,7 +266,7 @@ const MyPageComp: React.FC = () => {
 									</div>
 									<button
 										onClick={() => handleDeleteEntry(entry._id)}
-										className="px-2 py-1 text-red-500 border border-red-500 rounded hover:bg-red-500 hover:text-white rounded mt-2"
+										className="px-2 py-1 text-red-500 border border-red-500 rounded hover:bg-red-500 hover:text-white mt-2"
 									>
 										Delete
 									</button>
@@ -276,11 +291,11 @@ const MyPageComp: React.FC = () => {
 					</div>
 					<div className="h-1/2 pl-2 pr-2">
 						<h3 className="text-lg mb-2">Without Photos</h3>
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 max-h-96 overflow-y-scroll">
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 max-h-96 overflow-y-scroll justify-center">
 							{noPhotoGuestbookEntries.map((entry) => (
 								<div
 									key={entry._id}
-									className="flex flex-col space-y-2 p-4 border rounded shadow-md w-[220px] h-[350px]"
+									className="flex flex-col space-y-2 p-4 border rounded shadow-md w-[220px] h-[350px] mx-auto"
 								>
 									<div className="text-center text-sm text-gray-500 font-bold">
 										{entry.name}
@@ -293,7 +308,7 @@ const MyPageComp: React.FC = () => {
 									</div>
 									<button
 										onClick={() => handleDeleteEntry(entry._id)}
-										className="px-2 py-1 text-red-500 border border-red-500 rounded hover:bg-red-500 hover:text-white rounded mt-2"
+										className="px-2 py-1 text-red-500 border border-red-500 rounded hover:bg-red-500 hover:text-white mt-2"
 									>
 										Delete
 									</button>

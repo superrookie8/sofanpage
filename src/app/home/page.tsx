@@ -39,12 +39,12 @@ const MainPage: React.FC = () => {
 	};
 
 	return (
-		<div className="bg-transparent min-h-screen flex flex-col items-center relative ">
+		<div className="bg-transparent min-h-screen flex flex-col items-center relative">
 			<div className="bg-yellow-300 h-[400px] w-full mb-4 z-10">
 				여기 메인 사진
 			</div>
 
-			<div className=" w-full flex justify-center z-10">
+			<div className="w-full flex justify-center z-10">
 				<div className="w-full max-w-6xl">
 					<div className="bg-white text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
 						프로필
@@ -55,18 +55,18 @@ const MainPage: React.FC = () => {
 				</div>
 			</div>
 
-			<div className=" w-full flex justify-center z-10">
+			<div className="w-full flex justify-center z-10">
 				<div className="w-full max-w-6xl">
 					<div className="bg-white text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
 						기록
 					</div>
-					<section className="w-full bg-white p-4 mb-4 rounded ">
+					<section className="w-full bg-white p-4 mb-4 rounded overflow-x-auto">
 						<Stats />
 					</section>
 				</div>
 			</div>
 
-			<div className=" w-full flex justify-center z-10">
+			<div className="w-full flex justify-center z-10">
 				<div className="w-full max-w-6xl">
 					<div className="bg-white text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
 						사진
@@ -79,7 +79,7 @@ const MainPage: React.FC = () => {
 				</div>
 			</div>
 
-			<div className=" w-full flex justify-center z-10">
+			<div className="w-full flex justify-center z-10">
 				<div className="w-full max-w-6xl">
 					<div className="bg-white text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
 						게임

@@ -9,14 +9,10 @@ export async function PUT(req: NextRequest) {
 
 	try {
 		const formData = await req.formData();
-		const nickname = formData.get("nickname")?.toString();
 		const description = formData.get("description")?.toString();
 		const photo = formData.get("photo");
 
 		const backendFormData = new FormData();
-		if (nickname) {
-			backendFormData.append("nickname", nickname);
-		}
 		if (description) {
 			backendFormData.append("description", description);
 		}
@@ -46,6 +42,7 @@ export async function PUT(req: NextRequest) {
 		if (error instanceof Error) {
 			errorMessage = error.message;
 		}
+		console.error("Error processing request:", errorMessage);
 		return NextResponse.json({ message: errorMessage }, { status: 500 });
 	}
 }

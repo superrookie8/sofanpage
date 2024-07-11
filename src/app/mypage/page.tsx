@@ -1,5 +1,5 @@
 "use client";
-import MyPageComp from "@/components/MyPageComponent";
+import MyPageComp from "@/components/myPageComponent";
 import useAuth from "@/hooks/useAuth";
 
 export default function Mypage() {
