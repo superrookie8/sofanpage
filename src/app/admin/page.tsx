@@ -4,9 +4,7 @@ import React, { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-interface Props {}
-
-const Admin: React.FC<Props> = (props) => {
+const Admin: React.FC = () => {
 	const router = useRouter();
 
 	useEffect(() => {
@@ -15,6 +13,7 @@ const Admin: React.FC<Props> = (props) => {
 			router.push("/admin/login");
 		}
 	}, [router]);
+
 	return (
 		<div>
 			<h1>Admin Dashboard</h1>
