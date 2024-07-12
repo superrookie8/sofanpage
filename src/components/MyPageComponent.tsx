@@ -216,6 +216,7 @@ const MyPageComp: React.FC = () => {
 									layout="fill"
 									className="rounded-full"
 									style={{ objectFit: "cover" }}
+									sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 24px"
 								/>
 							</div>
 						) : (
@@ -226,6 +227,7 @@ const MyPageComp: React.FC = () => {
 									fill
 									className="rounded-full"
 									style={{ objectFit: "cover" }}
+									sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 24px"
 								/>
 							</div>
 						)}
