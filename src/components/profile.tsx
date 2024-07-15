@@ -17,7 +17,7 @@ const Profile: React.FC = () => {
 	useEffect(() => {
 		const fetchProfile = async () => {
 			try {
-				const response = await fetch("/api/admin/getprofile", {
+				const response = await fetch("/api/getprofile", {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
