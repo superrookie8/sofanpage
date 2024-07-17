@@ -74,7 +74,7 @@ const GuestBookList: React.FC = () => {
 	const setPage = activeTab === "photos" ? setPhotoPage : setNoPhotoPage;
 
 	return (
-		<div className="bg-white w-full flex justify-center items-center p-4 rounded-lg shadow-lg">
+		<div className=" w-full flex justify-center items-center p-4 rounded-lg shadow-lg">
 			<div className="relative p-4 w-full flex flex-col">
 				{/* Tabs */}
 				<div className="flex justify-between space-x-4 mb-4">
