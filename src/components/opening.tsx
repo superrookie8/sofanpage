@@ -4,12 +4,12 @@ interface Props {}
 
 const Opening: React.FC<Props> = (props) => {
 	return (
-		<div className="h-[580px] w-auto relative">
+		<div className="relative h-[580px] w-full sm:w-[1000px] md:w-[1100px]">
 			<Image
 				src="/images/leesohee1920.png"
 				alt="Super Sohee"
 				fill
-				sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+				sizes="100vw"
 				style={{ objectFit: "cover" }}
 				priority
 			/>
