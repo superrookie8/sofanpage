@@ -5,7 +5,7 @@ const Background: React.FC = () => {
 	return (
 		<div className="fixed w-full h-full z-0">
 			<Image
-				src="/images/soheeposter13.png"
+				src="/images/soheeposter26.png"
 				alt="Background"
 				fill
 				style={{

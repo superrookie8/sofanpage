@@ -28,7 +28,7 @@ export default function Page() {
 	// }, []);
 
 	return (
-		<main className="min-h-screen flex justify-center items-center">
+		<main className="bg-white min-h-screen flex justify-center items-center">
 			<div className="flex flex-col items-center justify-center min-h-screen">
 				BNK NO 36. 이소희
 				{/* 전체 화면을 가운데 정렬하는 컨테이너 */}
