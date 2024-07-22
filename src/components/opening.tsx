@@ -4,13 +4,15 @@ interface Props {}
 
 const Opening: React.FC<Props> = (props) => {
 	return (
-		<div className="relative h-[580px] w-full sm:w-[1000px] md:w-[1100px]">
+		<div className="relative h-[580px] w-full sm:w-full md:w-full lg:w-[1500px] responsive-image-container">
 			<Image
-				src="/images/leesohee1920.png"
+				src="/images/banner.png"
 				alt="Super Sohee"
-				fill
-				sizes="100vw"
-				style={{ objectFit: "cover" }}
+				layout="responsive"
+				width={1500}
+				height={580}
+				sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 1500px"
+				style={{ objectFit: "contain" }}
 				priority
 			/>
 		</div>

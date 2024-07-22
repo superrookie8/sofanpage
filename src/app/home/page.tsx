@@ -40,7 +40,7 @@ const MainPage: React.FC = () => {
 
 	return (
 		<div className="bg-transparent min-h-screen flex flex-col items-center relative">
-			<div className="w-full flex items-center sm: h-[200px] md:h-[300px]  lg:h-[400px]  max-w-6xl ">
+			<div className="w-full flex items-center sm: h-[200px] md:h-[300px]  lg:h-[400px] mb-4  max-w-6xl ">
 				<MainImage />
 			</div>
 

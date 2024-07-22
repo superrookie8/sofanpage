@@ -23,6 +23,17 @@ body {
 		width: 100%;
 		height: 100%;
 	}
+	.responsive-image-container {
+		width: 100%;
+		height: auto;
+	}
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+	.responsive-image-container {
+		width: 80%;
+		height: auto;
+	}
 }
 
 .page-enter {
