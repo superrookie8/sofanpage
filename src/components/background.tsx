@@ -10,7 +10,7 @@ const Background: React.FC = () => {
 				fill
 				style={{
 					objectFit: "contain",
-					objectPosition: "top",
+					objectPosition: "center",
 					marginTop: "32px",
 				}}
 				quality={100}

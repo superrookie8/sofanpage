@@ -40,7 +40,7 @@ const MainPage: React.FC = () => {
 
 	return (
 		<div className="bg-transparent min-h-screen flex flex-col items-center relative">
-			<div className="w-full flex items-center sm: h-[200px] md:h-[300px]  lg:h-[400px] mb-4  max-w-6xl ">
+			<div className="w-full flex items-center sm: h-[200px] md:h-[300px]  lg:h-[400px]  max-w-6xl ">
 				<MainImage />
 			</div>
 
@@ -50,7 +50,9 @@ const MainPage: React.FC = () => {
 						프로필
 					</div>
 					<section className="w-full bg-white p-4 mb-4 rounded">
-						<Profile />
+						<div className="flex flex-wrap justify-center">
+							<Profile />
+						</div>
 					</section>
 				</div>
 			</div>
