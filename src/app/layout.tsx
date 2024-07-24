@@ -8,8 +8,12 @@ import Header from "@/components/header";
 import Background from "@/components/background";
 
 export const metadata: Metadata = {
-	title: { default: "BNK NO36.Lee Sohee", template: "%s | Lee Sohee" },
-	description: "Welcome to the fan page of BNK NO36. Lee Sohee.",
+	title: {
+		default: "농구선수 이소희 팬페이지 SUPER SOHEE",
+		template: "%s | Lee Sohee",
+	},
+	description:
+		"Welcome to the fan page of BNK NO36. Lee Sohee. 농구선수 이소희의 팬페이지 입니다!",
 	keywords: [
 		"WKBL",
 		"BNK SUM",
