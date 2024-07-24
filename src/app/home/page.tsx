@@ -49,8 +49,8 @@ const MainPage: React.FC = () => {
 					<div className="bg-white text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
 						프로필
 					</div>
-					<section className="w-full bg-white p-4 mb-4 rounded">
-						<div className="flex flex-wrap justify-center">
+					<section className="w-full bg-white pb-4 mb-4 rounded">
+						<div className="flex flex-wrap ">
 							<Profile />
 						</div>
 					</section>
