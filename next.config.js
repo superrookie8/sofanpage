@@ -13,6 +13,15 @@ const nextConfig = {
 			},
 		];
 	},
+	images: {
+		remotePatterns: [
+			{
+				protocol: "https",
+				hostname: "jumpbcdn.iwinv.biz",
+				pathname: "/news/data/**",
+			},
+		],
+	},
 };
 
 module.exports = nextConfig;

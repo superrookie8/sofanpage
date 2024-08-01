@@ -8,7 +8,6 @@ const Opening: React.FC<Props> = (props) => {
 			<Image
 				src="/images/banner.png"
 				alt="Super Sohee"
-				layout="responsive"
 				width={1500}
 				height={580}
 				sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 1500px"
