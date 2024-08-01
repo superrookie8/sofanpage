@@ -4,7 +4,7 @@ import Stats from "@/components/stats";
 import GetPhotos from "@/components/photos";
 import { useState } from "react";
 import BrickBreakerGame from "@/components/brickbreakergame";
-import Background from "@/components/background";
+import MainImage from "@/components/mainImage";
 
 const MainPage: React.FC = () => {
 	const [showGame, setShowGame] = useState(false);
@@ -40,8 +40,8 @@ const MainPage: React.FC = () => {
 
 	return (
 		<div className="bg-transparent min-h-screen flex flex-col items-center relative">
-			<div className="bg-yellow-300 h-[400px] w-full mb-4 z-10">
-				여기 메인 사진
+			<div className="w-full flex items-center sm: h-[200px] md:h-[300px]  lg:h-[400px]  max-w-6xl ">
+				<MainImage />
 			</div>
 
 			<div className="w-full flex justify-center z-10">
@@ -49,8 +49,10 @@ const MainPage: React.FC = () => {
 					<div className="bg-white text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
 						프로필
 					</div>
-					<section className="w-full bg-white p-4 mb-4 rounded">
-						<Profile />
+					<section className="w-full bg-white pb-4 mb-4 rounded">
+						<div className="flex flex-wrap ">
+							<Profile />
+						</div>
 					</section>
 				</div>
 			</div>

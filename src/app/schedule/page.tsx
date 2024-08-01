@@ -1,3 +1,4 @@
+// src/components/Schedule.tsx
 "use client";
 import { useEffect } from "react";
 import Calendar from "@/components/calender";
@@ -15,16 +16,14 @@ const Schedule: React.FC = () => {
 	}, [setSelectedLocation]);
 
 	return (
-		<div>
-			<div className="flex justify-center items-center">
-				<div className="min-h-screen w-full flex flex-col justify-center p-8">
-					<div className="flex flex-col md:flex-row md:min-w-[1200px] md:space-x-4">
-						<div className="bg-red-500 md:w-1/2 mb-4 md:mb-0 p-4 rounded-lg shadow-lg">
-							<Calendar />
-						</div>
-						<div className="relative bg-red-500 md:w-1/2 h-[400px] md:h-auto p-4 rounded-lg shadow-lg">
-							<Map />
-						</div>
+		<div className="flex overflow-x-hidden justify-center items-center min-h-screen w-full">
+			<div className="flex flex-col  justify-center p-4 w-full max-w-screen-lg">
+				<div className="flex flex-col  md:flex-row lg:flex-row  md:space-x-4 lg:space-x-4">
+					<div className="bg-white w-full md:w-1/2 lg:w-1/2 mb-4 md:mb-0 lg:mb-0 rounded-lg shadow-lg">
+						<Calendar />
+					</div>
+					<div className="bg-white relative w-full md:w-1/2 lg:w-1/2 h-[400px] md:h-auto lg:h-auto p-4 rounded-lg shadow-lg">
+						<Map />
 					</div>
 				</div>
 			</div>

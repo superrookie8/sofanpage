@@ -50,7 +50,7 @@ const Stats: React.FC = () => {
 	useEffect(() => {
 		const fetchStats = async () => {
 			try {
-				const response = await fetch("/api/admin/getstats", {
+				const response = await fetch("/api/getstats", {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",

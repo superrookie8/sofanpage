@@ -93,25 +93,19 @@ const Login: React.FC = () => {
 	};
 
 	return (
-		<div className="w-full h-screen flex flex-col justify-center items-center">
-			<div className="w-[500px] h-[60px] bg-red-500 flex justify-center items-center relative rounded-tl-md rounded-tr-md">
-				<Image
-					src="/images/supersohee2.png"
-					alt="LOGO Image"
-					fill
-					sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 500px"
-					style={{ objectFit: "contain" }}
-					priority
-				/>
+		<div className="w-full h-screen flex flex-col justify-center items-center p-4 overflow-y-hidden">
+			<div className="w-full max-w-[500px] h-[60px] bg-red-500 flex justify-center items-center relative rounded-tl-md rounded-tr-md text-xl font-bold text-white">
+				SUPER SOHEE
 			</div>
+
 			<form
 				onSubmit={LoginHandler}
-				className="w-[500px] h-[230px] bg-red-300 flex flex-col justify-center items-center rounded-bl-md rounded-br-md"
+				className="w-full max-w-[500px] h-auto bg-red-200 flex flex-col justify-center items-center rounded-bl-md rounded-br-md p-4"
 			>
-				<div className="w-[500px] h-[60px] bg-red-300 flex flex-col justify-center items-center p-8">
-					<div className="w-[400px]">
+				<div className="w-full max-w-[500px] h-auto bg-red-200 flex flex-col justify-center items-center p-4">
+					<div className="w-full max-w-[400px]">
 						<input
-							className="pl-3 pr-20 w-[400px] focus:outline-none focus:border-transparent rounded-md"
+							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md"
 							name="nickname"
 							value={nickname}
 							onChange={handleNicknameChange}
@@ -119,15 +113,15 @@ const Login: React.FC = () => {
 							autoComplete="username"
 						></input>
 						<div
-							className="w-[400px] bg-yellow-300"
+							className="w-full bg-yellow-300 mt-2"
 							style={{ fontSize: "10px", color: nicknameMessage.color }}
 						>
 							{nicknameMessage.message}
 						</div>
 					</div>
 				</div>
-				<div className="w-[500px] h-[60px] bg-red-300 flex flex-col justify-center items-center p-8">
-					<div className="relative w-[400px] flex justify-center items-center">
+				<div className="w-full max-w-[500px] h-auto bg-red-200 flex flex-col justify-center items-center p-4">
+					<div className="relative w-full max-w-[400px] flex justify-center items-center">
 						<input
 							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md"
 							type={showPassword ? "text" : "password"}
@@ -146,16 +140,16 @@ const Login: React.FC = () => {
 						</button>
 					</div>
 					<div
-						className="w-[400px]"
+						className="w-full mt-2"
 						style={{ fontSize: "10px", color: passwordValid.color }}
 					>
 						{passwordValid.message}
 					</div>
 				</div>
-				<div className="w-[500px] h-[50px] flex justify-center items-center mt-4">
+				<div className="w-full max-w-[500px] h-[50px] flex justify-center items-center mt-4">
 					<button
 						type="submit"
-						className={`w-[100px] h-[40px] flex justify-center items-center mr-8 rounded-md ${
+						className={`w-[100px] h-[40px] flex justify-center items-center mr-4 rounded-md text-sm ${
 							formValid ? "bg-red-500" : "bg-gray-300"
 						}`}
 						disabled={!formValid}
@@ -166,7 +160,7 @@ const Login: React.FC = () => {
 						onClick={() => {
 							router.push("/signup");
 						}}
-						className="w-[100px] h-[40px] bg-green-200 flex justify-center items-center ml-8 rounded-md"
+						className="w-[100px] h-[40px] bg-green-200 flex justify-center items-center ml-4 rounded-md text-sm"
 					>
 						회원가입하기
 					</button>

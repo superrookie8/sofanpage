@@ -16,8 +16,14 @@ const config: Config = {
 			fontFamily: {
 				sans: ["GmarketSansMedium", "sans-serif"],
 			},
+			screens: {
+				sm: { min: "320px", max: "500px" },
+				md: { min: "501px", max: "950px" },
+				lg: { min: "951px" },
+			},
 		},
 	},
 	plugins: [],
 };
+
 export default config;

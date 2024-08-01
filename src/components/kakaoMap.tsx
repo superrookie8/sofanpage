@@ -12,11 +12,10 @@ const Map = () => {
 	const selectedLocation = useRecoilValue(selectedLocationState);
 
 	useEffect(() => {
-		// 스크립트 로딩 및 지도 초기화
 		const loadScript = () => {
 			const script = document.createElement("script");
 			script.async = true;
-			script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_API_KEY}&autoload=false&libraries=services`;
+			script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_API_KEY}&autoload=false&libraries=services`;
 			document.head.appendChild(script);
 
 			script.onload = () => {
@@ -35,7 +34,7 @@ const Map = () => {
 					const map = new window.kakao.maps.Map(container, options);
 
 					// 마커 추가
-					new window.kakao.maps.Marker({
+					const marker = new window.kakao.maps.Marker({
 						map: map,
 						position: new window.kakao.maps.LatLng(
 							selectedLocation.latitude,
@@ -59,11 +58,17 @@ const Map = () => {
 
 		loadScript();
 
-		// 컴포넌트 언마운트 시 스크립트 제거
+		// 컴포넌트 언마운트 시 스크립트와 지도 객체 정리
 		return () => {
 			const kakaoScript = document.querySelector("script[src*='kakao']");
 			if (kakaoScript) {
 				document.head.removeChild(kakaoScript);
+			}
+			const container = document.getElementById("map");
+			if (container) {
+				while (container.firstChild) {
+					container.removeChild(container.firstChild);
+				}
 			}
 		};
 	}, [selectedLocation]);

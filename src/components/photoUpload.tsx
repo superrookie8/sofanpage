@@ -35,7 +35,9 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotoUpload }) => {
 		fileInputRef.current?.click();
 	};
 
-	const latestPhoto = photos[photos.length - 1]?.preview || null;
+	// photos가 null 또는 undefined인 경우 기본값으로 빈 배열 사용
+	const latestPhoto =
+		photos?.length > 0 ? photos[photos.length - 1]?.preview : null;
 
 	return (
 		<div className="relative w-200 h-200 border-2 border-dashed border-gray-300 rounded-lg flex justify-center items-center cursor-pointer">

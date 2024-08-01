@@ -176,18 +176,18 @@ const SignUp: React.FC = () => {
 	};
 
 	return (
-		<div className="w-full h-screen flex flex-col justify-center items-center ">
-			<div className="w-[500px] h-[80px] bg-red-500 flex justify-center items-center rounded-tl-md rounded-tr-md ">
+		<div className="w-full h-screen flex flex-col justify-center items-center p-4">
+			<div className="w-full max-w-[500px] h-[80px] bg-red-500 flex justify-center items-center rounded-tl-md rounded-tr-md text-white text-xl font-bold">
 				슈퍼소히
 			</div>
 			<form
 				onSubmit={signUpHandler}
-				className="w-[500px] h-[300px] bg-red-200 flex flex-col justify-center items-center"
+				className="w-full max-w-[500px] bg-red-200 flex flex-col justify-center items-center rounded-bl-md rounded-br-md  p-4"
 			>
-				<div className="w-[500px] h-[60px] flex flex-col justify-center items-center p-8 rounded-bl-md rounded-br-md">
-					<div className="w-[400px] flex justify-center items-center mt-5 relative">
+				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
+					<div className="w-full max-w-[400px] flex justify-center items-center mt-5 relative">
 						<input
-							className="pl-3 pr-20 w-[400px] focus:outline-none focus:border-transparent rounded-md"
+							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md"
 							name="nickname"
 							value={nickname}
 							onChange={handleNicknameChange}
@@ -195,7 +195,7 @@ const SignUp: React.FC = () => {
 							placeholder="닉네임"
 						/>
 						<button
-							className="absolute right-0 top-0 h-full px-3 bg-red-500 rounded-md"
+							className="absolute right-0 top-0 h-full px-3 bg-red-500 text-white rounded-md"
 							type="button"
 							onClick={nicknameHandler}
 						>
@@ -203,14 +203,14 @@ const SignUp: React.FC = () => {
 						</button>
 					</div>
 					<div
-						className="w-[400px] "
-						style={{ fontSize: "10px", color: nicknameMessage.color }}
+						className="w-full max-w-[400px] mt-2 text-xs"
+						style={{ color: nicknameMessage.color }}
 					>
 						{nicknameMessage.message}
 					</div>
 				</div>
-				<div className="w-[500px] h-[60px] bg-red-200 flex flex-col justify-center items-center p-8">
-					<div className="relative w-[400px] flex justify-center items-center mt-5">
+				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
+					<div className="relative w-full max-w-[400px] flex justify-center items-center mt-5">
 						<input
 							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md"
 							type={showPassword ? "text" : "password"}
@@ -228,15 +228,14 @@ const SignUp: React.FC = () => {
 						</button>
 					</div>
 					<div
-						className="w-[400px]"
-						style={{ fontSize: "10px", color: passwordValid.color }}
+						className="w-full max-w-[400px] mt-2 text-xs"
+						style={{ color: passwordValid.color }}
 					>
 						{passwordValid.message}
 					</div>
 				</div>
-
-				<div className="w-[500px] h-[60px] bg-red-200 flex flex-col justify-center items-center p-8">
-					<div className="relative w-[400px] flex justify-center items-center mt-5">
+				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
+					<div className="relative w-full max-w-[400px] flex justify-center items-center mt-5">
 						<input
 							className="pl-3 pr-10 w-full focus:outline-none focus:border-transparent rounded-md"
 							type={showPasswordConfirm ? "text" : "password"}
@@ -254,27 +253,23 @@ const SignUp: React.FC = () => {
 						</button>
 					</div>
 					<div
-						className="w-[400px]"
-						style={{ fontSize: "10px", color: passwordConfirmValid.color }}
+						className="w-full max-w-[400px] mt-2 text-xs"
+						style={{ color: passwordConfirmValid.color }}
 					>
 						{passwordConfirmValid.message}
 					</div>
 				</div>
-
-				<div className="w-[600px] h-[50px] flex flex-col justify-center items-center mt-2">
+				<div className="w-full h-[50px] flex justify-center items-center mt-4">
 					<button
-						className={`w-[250px] h-[40px] flex justify-center items-center rounded-md ${
-							formValid ? "bg-red-500" : "bg-gray-300"
+						className={`w-full max-w-[250px] h-[40px] flex justify-center items-center rounded-md ${
+							formValid ? "bg-red-500 text-white" : "bg-gray-300 text-gray-500"
 						}`}
 						disabled={!formValid}
 					>
 						가입하기
 					</button>
 				</div>
-				<div
-					className="text-blue-500 hover:text-blue-700 cursor-pointer mt-4"
-					style={{ fontSize: "10px" }}
-				>
+				<div className="text-blue-500 hover:text-blue-700 cursor-pointer mt-4 text-xs">
 					<Link href="/login">이미 아이디가 있습니다</Link>
 				</div>
 			</form>
