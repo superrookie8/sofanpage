@@ -1,4 +1,5 @@
 import { atom } from "recoil";
+
 export interface PhotoData {
 	id: string;
 	preview: string;
@@ -9,5 +10,5 @@ export interface PhotoData {
 
 export const photoPreviewState = atom<PhotoData[]>({
 	key: "photoPreviewState",
-	default: [],
+	default: [], // 기본값을 빈 배열로 설정
 });
