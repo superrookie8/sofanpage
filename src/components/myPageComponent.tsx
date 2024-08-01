@@ -20,7 +20,6 @@ export const fetchUserInfo = async (): Promise<{
 		throw new Error("Failed to fetch user info");
 	}
 	const data = await response.json();
-	console.log("Fetched user info:", data); // 디버깅을 위한 로그 추가
 	return data;
 };
 
@@ -76,7 +75,7 @@ const MyPageComp: React.FC = () => {
 	const [noPhotoGuestbookEntries, setNoPhotoGuestbookEntries] = useState<
 		GuestBookEntry[]
 	>([]);
-	const [scrapNews, setScrapNews] = useState<any[]>([]); // 뉴스 스크랩 기능 추가 후 타입 지정
+	const [scrapNews, setScrapNews] = useState<any[]>([]);
 	const [photoPage, setPhotoPage] = useState(1);
 	const [noPhotoPage, setNoPhotoPage] = useState(1);
 	const pageSize = 10;
@@ -213,7 +212,7 @@ const MyPageComp: React.FC = () => {
 								<Image
 									src={profile.photoUrl}
 									alt="Profile"
-									layout="fill"
+									fill
 									className="rounded-full"
 									style={{ objectFit: "cover" }}
 									sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 24px"
