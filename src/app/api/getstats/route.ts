@@ -14,17 +14,13 @@ export async function GET(req: NextRequest) {
 			}
 		);
 
-		console.log("Backend response status:", backendResponse.status);
 		const backendText = await backendResponse.text();
-		console.log("Backend response text:", backendText);
 
 		if (!backendResponse.ok) {
-			console.error("Backend response error:", backendText);
 			throw new Error("Failed to fetch stats from backend");
 		}
 
 		const backendData = JSON.parse(backendText);
-		console.log("Fetched data from backend:", backendData);
 
 		return NextResponse.json(backendData, { status: 200 });
 	} catch (error: any) {
