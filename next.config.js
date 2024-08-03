@@ -20,6 +20,11 @@ const nextConfig = {
 				hostname: "jumpbcdn.iwinv.biz",
 				pathname: "/news/data/**",
 			},
+			{
+				protocol: "https",
+				hostname: "cdn.rookie.co.kr",
+				pathname: "/news/thumbnail/**",
+			},
 		],
 	},
 };
