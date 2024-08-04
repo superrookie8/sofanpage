@@ -65,57 +65,32 @@ export default function News() {
 
 	return (
 		<div>
-			<div className="flex justify-center items-center ">
+			<div className="flex justify-center items-center">
 				<div className="bg-white bg-opacity-75 min-h-screen w-full flex-col justify-center p-8 relative">
-					<div className="bg-red-200 min-h-screen w-full flex p-8">
-						<MainNews article={data.main_article} />
-					</div>
-					<div className="bg-yellow-200 min-h-screen w-full flex flex-col  md:flex-row lg:flex-row   md:space-x-4 lg:space-x-4 justify-center p-8">
-						<div className="w-full md:w-1/2 lg:w-1/2  items-center">
-							<h2>Jumpball Section</h2>
-							{displayedJumpballArticles.map((article) => (
-								<JumpballSection key={article.link} jumpballarticle={article} />
-							))}
-							<div className="flex justify-between mt-4">
-								<button
-									disabled={jumpPage === 1}
-									onClick={() => setJumpPage(jumpPage - 1)}
-									className="px-4 py-2 bg-gray-300 disabled:opacity-50"
-								>
-									Previous
-								</button>
-								<button
-									disabled={jumpPage * articlesPerPage >= jump.articles.length}
-									onClick={() => setJumpPage(jumpPage + 1)}
-									className="px-4 py-2 bg-gray-300 disabled:opacity-50"
-								>
-									Next
-								</button>
-							</div>
+					<div className="min-h-[50vh] w-full flex flex-col items-center p-8">
+						<h2>Main Article</h2>
+						<div className="bg-white grid rounded-lg shadow-md">
+							<MainNews article={data.main_article} />
 						</div>
-						<div className="w-full md:w-1/2 lg:w-1/2 flex flex-col items-center">
-							<h2>Rookie Section</h2>
-							{displayedRookieArticles.map((article) => (
-								<RookieSection key={article.link} rookiearticle={article} />
-							))}
-							<div className="flex justify-between mt-4">
-								<button
-									disabled={rookiePage === 1}
-									onClick={() => setRookiePage(rookiePage - 1)}
-									className="px-4 py-2 bg-gray-300 disabled:opacity-50"
-								>
-									Previous
-								</button>
-								<button
-									disabled={
-										rookiePage * articlesPerPage >= rookie.articles.length
-									}
-									onClick={() => setRookiePage(rookiePage + 1)}
-									className="px-4 py-2 bg-gray-300 disabled:opacity-50"
-								>
-									Next
-								</button>
-							</div>
+					</div>
+					<div className=" min-h-screen w-full flex flex-col md:flex-row lg:flex-row md:space-x-4 lg:space-x-4 justify-center">
+						<div className="w-full md:w-1/2 lg:w-1/2 mt-4 md:mt-0">
+							<JumpballSection
+								articles={displayedJumpballArticles}
+								page={jumpPage}
+								setPage={setJumpPage}
+								totalArticles={jump.articles.length}
+								articlesPerPage={articlesPerPage}
+							/>
+						</div>
+						<div className="w-full md:w-1/2 lg:w-1/2 mt-4 md:mt-0">
+							<RookieSection
+								articles={displayedRookieArticles}
+								page={rookiePage}
+								setPage={setRookiePage}
+								totalArticles={rookie.articles.length}
+								articlesPerPage={articlesPerPage}
+							/>
 						</div>
 					</div>
 				</div>
