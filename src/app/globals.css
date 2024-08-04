@@ -18,6 +18,11 @@ body {
 	display: none;
 }
 
+.wrap-text {
+    white-space: pre-wrap; /* 줄바꿈과 공백을 유지합니다. */
+    word-wrap: break-word; /* 긴 단어가 자동으로 줄바꿈됩니다. */
+}
+
 @media (max-width: 768px) {
 	.fixed {
 		width: 100%;
