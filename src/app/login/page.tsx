@@ -47,7 +47,7 @@ const Login: React.FC = () => {
 		const { value } = event.target;
 		setNickname(value);
 		if (!value.trim()) {
-			setNicknameMessage({ message: "", color: "" });
+			setNicknameMessage({ message: "아이디가 없습니다", color: "red" });
 			setFormValid(false);
 		}
 	};
@@ -57,7 +57,10 @@ const Login: React.FC = () => {
 		setPassword(value);
 		setFormValid(checkFormValid());
 		if (!value.trim()) {
-			setPasswordValid({ message: "", color: "" });
+			setPasswordValid({
+				message: "비밀번호를 잘못 입력하셨습니다",
+				color: "red",
+			});
 		} else {
 			const regex =
 				/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$^&*-]).{8,}$/;
