@@ -14,6 +14,7 @@ const fetchGuestbookEntries = async (): Promise<{
 	const response = await fetch(`/api/getguestbooks`, {
 		headers: {
 			Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+			"Cache-Control": "no-store",
 		},
 	});
 	if (!response.ok) {
