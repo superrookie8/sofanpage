@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const isDevelopment = process.env.NODE_ENV === "development";
+// const isDevelopment = process.env.NODE_ENV === "development";
 
 export async function GET(req: NextRequest) {
 	try {
@@ -19,7 +19,6 @@ export async function GET(req: NextRequest) {
 			headers: {
 				"Content-Type": "application/json",
 			},
-			cache: isDevelopment ? "no-store" : "default",
 		});
 
 		if (!response.ok) {
