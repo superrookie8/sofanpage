@@ -15,6 +15,7 @@ const fetchGuestbookEntries = async (): Promise<{
 		headers: {
 			Authorization: `Bearer ${sessionStorage.getItem("token")}`,
 		},
+		cache: "no-store",
 	});
 	if (!response.ok) {
 		throw new Error("Network response was not ok");
