@@ -15,7 +15,6 @@ const fetchGuestbookEntries = async (): Promise<{
 		headers: {
 			Authorization: `Bearer ${sessionStorage.getItem("token")}`,
 		},
-		cache: "no-store",
 	});
 	if (!response.ok) {
 		throw new Error("Network response was not ok");
@@ -30,7 +29,7 @@ const formatDate = (dateString: string): string => {
 };
 
 const GuestBookList: React.FC = () => {
-	useAuth();
+	// useAuth();
 	const [activeTab, setActiveTab] = useState("photos");
 	const [photoEntries, setPhotoEntries] = useState<GuestBookEntry[]>([]);
 	const [noPhotoEntries, setNoPhotoEntries] = useState<GuestBookEntry[]>([]);
