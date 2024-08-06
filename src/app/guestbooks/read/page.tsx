@@ -40,20 +40,17 @@ const GuestBookList: React.FC = () => {
 	const router = useRouter();
 
 	useEffect(() => {
-		const fetchEntries = async () => {
-			setLoading(true);
-			try {
-				const data = await fetchGuestbookEntries();
+		setLoading(true);
+		fetchGuestbookEntries()
+			.then((data) => {
 				setPhotoEntries(data.photo_entries);
 				setNoPhotoEntries(data.no_photo_entries);
-			} catch (error) {
-				console.error("Failed to fetch guestbook entries:", error);
-			} finally {
 				setLoading(false);
-			}
-		};
-
-		fetchEntries();
+			})
+			.catch((error) => {
+				console.error("Failed to fetch guestbook entries:", error);
+				setLoading(false);
+			});
 	}, []);
 
 	const handleTabChange = (tab: string) => {
