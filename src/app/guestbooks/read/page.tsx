@@ -39,20 +39,20 @@ const GuestBookList: React.FC = () => {
 	const pageSize = 10;
 	const router = useRouter();
 
-	const fetchEntries = async () => {
-		setLoading(true);
-		try {
-			const data = await fetchGuestbookEntries();
-			setPhotoEntries(data.photo_entries);
-			setNoPhotoEntries(data.no_photo_entries);
-			setLoading(false);
-		} catch (error) {
-			console.error("Failed to fetch guestbook entries:", error);
-			setLoading(false);
-		}
-	};
-
 	useEffect(() => {
+		const fetchEntries = async () => {
+			setLoading(true);
+			try {
+				const data = await fetchGuestbookEntries();
+				setPhotoEntries(data.photo_entries);
+				setNoPhotoEntries(data.no_photo_entries);
+			} catch (error) {
+				console.error("Failed to fetch guestbook entries:", error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
 		fetchEntries();
 	}, []);
 
