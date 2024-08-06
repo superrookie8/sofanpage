@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const isDevelopment = process.env.NODE_ENV === "development";
-
 export async function GET(req: NextRequest) {
 	try {
 		const { searchParams } = new URL(req.url);
@@ -19,7 +17,6 @@ export async function GET(req: NextRequest) {
 			headers: {
 				"Content-Type": "application/json",
 			},
-			cache: isDevelopment ? "no-store" : "default",
 		});
 
 		if (!response.ok) {
