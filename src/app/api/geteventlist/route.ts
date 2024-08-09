@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				cache: isDevelopment ? "no-store" : "default",
+				cache: "no-store",
 			}
 		);
 
