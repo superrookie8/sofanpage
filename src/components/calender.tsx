@@ -30,6 +30,7 @@ const Calendar: React.FC = () => {
 				const data = await response.json();
 				if (Array.isArray(data)) {
 					setSchedules(data);
+					console.log(data);
 				} else {
 					console.error("Fetched data is not an array:", data);
 				}
@@ -77,20 +78,24 @@ const Calendar: React.FC = () => {
 			(schedule) => schedule.date === formattedDate
 		);
 
+
 		return todaySchedules.map((schedule, index) => (
 			<div
 				key={index}
 				className={`mt-1 text-[10px] ${
 					schedule.isHome ? "bg-red-200" : "bg-blue-200"
-				} rounded p-1`}
+				} rounded p-1 overflow-y-auto cursor-pointer`}
+				onClick={() => handleDateClick(schedule.date)}
 			>
-				<span
-					className="cursor-pointer"
-					onClick={() => handleDateClick(schedule.date)}
-				>
+				<div>
+				<span>
 					{schedule.opponent}
 				</span>
+
+				
 				<span>{` ${schedule.time}`}</span>
+			</div>
+			<div className="mt-2 screen-y-scroll">{schedule.specialGame ? <span>{schedule.specialGame}</span> : ""}</div>
 			</div>
 		));
 	};
