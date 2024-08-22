@@ -63,6 +63,9 @@ const Header: React.FC = () => {
 							<Link href="/mypage" className={linkStyle("/mypage")}>
 								Mypage
 							</Link>
+							<Link href="/diary" className={linkStyle("/diary")}>
+								Diary
+							</Link>
 							<button
 								onClick={handleLogout}
 								className="px-2 py-1 rounded hover:bg-red-200 active:bg-red-600 focus:outline-none"

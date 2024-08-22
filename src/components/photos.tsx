@@ -66,7 +66,7 @@ const GetPhotos: React.FC = () => {
 					onClick={closeModal}
 				>
 					<div
-						className="w-full relative bg-white p-4 rounded max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-3xl max-h-[90vh] overflow-auto mx-4 my-8 sm:my-16"
+						className="w-full relative bg-white bg-opacity-75 p-4 rounded max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-3xl max-h-[90vh] overflow-auto mx-4 my-8 sm:my-16"
 						onClick={(e) => e.stopPropagation()}
 					>
 						<div className="relative w-full h-[60vh] sm:h-[70vh] md:h-[80vh]">

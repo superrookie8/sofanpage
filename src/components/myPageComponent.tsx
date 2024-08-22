@@ -204,7 +204,7 @@ const MyPageComp: React.FC = () => {
 
 	return (
 		<div className="w-full p-4">
-			<div className="bg-white w-full h-[250px] flex flex-col items-center pt-8 mb-4">
+			<div className=" w-full h-[250px] flex flex-col items-center pt-8 mb-4 border-b-2 border-t-2 border-red-500 ">
 				<div className="flex space-x-4">
 					<div className="flex items-center">
 						{profile.photoUrl ? (
@@ -245,7 +245,7 @@ const MyPageComp: React.FC = () => {
 					Edit Profile
 				</button>
 			</div>
-			<div className="mb-4 bg-white flex flex-col pl-2 pr-2">
+			<div className="mb-4 flex flex-col pl-2 pr-2">
 				<div className="flex flex-col space-y-8">
 					<h2 className="text-xl mb-2">My GuestBooks</h2>
 					<div className="h-1/2 pl-2 pr-2">
