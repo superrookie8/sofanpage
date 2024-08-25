@@ -29,7 +29,6 @@ const Schedule: React.FC = () => {
 							<Map />
 						</div>
 						<div className="mt-4 p-4 h-[250px] sm:h-auto border border-red-500 rounded">
-							{" "}
 							<DirectionsGuide />
 						</div>
 					</div>

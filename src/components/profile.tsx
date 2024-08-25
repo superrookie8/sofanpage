@@ -48,7 +48,7 @@ const Profile: React.FC = () => {
 	}
 
 	return (
-		<div className="p-4 w-[500px] bg-white">
+		<div className="p-4 w-[500px]">
 			<p className="ml-8 mt-4 text-gray-500">Name : {profile.name}</p>
 			<p className="ml-8 mt-4 text-gray-500">Team : {profile.team}</p>
 			<p className="ml-8 mt-4 text-gray-500">Position : {profile.position}</p>

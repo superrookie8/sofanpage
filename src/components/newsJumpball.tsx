@@ -54,13 +54,15 @@ const JumpballSection: React.FC<JumpballProps> = ({
 		setPage(Math.min(totalPages, page + maxPagesToShow));
 	};
 
+	console.log("Articles received:", articles);
+
 	return (
 		<div className="flex flex-col justify-center p-4 h-[320vh] sm:h-[150vh] overflow-y-scroll">
 			<h2 className="flex justify-center mb-4">Jumpball Section</h2>
 			<div className="grid grid-cols-1 gap-4 h-full overflow-y-scroll">
 				{articles.map((article) => (
 					<div
-						key={article.link}
+						key={article._id}
 						className="bg-gray-100 shadow-md rounded-lg p-4 flex flex-col sm:flex-row sm:h-[25vh]"
 					>
 						<div className="flex justify-center md:w-1/3 mb-4 md:mb-0 sm: pr-4">

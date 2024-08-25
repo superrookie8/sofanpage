@@ -49,7 +49,7 @@ const MainPage: React.FC = () => {
 					<div className="bg-white text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
 						프로필
 					</div>
-					<section className="w-full bg-white pb-4 mb-4 rounded">
+					<section className="w-full bg-white bg-opacity-75 pb-4 mb-4 rounded">
 						<div className="flex flex-wrap ">
 							<Profile />
 						</div>
@@ -59,10 +59,10 @@ const MainPage: React.FC = () => {
 
 			<div className="w-full flex justify-center z-10">
 				<div className="w-full max-w-6xl">
-					<div className="bg-white text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
+					<div className="bg-white text-red-500 bg-opacity-75 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
 						기록
 					</div>
-					<section className="w-full bg-white p-4 mb-4 rounded overflow-x-auto">
+					<section className="w-full bg-white bg-opacity-75 p-4 mb-4 rounded overflow-x-auto">
 						<Stats />
 					</section>
 				</div>
@@ -70,10 +70,10 @@ const MainPage: React.FC = () => {
 
 			<div className="w-full flex justify-center z-10">
 				<div className="w-full max-w-6xl">
-					<div className="bg-white text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
+					<div className="bg-white bg-opacity-75 text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
 						사진
 					</div>
-					<section className="w-full bg-white p-4 mb-4 rounded overflow-x-auto">
+					<section className="w-full bg-white bg-opacity-75 p-4 mb-4 rounded overflow-x-auto">
 						<div className="flex flex-wrap justify-center">
 							<GetPhotos />
 						</div>
@@ -83,10 +83,10 @@ const MainPage: React.FC = () => {
 
 			<div className="w-full flex justify-center z-10">
 				<div className="w-full max-w-6xl">
-					<div className="bg-white text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
+					<div className="bg-white bg-opacity-75 text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
 						게임
 					</div>
-					<section className="w-full bg-white p-4 mb-4 rounded text-center">
+					<section className="w-full bg-white bg-opacity-75 p-4 mb-4 rounded text-center">
 						<div className="font-bold text-black">
 							<div>벽돌깨기</div>
 							<div>미스터비 구조대</div>

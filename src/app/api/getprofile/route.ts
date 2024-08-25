@@ -16,7 +16,6 @@ export async function GET(req: NextRequest) {
 		);
 
 		const backendData = await backendResponse.json();
-		console.log("backendData", backendData);
 
 		if (!backendResponse.ok) {
 			throw new Error(backendData.message || "Failed to get profile.");

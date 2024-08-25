@@ -86,7 +86,7 @@ const Stats: React.FC = () => {
 		keys: (keyof T)[],
 		type: "average" | "total"
 	) => (
-		<table className="min-w-full bg-white">
+		<table className="min-w-full ">
 			<thead>
 				<tr>
 					<th className="py-2 px-4 border-b-2 border-red-200 bg-red-100 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
