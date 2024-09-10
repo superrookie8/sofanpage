@@ -19,8 +19,8 @@ body {
 }
 
 .wrap-text {
-    white-space: pre-wrap; /* 줄바꿈과 공백을 유지합니다. */
-    word-wrap: break-word; /* 긴 단어가 자동으로 줄바꿈됩니다. */
+	white-space: pre-wrap; /* 줄바꿈과 공백을 유지합니다. */
+	word-wrap: break-word; /* 긴 단어가 자동으로 줄바꿈됩니다. */
 }
 
 @media (max-width: 768px) {
@@ -61,4 +61,10 @@ body {
 	opacity: 0;
 	transform: translateX(-100%);
 	transition: opacity 300ms, transform 300ms;
+}
+
+#unityContainer {
+	width: 960px;
+	height: 600px;
+	background-color: black;
 }

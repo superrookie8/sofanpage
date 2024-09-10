@@ -13,9 +13,11 @@ const SelectedWeather: React.FC<SelectedWeatherProps> = ({ weather }) => {
 	};
 
 	return (
-		<div className="text-2xl">
-			{weather ? weatherIcons[weather] : "날씨를 선택하세요"}
-		</div>
+		<div className="text-lg">
+  <span className="text-3xl">{weatherIcons[weather]}</span> {/* weatherIcons 부분은 text-2xl */}
+  <span>{weatherIcons[weather] ? '' : '선택해주세요'}</span> {/* 선택해주세요는 text-lg */}
+</div>
+
 	);
 };
 
