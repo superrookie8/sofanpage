@@ -68,3 +68,13 @@ body {
 	height: 600px;
 	background-color: black;
 }
+
+.background{
+	background-attachment: fixed;
+}
+
+@media (max-width:768px){
+	.background{
+		background-attachment: fixed;
+	}
+}
