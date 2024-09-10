@@ -6,7 +6,7 @@ import { locations } from "@/data/schedule";
 import Map from "@/components/kakaoMap";
 import { useSetRecoilState } from "recoil";
 import { selectedLocationState } from "@/states/locationState";
-import DirectionsGuide from "@/components/DirectionsGuide";
+import DirectionsGuide from "@/components/directionsGuide";
 
 const Schedule: React.FC = () => {
 	const setSelectedLocation = useSetRecoilState(selectedLocationState);

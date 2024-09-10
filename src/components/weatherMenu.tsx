@@ -1,5 +1,4 @@
-import { isWasm } from "next/dist/build/swc";
-import React, { useState, FormEvent } from "react";
+import React, { useState } from "react";
 
 interface Props {
 	onSelect: (weather: string) => void;
@@ -25,7 +24,7 @@ const WeatherToggleMenu: React.FC<Props> = ({ onSelect }) => {
 		<div className="relative">
 			<button
 				onClick={weatherMenu}
-				className="px-2 py-1 hover:bg-red-200 active: border border-red-500 rounded focus:outline-none"
+				className="px-2 py-1 hover:bg-red-200  focus:outline-none"
 			>
 				{isWeatherOpen ? "▼" : "▶"}
 			</button>
