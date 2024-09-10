@@ -112,6 +112,13 @@ const Header: React.FC = () => {
 							Events
 						</Link>
 						<Link
+							href="/arcade"
+							className={mobileLinkStyle("/arcade")}
+							onClick={toggleMenu}
+						>
+							Arcade
+						</Link>
+						<Link
 							href="/schedule"
 							className={mobileLinkStyle("/schedule")}
 							onClick={toggleMenu}
