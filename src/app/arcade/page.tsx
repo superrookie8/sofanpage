@@ -110,7 +110,7 @@ const Arcade: React.FC<Props> = (props) => {
 								<div>달려라 슈퍼소히</div>
 							</div>
 							<div className="text-center">
-								<p>난이도 점점 세짐</p>
+								<p>100코인 모으면 천재..</p>
 							</div>
 							{showUnity && (
 								<div className="flex flex-col justify-center items-center">

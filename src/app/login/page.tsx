@@ -49,6 +49,8 @@ const Login: React.FC = () => {
 		if (!value.trim()) {
 			setNicknameMessage({ message: "아이디가 없습니다", color: "red" });
 			setFormValid(false);
+		}else {
+			setNicknameMessage({message:"", color:"red"})
 		}
 	};
 
@@ -116,7 +118,7 @@ const Login: React.FC = () => {
 							autoComplete="username"
 						></input>
 						<div
-							className="w-full bg-yellow-300 mt-2"
+							className="w-full  mt-2"
 							style={{ fontSize: "10px", color: nicknameMessage.color }}
 						>
 							{nicknameMessage.message}
@@ -143,7 +145,7 @@ const Login: React.FC = () => {
 						</button>
 					</div>
 					<div
-						className="w-full mt-2"
+						className="w-full mt-2 ml-10"
 						style={{ fontSize: "10px", color: passwordValid.color }}
 					>
 						{passwordValid.message}

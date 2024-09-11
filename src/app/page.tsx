@@ -30,7 +30,7 @@ export default function Page() {
 	return (
 		<main className="bg-white min-h-screen flex flex-col items-center justify-center">
 			<div className="text-center">
-				<h1 className="text-2xl font-bold">BNK NO 36. 이소희</h1>
+				<h1 className="text-2xl font-bold">BNK NO 6. 이소희</h1>
 			</div>
 			<div className="mt-8 h-[580px] w-full lg:w-[1440px] flex items-center justify-center">
 				<Opening />

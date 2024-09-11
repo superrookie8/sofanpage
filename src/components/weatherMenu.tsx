@@ -24,7 +24,7 @@ const WeatherToggleMenu: React.FC<Props> = ({ onSelect }) => {
 		<div className="relative">
 			<button
 				onClick={weatherMenu}
-				className="px-2 py-1 hover:bg-red-200  focus:outline-none"
+				className="px-2 py-1 ml-6 hover:bg-red-200  focus:outline-none"
 			>
 				{isWeatherOpen ? "▼" : "▶"}
 			</button>
@@ -39,7 +39,7 @@ const WeatherToggleMenu: React.FC<Props> = ({ onSelect }) => {
 									onSelect(key);
 									setIsWeatherOpen(false);
 								}}
-								className="text-2xl p-2 hover:bg-gray-200 rounded"
+								className=" text-2xl p-2 hover:bg-gray-200 rounded"
 							>
 								{weatherIcons[key]}
 							</button>

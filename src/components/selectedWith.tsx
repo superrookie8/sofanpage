@@ -14,8 +14,9 @@ const SelectedTogether: React.FC<SelectedWithProps> = ({ together }) => {
 	};
 
 	return (
-		<div className="text-lg">
-			{togetherWatching[together] || "선택해주세요" }
+		<div className="text-xs">
+			<span className="text-xs">{togetherWatching[together] }</span>
+			<span>{togetherWatching[together] ? "": "선택해주세요"}</span>
 		</div>
 	);
 };

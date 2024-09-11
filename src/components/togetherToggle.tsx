@@ -32,7 +32,7 @@ const TogetherToggleMenu: React.FC<Props> = ({ onSelect }) => {
 
 			{isTogetherWatchingOpen && (
 				<div className="bg-white absolute top-full  py-2 border rounded shadow-lg">
-					<div className="flex flex-col items-center justify-center w-[200px] h-[200px] p-4">
+					<div className="flex flex-col items-center justify-center w-[110px] h-[160px] p-4">
 						{Object.keys(togetherWatching).map((key) => (
 							<button
 								key={key}
@@ -40,7 +40,7 @@ const TogetherToggleMenu: React.FC<Props> = ({ onSelect }) => {
 									onSelect(key);
 									setIsTogetherWatchingOpen(false);
 								}}
-								className="text-lg p-1 hover:bg-gray-200 rounded"
+								className="text-sm p-1 hover:bg-gray-200 rounded"
 							>
 								{togetherWatching[key]}
 							</button>
