@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { where, weather, together, result } from "@/data/constants";
 import { fetchUserStats } from "@/api";
+import UserProfileModal from "./userProfileModal";
 
 // 사용자 정보를 가져오는 함수 (토큰 기반)
 export const fetchUserInfo = async (): Promise<{
@@ -111,6 +112,55 @@ const DiaryTabs: React.FC = () => {
 		away_win_percentage: 0,
 		attendance_percentage: 0,
 	}); // 통계 데이터 상태 추가
+	const [isModalOpen, setIsModalOpen] = useState(false); // 모달 열림 상태 추가
+	const [selectedProfile, setSelectedProfile] = useState({
+		nickname: "",
+		description: "",
+		photoUrl: "",
+	}); // 선택된 유저의 프로필 상태 추가
+
+	const handleProfileClick = async (nickname: string) => {
+		// 토큰 가져오기
+		const token = sessionStorage.getItem("token");
+
+		if (!token) {
+			console.error("No token found");
+			return;
+		}
+
+		try {
+			// 선택된 유저의 정보를 가져오기
+			const profileResponse = await fetch(
+				`/api/getuserinfo?nickname=${nickname}`,
+				{
+					headers: {
+						Authorization: `Bearer ${token}`, // 토큰을 헤더에 포함
+					},
+				}
+			);
+
+			if (!profileResponse.ok) {
+				throw new Error("Failed to fetch profile info");
+			}
+
+			const profileData = await profileResponse.json();
+
+			// 통계 정보 가져오기
+			const statsData = await fetchUserStats(nickname);
+
+			// 상태 업데이트
+			setSelectedProfile({
+				nickname: profileData.nickname,
+				description: profileData.description || "",
+				photoUrl: profileData.photoUrl || "",
+			});
+
+			setUserStats(statsData);
+			setIsModalOpen(true); // 모달 열기
+		} catch (error) {
+			console.error("Error fetching profile or stats:", error);
+		}
+	};
 
 	useEffect(() => {
 		const fetchUserAndDiaries = async () => {
@@ -286,8 +336,16 @@ const DiaryTabs: React.FC = () => {
 												className="object-cover rounded-t-lg"
 											/>
 										</div>
-										<div className="flex flex-col w-full h-2/5 p-2">
-											<span>아이디: {diary.name}</span>
+										<div className="flex flex-col w-full h-2/5 p-2 text-sm justify-center pl-8">
+											<div>
+												<span>아이디: </span>
+												<span
+													onClick={() => handleProfileClick(diary.name)} // 클릭 시 프로필 정보 로드
+													className="cursor-pointer text-blue-500 hover:underline"
+												>
+													{diary.name}
+												</span>
+											</div>
 											<span>
 												관람일자: {new Date(diary.date).toLocaleDateString()}
 											</span>
@@ -306,6 +364,13 @@ const DiaryTabs: React.FC = () => {
 							)}
 						</div>
 					)}
+					{/* 프로필 모달 컴포넌트 */}
+					<UserProfileModal
+						isOpen={isModalOpen}
+						onClose={() => setIsModalOpen(false)}
+						profile={selectedProfile}
+						userStats={userStats}
+					/>
 				</div>
 			</div>
 		</div>
