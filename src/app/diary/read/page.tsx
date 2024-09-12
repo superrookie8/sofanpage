@@ -80,42 +80,44 @@ const DiaryRead: React.FC<Props> = (props) => {
 					로그인 바로가기
 				</button>
 			</div>
-			<div className="w-full h-[500px] ">
-				<div className="w-full p-8 h-[500px] bg-black bg-opacity-75 flex flex-row justify-start gap-8 items-start">
+			<div className="w-full h-[500px]">
+				<div className="w-full p-8 h-[500px] bg-black bg-opacity-75 grid justify-center gap-8 items-center overflow-y-auto">
 					{diaries && diaries.length > 0 ? (
-						diaries.map((diary) => (
-							<div
-								key={diary._id}
-								className="w-[200px] h-[270px] bg-white rounded"
-							>
-								<div className="w-full h-3/5 flex justify-center pt-4">
-									<Image
-										src={`data:image/jpeg;base64,${diary.diary_photo}`}
-										alt="diary entry"
-										width={150}
-										height={100}
-										style={{ objectFit: "fill" }}
-										className="object-cover rounded border shadow-lg "
-									/>
-								</div>
+						<div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full">
+							{diaries.map((diary) => (
+								<div
+									key={diary._id}
+									className="w-[200px] h-[270px] bg-white rounded"
+								>
+									<div className="w-full h-3/5 flex justify-center pt-4">
+										<Image
+											src={`data:image/jpeg;base64,${diary.diary_photo}`}
+											alt="diary entry"
+											width={150}
+											height={100}
+											style={{ objectFit: "fill" }}
+											className="object-cover rounded border shadow-lg"
+										/>
+									</div>
 
-								<div className="flex flex-col w-full h-2/5 text-sm pt-4 pl-4 pb-4">
-									<span>아이디: {diary.name}</span>
-									<span>
-										관람일자: {new Date(diary.date).toLocaleDateString()}
-									</span>
-									<span>
-										날씨: {weather[diary.weather as keyof typeof weather]}
-									</span>
-									<span>
-										좌석:{" "}
-										{`${diary.seat_info.section}/${diary.seat_info.row}/${diary.seat_info.number}`}
-									</span>
+									<div className="flex flex-col w-full h-2/5 text-sm pt-4 pl-4 pb-4">
+										<span>아이디: {diary.name}</span>
+										<span>
+											관람일자: {new Date(diary.date).toLocaleDateString()}
+										</span>
+										<span>
+											날씨: {weather[diary.weather as keyof typeof weather]}
+										</span>
+										<span>
+											좌석:{" "}
+											{`${diary.seat_info.section}/${diary.seat_info.row}/${diary.seat_info.number}`}
+										</span>
+									</div>
 								</div>
-							</div>
-						))
+							))}
+						</div>
 					) : (
-						<p>일지가 없습니다.</p> // 일지가 없을 때 표시할 텍스트
+						<p>일지가 없습니다.</p>
 					)}
 				</div>
 			</div>
