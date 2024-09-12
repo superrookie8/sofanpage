@@ -17,7 +17,7 @@ const SelectedLocation: React.FC<SelectedLocationProps> = ({ location}) => {
 	};
 
 	return (
-		<div className="text-lg">
+		<div className="text-xs">
             <span className="text-sm">{where[location]}</span>
 			<span>{where[location]? " " : "선택해주세요"}</span>
 		</div>

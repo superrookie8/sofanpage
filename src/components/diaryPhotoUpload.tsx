@@ -45,7 +45,10 @@ const DiaryPhotoUpload: React.FC<DiaryPhotoUploadProps> = ({
 		photos?.length > 0 ? photos[photos.length - 1]?.preview : null;
 
 	return (
-		<div className="relative w-400 h-400  bg-white border-2 border-dashed border-gray-300 rounded-lg flex justify-center items-center cursor-pointer">
+		<div
+			className="relative w-400 h-400  bg-white border-2 border-dashed border-gray-300 rounded-lg flex justify-center items-center cursor-pointer"
+			onClick={handleUploadClick}
+		>
 			<input
 				type="file"
 				ref={fileInputRef}
@@ -64,10 +67,7 @@ const DiaryPhotoUpload: React.FC<DiaryPhotoUploadProps> = ({
 					/>
 				</div>
 			) : (
-				<div
-					onClick={handleUploadClick}
-					className="relative flex justify-center items-center text-center space-y-2"
-				>
+				<div className="relative flex justify-center items-center text-center space-y-2">
 					<svg className="w-[350px] h-[300px] mx-auto"></svg>
 					<p className="absolute text-black">사진 업로드 (클릭)</p>
 				</div>

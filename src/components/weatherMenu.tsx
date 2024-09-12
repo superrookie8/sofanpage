@@ -21,7 +21,7 @@ const WeatherToggleMenu: React.FC<Props> = ({ onSelect }) => {
 	};
 
 	return (
-		<div className="relative">
+		<div className="relative z-10">
 			<button
 				onClick={weatherMenu}
 				className="px-2 py-1 ml-6 hover:bg-red-200  focus:outline-none"
