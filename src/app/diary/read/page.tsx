@@ -7,7 +7,7 @@ import Image from "next/image";
 
 interface Props {}
 
-export const fetchAllDiariesPage = async (
+const fetchAllDiariesPage = async (
 	page: number,
 	pageSize: number
 ): Promise<DiaryEntry[]> => {
