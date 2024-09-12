@@ -70,8 +70,7 @@ const DiaryRead: React.FC<Props> = (props) => {
 		<>
 			<div className="w-full h-[150px] flex flex-col gap-4 justify-center items-center bg-black bg-opacity-75">
 				<span className="text-white mr-4">
-					{" "}
-					작성하려면, 로그인이 필요합니다!{" "}
+					작성하려면, 로그인이 필요합니다!
 				</span>
 				<button
 					onClick={goToLogin}
