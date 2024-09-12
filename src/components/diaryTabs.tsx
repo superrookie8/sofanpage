@@ -2,6 +2,7 @@
 import { DiaryEntry } from "@/data/diary";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { where, weather, together, result } from "@/data/constants";
 
 // 사용자 정보를 가져오는 함수 (토큰 기반)
 export const fetchUserInfo = async (): Promise<{
@@ -101,40 +102,6 @@ const DiaryTabs: React.FC = () => {
 	const [pageSize] = useState(10);
 	const [user, setUser] = useState<string | null>(null); // 사용자 정보 상태 추가
 	const [loading, setLoading] = useState<boolean>(true); // 로딩 상태 추가
-
-	const where = {
-		busan: "부산 사직실내체육관",
-		asan: "아산 이순신체육관",
-		yongin: "용인 실내체육관",
-		incheon: "인천 도원체육관",
-		bucheon: "부천 체육관",
-		chungju: "청주 체육관",
-		second: "창원 실내체육관",
-		third: "울산 동천체육관",
-		other: "기타",
-	};
-	const weather = {
-		sunny: "☀️",
-		cloudy: "☁️",
-		snowy: "❄️",
-		rainy: "☂️",
-		night: "🌙",
-		stormy: "⚡",
-	};
-
-	const together = {
-		alone: "나와 함께",
-		family: "가족",
-		friend: "친구",
-		friends: "친구들",
-		co_worker: "동료",
-		couples: "연인",
-	};
-
-	const result = {
-		win: "승요",
-		lose: "패요",
-	};
 
 	useEffect(() => {
 		const fetchUserAndDiaries = async () => {
@@ -315,7 +282,7 @@ const DiaryTabs: React.FC = () => {
 												날씨: {weather[diary.weather as keyof typeof weather]}
 											</span>
 											<span>
-												좌석:{" "}
+												좌석:
 												{`${diary.seat_info.section}/${diary.seat_info.row}/${diary.seat_info.number}`}
 											</span>
 										</div>
