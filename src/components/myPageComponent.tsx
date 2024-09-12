@@ -5,6 +5,7 @@ import ProfileModal from "@/components/profileModal";
 import { GuestBookEntry } from "@/data/guestbook";
 import { format } from "date-fns";
 import Image from "next/image";
+import { fetchUserStats } from "@/api";
 
 export const fetchUserInfo = async (): Promise<{
 	nickname: string;
@@ -69,6 +70,14 @@ const MyPageComp: React.FC = () => {
 		description: "",
 		photoUrl: "",
 	});
+
+	const [userStats, setUserStats] = useState({
+		win_percentage: 0,
+		sunny_percentage: 0,
+		home_win_percentage: 0,
+		away_win_percentage: 0,
+		attendance_percentage: 0,
+	});
 	const [photoGuestbookEntries, setPhotoGuestbookEntries] = useState<
 		GuestBookEntry[]
 	>([]);
@@ -92,6 +101,10 @@ const MyPageComp: React.FC = () => {
 						description: data.description || "",
 						photoUrl: data.photoUrl || "",
 					});
+					return fetchUserStats(data.nickname);
+				})
+				.then((stats) => {
+					setUserStats(stats);
 				})
 				.catch((error) => {
 					console.error("Error fetching user info:", error);
@@ -204,47 +217,72 @@ const MyPageComp: React.FC = () => {
 
 	return (
 		<div className="w-full p-4">
-			<div className=" w-full h-[250px] flex flex-col items-center pt-8 mb-4 border-b-2 border-t-2 border-red-500 ">
-				<div className="flex space-x-4">
-					<div className="flex items-center">
-						{profile.photoUrl ? (
-							<div className="relative w-24 h-24 rounded-full">
-								<Image
-									src={profile.photoUrl}
-									alt="Profile"
-									fill
-									className="rounded-full"
-									style={{ objectFit: "cover" }}
-									sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 24px"
-								/>
-							</div>
-						) : (
-							<div className="relative w-24 h-24 rounded-full">
-								<Image
-									src="/images/ci_2023_default.png"
-									alt="Default Profile"
-									fill
-									className="rounded-full"
-									style={{ objectFit: "cover" }}
-									sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 24px"
-								/>
-							</div>
-						)}
-					</div>
-					<div className="flex flex-col mt-2">
-						<div className="text-gray-500 text-sm mt-4">
-							@{profile.nickname}
+			<div className=" w-full h-[280px] flex flex-col items-center pt-8 mb-4 border-b-2 border-t-2 border-red-500 ">
+				<div className="flex space-x-4 flex-col">
+					<div className="flex flex-row justify-center gap-4">
+						<div className="flex items-center">
+							{profile.photoUrl ? (
+								<div className="relative w-24 h-24 rounded-full">
+									<Image
+										src={profile.photoUrl}
+										alt="Profile"
+										fill
+										className="rounded-full"
+										style={{ objectFit: "cover" }}
+										sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 24px"
+									/>
+								</div>
+							) : (
+								<div className="relative w-24 h-24 rounded-full">
+									<Image
+										src="/images/ci_2023_default.png"
+										alt="Default Profile"
+										fill
+										className="rounded-full"
+										style={{ objectFit: "cover" }}
+										sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 24px"
+									/>
+								</div>
+							)}
 						</div>
-						<div>{profile.description}</div>
+						<div className="flex flex-col mt-2">
+							<div className="text-gray-500 text-sm mt-4">
+								@{profile.nickname}
+							</div>
+							<div>{profile.description}</div>
+						</div>
+					</div>
+					<div>
+						<div className="flex flex-col items-center space-y-2 mb-4">
+							<div className="flex flex-col text-sm pt-4">
+								<div className="flex flex-row w-full gap-4 ">
+									<div className="text-gray-500">
+										농구마니아지수: {userStats.attendance_percentage}%
+									</div>
+									<div className="text-gray-500">
+										날씨요정지수: {userStats.sunny_percentage}%
+									</div>
+								</div>
+								<div className="flex flex-row  w-full gap-8">
+									<div className="text-gray-500">
+										직관승요지수: {userStats.win_percentage}%
+									</div>
+									<div className="text-gray-500">
+										홈경기지수: {userStats.home_win_percentage}%
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 				<button
 					onClick={() => setIsModalOpen(true)}
-					className="mt-auto mb-4 px-4 py-2 text-red-500 border border-red-500 rounded hover:bg-red-500 hover:text-white"
+					className="mt-auto mb-8 px-4 py-2 text-red-500 border border-red-500 rounded hover:bg-red-500 hover:text-white"
 				>
 					Edit Profile
 				</button>
 			</div>
+
 			<div className="mb-4 flex flex-col pl-2 pr-2">
 				<div className="flex flex-col space-y-8">
 					<h2 className="text-xl mb-2">My GuestBooks</h2>

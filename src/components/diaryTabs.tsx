@@ -3,6 +3,7 @@ import { DiaryEntry } from "@/data/diary";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { where, weather, together, result } from "@/data/constants";
+import { fetchUserStats } from "@/api";
 
 // 사용자 정보를 가져오는 함수 (토큰 기반)
 export const fetchUserInfo = async (): Promise<{
@@ -95,6 +96,7 @@ export const fetchAllDiaries = async (
 		return [];
 	}
 };
+
 const DiaryTabs: React.FC = () => {
 	const [activeTab, setActiveTab] = useState<"A" | "B">("A"); // 기본 A탭
 	const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
@@ -102,20 +104,31 @@ const DiaryTabs: React.FC = () => {
 	const [pageSize] = useState(10);
 	const [user, setUser] = useState<string | null>(null); // 사용자 정보 상태 추가
 	const [loading, setLoading] = useState<boolean>(true); // 로딩 상태 추가
+	const [userStats, setUserStats] = useState({
+		win_percentage: 0,
+		sunny_percentage: 0,
+		home_win_percentage: 0,
+		away_win_percentage: 0,
+		attendance_percentage: 0,
+	}); // 통계 데이터 상태 추가
 
 	useEffect(() => {
 		const fetchUserAndDiaries = async () => {
 			try {
 				setLoading(true);
 
-				// A탭일 때만 개인 일지를 가져옴
-				if (activeTab === "A") {
-					// 사용자 정보를 먼저 가져옴
-					const userInfo = await fetchUserInfo();
-					setUser(userInfo.nickname);
+				// 사용자 정보를 먼저 가져옴
+				const userInfo = await fetchUserInfo();
+				setUser(userInfo.nickname);
 
-					// 사용자 정보가 있을 경우 개인 일지를 가져옴
-					if (userInfo.nickname) {
+				// 사용자 정보가 있을 경우 통계 데이터 가져오기
+				if (userInfo.nickname) {
+					const stats = await fetchUserStats(userInfo.nickname);
+					console.log("User stats:", stats); // 콘솔에서 통계 데이터 확인
+					setUserStats(stats);
+
+					// A탭일 때만 개인 일지를 가져옴
+					if (activeTab === "A") {
 						const personalDiaries = await fetchPersonalDiaries({
 							nickname: userInfo.nickname,
 							page,
@@ -125,7 +138,7 @@ const DiaryTabs: React.FC = () => {
 					}
 				}
 
-				// B탭일 때만 전체 일지를 가져옴
+				// B탭일 때는 전체 일지를 가져옴
 				if (activeTab === "B") {
 					const allDiaries = await fetchAllDiaries(page, pageSize);
 					setDiaries(allDiaries);
@@ -172,10 +185,10 @@ const DiaryTabs: React.FC = () => {
 			{activeTab === "A" && (
 				<div className="mt-4">
 					<div className="flex flex-row justify-between items-center w-full text-sm pl-4 pr-4 border-b-2 border-red-500  shadow-md">
-						<span>농구마니아지수: 80%</span>
-						<span>날씨요정지수: 50%</span>
-						<span>직관승요지수: 30%</span>
-						<span>홈경기 승요지수: 20%</span>
+						<span>농구마니아지수: {userStats.attendance_percentage}%</span>
+						<span>날씨요정지수: {userStats.sunny_percentage}%</span>
+						<span>직관승요지수: {userStats.win_percentage}%</span>
+						<span>홈경기 승요지수: {userStats.home_win_percentage}%</span>
 					</div>
 				</div>
 			)}
