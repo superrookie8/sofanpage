@@ -1,5 +1,6 @@
 // src/app/layout.tsx
 import type { Metadata } from "next";
+import Script from "next/script"; // Import Script from next
 import "./globals.css";
 import RecoilRootProvider from "@/utils/recoilRootProvider";
 import ScriptProvider from "@/utils/scriptProvider";
@@ -40,6 +41,19 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en">
+			{/* Google Tag Manager Script */}
+			<Script
+				async
+				src="https://www.googletagmanager.com/gtag/js?id=G-FESK7ETCDB"
+			></Script>
+			<Script id="google-analytics" strategy="afterInteractive">
+				{`
+				  window.dataLayer = window.dataLayer || [];
+				  function gtag(){dataLayer.push(arguments);}
+				  gtag('js', new Date());
+				  gtag('config', 'G-FESK7ETCDB');
+				`}
+			</Script>
 			<ScriptProvider />
 			<body>
 				<RecoilRootProvider>
