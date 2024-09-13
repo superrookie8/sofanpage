@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 		template: "%s | Lee Sohee",
 	},
 	description:
-		"Welcome to the fan page of BNK NO36. Lee Sohee. 농구선수 이소희의 팬페이지 입니다!",
+		"Welcome to the fan page of BNK NO 6. Lee Sohee. 농구선수 이소희의 팬페이지 입니다!",
 	keywords: [
 		"WKBL",
 		"BNK SUM",
