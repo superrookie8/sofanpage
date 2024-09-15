@@ -22,12 +22,13 @@
 
 ## 스크린샷
 웹
-![홈페이지](https://github.com/user-attachments/assets/cc6088ca-c123-4c3c-a15d-a7888d8b8dbb)
-![뉴스페이지](https://github.com/user-attachments/assets/37e7ceb8-edc5-4400-8d46-39574eee9b9c)
-![이벤트페이지](https://github.com/user-attachments/assets/571d4455-06af-4113-ba68-75caa2699715)
-![아케이드페이지](https://github.com/user-attachments/assets/aaa39976-4c32-44f4-80c0-b3ec53afe142)
-![방명록페이지](https://github.com/user-attachments/assets/8b157780-76dc-4383-9dfb-7c9b29fca7f8)
-![직관일지페이지](https://github.com/user-attachments/assets/848f0f28-85d7-4990-a3ef-60c275d5de44)
+
+<img src="https://github.com/user-attachments/assets/cc6088ca-c123-4c3c-a15d-a7888d8b8dbb" width="480" height="270" alt="홈페이지">
+<img src="https://github.com/user-attachments/assets/37e7ceb8-edc5-4400-8d46-39574eee9b9c" width="480" height="270" alt="뉴스페이지">
+<img src="https://github.com/user-attachments/assets/571d4455-06af-4113-ba68-75caa2699715" width="480" height="270" alt="이벤트페이지">
+<img src="https://github.com/user-attachments/assets/aaa39976-4c32-44f4-80c0-b3ec53afe142" width="480" height="270" alt="아케이드페이지">
+<img src="https://github.com/user-attachments/assets/8b157780-76dc-4383-9dfb-7c9b29fca7f8" width="480" height="270" alt="방명록페이지">
+<img src="https://github.com/user-attachments/assets/848f0f28-85d7-4990-a3ef-60c275d5de44" width="480" height="270" alt="직관일지페이지">
 
 
 ## 사용된 기술 스택
