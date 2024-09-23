@@ -5,6 +5,7 @@ import Image from "next/image";
 import { where, weather, together, result } from "@/data/constants";
 import { fetchUserStats } from "@/api";
 import UserProfileModal from "./userProfileModal";
+import Modal from "./alertModal";
 
 // 사용자 정보를 가져오는 함수 (토큰 기반)
 export const fetchUserInfo = async (): Promise<{
@@ -98,6 +99,19 @@ export const fetchAllDiaries = async (
 	}
 };
 
+export const deleteDiaryEntry = async (entryId: string): Promise<void> => {
+	const response = await fetch(`/api/deletediary?entry_id=${entryId}`,{
+		method: "DELETE",
+		headers: {
+			Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+		},
+	});
+	if (!response.ok){
+        const errorData = await response.json();
+		throw new Error(errorData.message);
+	}
+}
+
 const DiaryTabs: React.FC = () => {
 	const [activeTab, setActiveTab] = useState<"A" | "B">("A"); // 기본 A탭
 	const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
@@ -118,6 +132,10 @@ const DiaryTabs: React.FC = () => {
 		description: "",
 		photoUrl: "",
 	}); // 선택된 유저의 프로필 상태 추가
+	const [diaryToDelete, setDiaryToDelete] = useState<string | null>(null);
+	const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+	const [alertMessage, setAlertMessage] = useState("");
+	const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
 
 	const handleProfileClick = async (nickname: string) => {
 		// 토큰 가져오기
@@ -209,6 +227,33 @@ const DiaryTabs: React.FC = () => {
 		return <div>Loading...</div>;
 	}
 
+	const handleDeleteEntry = async (entryId: string) => {
+		setDiaryToDelete(entryId);
+		setIsAlertModalOpen(true);
+		setAlertMessage("일지를 삭제하시겠습니까?")
+		setIsDeleteConfirm(true);
+	};
+
+	const confirmDelete = async () => {
+		if (diaryToDelete) {
+			try {
+				await deleteDiaryEntry(diaryToDelete);
+				setDiaries(diaries.filter((diary) => diary._id !== diaryToDelete));
+				setAlertMessage("일지가 성공적으로 삭제되었습니다.");
+				setIsDeleteConfirm(false);
+				setIsAlertModalOpen(false);
+			} catch (error) {
+				console.error("Error deleting diary entry:", error);
+				setAlertMessage("일지 삭제 중 오류가 발생했습니다.");
+			}
+		}
+	};
+
+	const closeAlertModal = () => {
+		setIsAlertModalOpen(false);
+		setDiaryToDelete(null);
+	};
+
 	return (
 		<div className="w-full h-[600px] p-4">
 			{/* 탭 버튼들 */}
@@ -298,18 +343,25 @@ const DiaryTabs: React.FC = () => {
 										</span>
 									</div>
 								</div>
-								<div className="mt-2 bg-red-200 flex flex-row items-center p-2 rounded-md">
-									<div className="w-[100px] h-[70px] bg-gray-300 flex items-center justify-center rounded-lg">
-										<Image
-											src={`data:image/jpeg;base64,${diary.diary_photo}`}
-											alt="diary entry"
-											width={70}
-											height={70}
-											style={{ objectFit: "cover" }}
-											className="object-cover"
-										/>
+								<div className="flex flex-row justify-between items-center">
+									<div className="mt-2 w-full bg-red-200 flex flex-row items-center p-2 rounded-md relative">
+										<div className="w-[100px] h-[70px] bg-gray-300 flex items-center justify-center rounded-lg">
+											<Image
+												src={`data:image/jpeg;base64,${diary.diary_photo}`}
+												alt="diary entry"
+												width={70}
+												height={70}
+												style={{ objectFit: "cover" }}
+												className="object-cover"
+											/>
+										</div>
+										<div className="w-auto pl-4">{diary.diary_message}</div>
+										<button 
+										onClick={()=>handleDeleteEntry(diary._id)}
+										className="bg-gray-400 rounded-lg w-[100px] h-[40px] hover:bg-red-500 flex justify-center items-center absolute bottom-2 right-2">
+											삭제
+										</button>
 									</div>
-									<div className="w-auto pl-4">{diary.diary_message}</div>
 								</div>
 							</div>
 						))
@@ -370,6 +422,13 @@ const DiaryTabs: React.FC = () => {
 						onClose={() => setIsModalOpen(false)}
 						profile={selectedProfile}
 						userStats={userStats}
+					/>
+					<Modal
+						isOpen={isAlertModalOpen}
+						message={alertMessage}
+						onClose={closeAlertModal}
+						buttonText={isDeleteConfirm ? "확인" : "닫기"}
+						onConfirm={isDeleteConfirm ? confirmDelete : closeAlertModal}
 					/>
 				</div>
 			</div>
