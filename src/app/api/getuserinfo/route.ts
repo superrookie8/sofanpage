@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
 					Authorization: `Bearer ${token}`,
 					"Content-Type": "application/json",
 				},
+				cache: "no-store", // 캐시 방지
 			}
 		);
 

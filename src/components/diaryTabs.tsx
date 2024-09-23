@@ -192,7 +192,7 @@ const DiaryTabs: React.FC = () => {
 				// 사용자 정보가 있을 경우 통계 데이터 가져오기
 				if (userInfo.nickname) {
 					const stats = await fetchUserStats(userInfo.nickname);
-					console.log("User stats:", stats); // 콘솔에서 통계 데이터 확인
+					
 					setUserStats(stats);
 
 					// A탭일 때만 개인 일지를 가져옴
@@ -350,8 +350,8 @@ const DiaryTabs: React.FC = () => {
 												src={`data:image/jpeg;base64,${diary.diary_photo}`}
 												alt="diary entry"
 												width={70}
-												height={70}
-												style={{ objectFit: "cover" }}
+												height={50}
+												style={{ objectFit: "cover", width: "auto", height: "auto"  }}
 												className="object-cover"
 											/>
 										</div>

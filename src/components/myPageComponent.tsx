@@ -17,6 +17,7 @@ export const fetchUserInfo = async (): Promise<{
 		headers: {
 			Authorization: `Bearer ${sessionStorage.getItem("token")}`,
 		},
+		cache: "no-store", // 캐시 방지
 	});
 	if (!response.ok) {
 		throw new Error("Failed to fetch user info");
@@ -165,6 +166,9 @@ const MyPageComp: React.FC = () => {
 			formData.append("photo", newProfile.photo);
 		}
 
+		// 디버깅을 위한 콘솔 로그 추가
+		console.log("FormData to be sent:", Array.from(formData.entries()));
+
 		try {
 			const response = await fetch("/api/putuserinfo", {
 				method: "PUT",
@@ -178,27 +182,36 @@ const MyPageComp: React.FC = () => {
 				const contentType = response.headers.get("content-type");
 				if (contentType && contentType.indexOf("application/json") !== -1) {
 					const errorData = await response.json();
-					console.error("Failed to update profile:", errorData.message);
+
 					throw new Error(errorData.message);
 				} else {
 					const errorText = await response.text();
-					console.error("Failed to update profile:", errorText);
+
 					throw new Error(errorText);
 				}
 			}
 
 			const data = await response.json();
+			
 			setProfile((prevProfile) => ({
 				...prevProfile,
 				description: data.description || prevProfile.description,
 				photoUrl: data.photoUrl || prevProfile.photoUrl,
 			}));
+
+			// 프로필 업데이트 후 데이터를 다시 불러오기
+			fetchUserInfo().then((updatedData) => {
+				setProfile({
+					nickname: updatedData.nickname,
+					description: updatedData.description || "",
+					photoUrl: updatedData.photoUrl || "",
+				});
+			});
 		} catch (error) {
 			let errorMessage = "An unknown error occurred";
 			if (error instanceof Error) {
 				errorMessage = error.message;
 			}
-			console.error("Error updating profile:", errorMessage);
 			alert(`Error updating profile: ${errorMessage}`);
 		}
 	};
@@ -223,7 +236,7 @@ const MyPageComp: React.FC = () => {
 				setAlertMessage("항목이 성공적으로 삭제되었습니다.");
 				setIsDeleteConfirm(false);
 			} catch (error) {
-				console.error("Failed to delete guestbook entry:", error);
+
 				setAlertMessage(`Failed to delete guestbook entry: ${(error as Error).message}`);
 				setIsDeleteConfirm(false);
 			}
@@ -407,7 +420,7 @@ const MyPageComp: React.FC = () => {
 				</div>
 			</div>
 
-			<div className="mb-4 flex pl-2">
+			{/* <div className="mb-4 flex pl-2">
 				<h2 className="text-xl mb-2">Scrap News</h2>
 				<ul>
 					{scrapNews.map((news) => (
@@ -417,7 +430,7 @@ const MyPageComp: React.FC = () => {
 						</li>
 					))}
 				</ul>
-			</div>
+			</div> */}
 			<ProfileModal
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
