@@ -6,6 +6,8 @@ import { format } from "date-fns";
 import { GuestBookEntry } from "@/data/guestbook";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useRecoilValue } from "recoil";
+import { loginState } from "@/states/loginState";
 
 const fetchGuestbookEntries = async (): Promise<{
 	photo_entries: GuestBookEntry[];
@@ -38,6 +40,7 @@ const GuestBookList: React.FC = () => {
 	const [noPhotoPage, setNoPhotoPage] = useState(1);
 	const pageSize = 10;
 	const router = useRouter();
+	const isLoggedIn = useRecoilValue(loginState);
 
 	useEffect(() => {
 		setLoading(true);
@@ -56,6 +59,14 @@ const GuestBookList: React.FC = () => {
 	const handleTabChange = (tab: string) => {
 		setActiveTab(tab);
 	};
+
+	const handleCreateClick = () => {
+		if (isLoggedIn){
+			router.push("/guestbooks/create");
+		} else {
+			router.push("/login");
+		}
+	}
 
 	const displayEntries =
 		activeTab === "photos"
@@ -99,9 +110,7 @@ const GuestBookList: React.FC = () => {
 					</div>
 					<div className="flex ">
 						<button
-							onClick={() => {
-								router.push("/guestbooks/create");
-							}}
+							onClick={handleCreateClick}
 							className="border-red-500 border-2 text-red-500 font-bold py-2 px-4 rounded top-4 right-4 hover:bg-red-500 hover:text-white "
 						>
 							Create

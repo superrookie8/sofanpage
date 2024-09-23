@@ -7,6 +7,7 @@ import { useRecoilState } from "recoil";
 import { nicknameState } from "@/states/nicknameState";
 import { passwordState } from "@/states/passwordState";
 import EyeIcon from "@/icons/eyeicon";
+import Modal from "@/components/alertModal";
 
 interface ValidationState {
 	message: string;
@@ -38,6 +39,8 @@ const SignUp: React.FC = () => {
 		});
 
 	const [formValid, setFormValid] = useState(false);
+	const [showModal, setShowModal] = useState(false);
+	const [modalMessage, setModalMessage] = useState("");
 
 	const checkFormValid = useCallback(() => {
 		return (
@@ -146,9 +149,17 @@ const SignUp: React.FC = () => {
 	};
 
 	const handleNicknameBlur = () => {
-		if (!nicknameChecked) {
-			alert("닉네임 중복확인을 해주시기 바랍니다");
-		}
+		if (!nickname.trim()) {
+            setModalMessage("닉네임을 입력해 주세요.");
+            setShowModal(true);
+        } else if (!nicknameChecked) {
+            setModalMessage("닉네임 중복확인을 해주시기 바랍니다.");
+            setShowModal(true);
+        }
+	};
+
+	const handleModalClose = () => {
+		setShowModal(false);
 	};
 
 	const signUpHandler = (e: React.FormEvent<HTMLFormElement>) => {
@@ -158,7 +169,7 @@ const SignUp: React.FC = () => {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-			},
+				},
 			body: JSON.stringify({ nickname, password, passwordConfirm }),
 		};
 
@@ -272,6 +283,11 @@ const SignUp: React.FC = () => {
 				<div className="text-blue-500 hover:text-blue-700 cursor-pointer mt-4 text-xs">
 					<Link href="/login">이미 아이디가 있습니다</Link>
 				</div>
+				<Modal
+					isOpen={showModal}
+					onClose={handleModalClose}
+					message={modalMessage}
+				/>
 			</form>
 		</div>
 	);

@@ -39,6 +39,11 @@ const Login: React.FC = () => {
 		setFormValid(checkFormValid());
 	}, [nickname, password, checkFormValid]);
 
+	useEffect(() => {
+		if (nickname === undefined) setNickname("");
+		if (password === undefined) setPassword("");
+	}, [nickname, password, setNickname, setPassword]);
+
 	const togglePasswordVisibility = () => {
 		setShowPassword(!showPassword);
 	};
@@ -97,6 +102,13 @@ const Login: React.FC = () => {
 		}
 	};
 
+	useEffect(() => {
+		return () => {
+			setNickname("");
+			setPassword("");
+		};
+	}, [setNickname, setPassword]);
+
 	return (
 		<div className="w-full h-screen flex flex-col justify-center items-center p-4 overflow-y-hidden">
 			<div className="w-full max-w-[500px] h-[60px] bg-red-500 flex justify-center items-center relative rounded-tl-md rounded-tr-md text-xl font-bold text-white">
@@ -111,8 +123,9 @@ const Login: React.FC = () => {
 					<div className="w-full max-w-[400px]">
 						<input
 							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md"
+							type="text"
 							name="nickname"
-							value={nickname}
+							value={nickname || ""}
 							onChange={handleNicknameChange}
 							placeholder="닉네임"
 							autoComplete="username"
@@ -131,6 +144,7 @@ const Login: React.FC = () => {
 							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md"
 							type={showPassword ? "text" : "password"}
 							name="password"
+							value={password || ""}
 							onChange={handlePasswordChange}
 							autoComplete="current-password"
 							placeholder="비밀번호"
