@@ -42,6 +42,7 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			{/* Google Tag Manager Script */}
+			<meta charSet="UTF-8"></meta>
 			<Script
 				async
 				src="https://www.googletagmanager.com/gtag/js?id=G-FESK7ETCDB"

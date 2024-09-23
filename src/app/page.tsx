@@ -16,16 +16,6 @@ export default function Page() {
 		}
 	}, [pathname]);
 
-	// const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-	// useEffect(() => {
-	//  const token = sessionStorage.getItem("token");
-	//  if (token) {
-	//      setIsLoggedIn(true);
-	//  } else {
-	//      setIsLoggedIn(false);
-	//  }
-	// }, []);
 
 	return (
 		<main className="bg-white min-h-screen flex flex-col items-center justify-center">

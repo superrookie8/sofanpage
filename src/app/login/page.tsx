@@ -85,6 +85,7 @@ const Login: React.FC = () => {
 
 	const LoginHandler = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		if (!formValid) return; // 추가: formValid가 false일 경우 함수 종료
 		const response = await fetch("/api/login", {
 			method: "POST",
 			headers: {
