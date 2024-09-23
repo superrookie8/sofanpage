@@ -45,6 +45,7 @@ const BasketballDiary: React.FC<Props> = (props) => {
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [modalMessage, setModalMessage] = useState<string>("");
+	const [isLoading, setIsLoading] = useState(false); // 로딩 상태 추가
 
 	const handleOpenModal = (message: string) => {
 		setModalMessage(message);
@@ -85,9 +86,11 @@ const BasketballDiary: React.FC<Props> = (props) => {
 	// POST 데이터 전송 함수
 	const postData = async (): Promise<void> => {
 		if (!user) {
-			alert("로그인 해주세요.");
+			handleOpenModal("로그인 해주세요.");
 			return;
 		}
+
+		setIsLoading(true); // Start loading
 
 		// FormData 객체 생성
 		const formData = new FormData();
@@ -118,10 +121,6 @@ const BasketballDiary: React.FC<Props> = (props) => {
 
 		formData.append("message", message);
 
-		// Array.from(formData.entries()).forEach(([key, value]) => {
-		// 	console.log(`${key}:`, value);
-		// });
-
 		try {
 			// 백엔드로 데이터 전송
 			const response = await fetch("/api/postdiary", {
@@ -136,7 +135,7 @@ const BasketballDiary: React.FC<Props> = (props) => {
 			}
 
 			const responseData = await response.json();
-			handleOpenModal("Diary entry added successfully");
+			handleOpenModal("일지가 성공적으로 추가되었습니다");
 
 			// 성공 후 상태 초기화
 			setPhoto("");
@@ -149,8 +148,10 @@ const BasketballDiary: React.FC<Props> = (props) => {
 			setSeatInfo({ section: "", row: "", number: "" });
 			setPreview([]);
 		} catch (error) {
-			console.error("Error posting diary entry:", error);
-			handleOpenModal("Error occurred while posting the diary entry.");
+			console.error("일지 등록중 오류 발생:", error);
+			handleOpenModal("일지를 등록하는 동안 오류가 발생했습니다.");
+		} finally {
+			setIsLoading(false); // Stop loading
 		}
 	};
 
@@ -261,10 +262,18 @@ const BasketballDiary: React.FC<Props> = (props) => {
 				</div>
 				<div className="w-full h-[100px] flex justify-center items-center">
 					<button
-						className="bg-gray-400 rounded-lg w-[100px] h-[40px] hover:bg-red-500"
+						className="bg-gray-400 rounded-lg w-[100px] h-[40px] hover:bg-red-500 flex justify-center items-center"
 						onClick={postData}
+						disabled={isLoading} // 로딩 중일 때 버튼 비활성화
 					>
-						올리기
+						{isLoading ? (
+							<svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+								<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+								<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+							</svg>
+						) : (
+							"올리기"
+						)}
 					</button>
 				</div>
 			</div>

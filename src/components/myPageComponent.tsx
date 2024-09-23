@@ -6,6 +6,7 @@ import { GuestBookEntry } from "@/data/guestbook";
 import { format } from "date-fns";
 import Image from "next/image";
 import { fetchUserStats } from "@/api";
+import Modal from "./alertModal";// Modal 컴포넌트 import
 
 export const fetchUserInfo = async (): Promise<{
 	nickname: string;
@@ -65,6 +66,10 @@ const formatDate = (dateString: string): string => {
 const MyPageComp: React.FC = () => {
 	const router = useRouter();
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+	const [alertMessage, setAlertMessage] = useState("");
+	const [entryToDelete, setEntryToDelete] = useState<string | null>(null);
+	const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
 	const [profile, setProfile] = useState({
 		nickname: "",
 		description: "",
@@ -199,20 +204,36 @@ const MyPageComp: React.FC = () => {
 	};
 
 	const handleDeleteEntry = async (entryId: string) => {
-		if (confirm("Are you sure you want to delete this entry?")) {
+		setEntryToDelete(entryId);
+		setAlertMessage("정말로 이 항목을 삭제하시겠습니까?");
+		setIsDeleteConfirm(true);
+		setIsAlertModalOpen(true);
+	};
+
+	const confirmDelete = async () => {
+		if (entryToDelete) {
 			try {
-				await deleteGuestbookEntry(entryId);
+				await deleteGuestbookEntry(entryToDelete);
 				setPhotoGuestbookEntries(
-					photoGuestbookEntries.filter((entry) => entry._id !== entryId)
+					photoGuestbookEntries.filter((entry) => entry._id !== entryToDelete)
 				);
 				setNoPhotoGuestbookEntries(
-					noPhotoGuestbookEntries.filter((entry) => entry._id !== entryId)
+					noPhotoGuestbookEntries.filter((entry) => entry._id !== entryToDelete)
 				);
+				setAlertMessage("항목이 성공적으로 삭제되었습니다.");
+				setIsDeleteConfirm(false);
 			} catch (error) {
 				console.error("Failed to delete guestbook entry:", error);
-				alert(`Failed to delete guestbook entry: ${(error as Error).message}`);
+				setAlertMessage(`Failed to delete guestbook entry: ${(error as Error).message}`);
+				setIsDeleteConfirm(false);
 			}
 		}
+		setIsAlertModalOpen(true);
+	};
+
+	const closeAlertModal = () => {
+		setIsAlertModalOpen(false);
+		setEntryToDelete(null);
 	};
 
 	return (
@@ -402,6 +423,13 @@ const MyPageComp: React.FC = () => {
 				onClose={() => setIsModalOpen(false)}
 				onSave={handleSaveProfile}
 				profile={profile}
+			/>
+			<Modal
+				isOpen={isAlertModalOpen}
+				message={alertMessage}
+				onClose={closeAlertModal}
+				buttonText={isDeleteConfirm ? "확인" : "닫기"}
+				onConfirm={isDeleteConfirm ? confirmDelete : closeAlertModal}
 			/>
 		</div>
 	);

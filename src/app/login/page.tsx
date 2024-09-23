@@ -14,6 +14,13 @@ interface ValidationState {
 	color: string;
 }
 
+const Spinner = () => (
+	<svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+		<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+		<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+	</svg>
+);
+
 const Login: React.FC = () => {
 	const router = useRouter();
 	const [message, setMessage] = useState("");
@@ -30,6 +37,7 @@ const Login: React.FC = () => {
 	});
 	const [formValid, setFormValid] = useState(false);
 	const setIsLoggedIn = useSetRecoilState(loginState); // Set the login state
+	const [isLoading, setIsLoading] = useState(false);
 
 	const checkFormValid = useCallback(() => {
 		return nickname.trim() !== "" && password.trim() !== "";
@@ -85,21 +93,29 @@ const Login: React.FC = () => {
 
 	const LoginHandler = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		if (!formValid) return; // 추가: formValid가 false일 경우 함수 종료
-		const response = await fetch("/api/login", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ nickname, password }),
-		});
-		const data = await response.json();
-		if (response.ok) {
-			sessionStorage.setItem("token", data.access_token);
-			setIsLoggedIn(true); // Update the global login state
-			router.push("/home");
-		} else {
-			setMessage(data.msg);
+		if (!formValid) return;
+		setIsLoading(true);  // Start loading
+		try {
+			const response = await fetch("/api/login", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ nickname, password }),
+			});
+			const data = await response.json();
+			if (response.ok) {
+				sessionStorage.setItem("token", data.access_token);
+				setIsLoggedIn(true);
+				router.push("/home");
+			} else {
+				setMessage(data.msg);
+			}
+		} catch (error) {
+			console.error("Login error:", error);
+			setMessage("로그인 중 오류가 발생했습니다.");
+		} finally {
+			setIsLoading(false);  // Stop loading
 		}
 	};
 
@@ -172,9 +188,9 @@ const Login: React.FC = () => {
 						className={`w-[100px] h-[40px] flex justify-center items-center mr-4 rounded-md text-sm ${
 							formValid ? "bg-red-500" : "bg-gray-300"
 						}`}
-						disabled={!formValid}
+						disabled={!formValid || isLoading}
 					>
-						로그인하기
+						{isLoading ? <Spinner /> : "로그인하기"}
 					</button>
 					<button
 						onClick={() => {

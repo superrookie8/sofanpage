@@ -6,6 +6,7 @@ import { pageState } from "@/states/pageState";
 import { photoPreviewState } from "@/states/photoPreviewState";
 import PhotoUpload from "@/components/photoUpload";
 import useAuth from "@/hooks/useAuth";
+import Modal from "@/components/alertModal";
 
 const GuestBookCreate: React.FC = () => {
 	const user = useAuth();
@@ -15,6 +16,9 @@ const GuestBookCreate: React.FC = () => {
 	const currentPage = useRecoilValue(pageState);
 	const setPage = useSetRecoilState(pageState);
 	const [photos, setPhotos] = useRecoilState(photoPreviewState);
+	const [isLoading, setIsLoading] = useState(false);
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalMessage, setModalMessage] = useState("");
 
 	const handlerOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setWrite(e.target.value);
@@ -26,9 +30,12 @@ const GuestBookCreate: React.FC = () => {
 
 	const postData = async (): Promise<void> => {
 		if (!user) {
-			alert("로그인 해주세요.");
+			setModalMessage("로그인 해주세요.");
+			setModalOpen(true);
 			return;
 		}
+
+		setIsLoading(true);
 
 		const formData = new FormData();
 		formData.append("name", user.nickname);
@@ -54,16 +61,25 @@ const GuestBookCreate: React.FC = () => {
 
 			const responseData = await response.json();
 			console.log(responseData);
-			alert("Guestbook entry added successfully");
+			setModalMessage("방명록이 성공적으로 추가되었습니다.");
+			setModalOpen(true);
 			// 사진 업로드 후 미리보기 상태 초기화
 			setPhoto(null);
 			setWrite("");
-			setPhotos([]); // 추가된 부분: photoPreviewState를 초기화합니다.
+			setPhotos([]);
 			setPage("default");
 			router.push(`/guestbooks/read`);
 		} catch (error) {
 			console.error("There was a problem with the fetch operation:", error);
+			setModalMessage("방명록 추가 중 오류가 발생했습니다.");
+			setModalOpen(true);
+		} finally {
+			setIsLoading(false);
 		}
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
 	};
 
 	return (
@@ -95,10 +111,18 @@ const GuestBookCreate: React.FC = () => {
 											그냥 글
 										</button>
 										<button
-											className="w-[200px] bg-red-500 text-white font-bold py-2 px-4 rounded ml-0 lg:ml-4"
+											className="w-[200px] bg-red-500 text-white font-bold py-2 px-4 rounded ml-0 lg:ml-4 flex justify-center items-center"
 											onClick={postData}
+											disabled={isLoading}
 										>
-											남기기
+											{isLoading ? (
+												<svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+													<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+													<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+												</svg>
+											) : (
+												"남기기"
+											)}
 										</button>
 									</div>
 								</div>
@@ -123,10 +147,18 @@ const GuestBookCreate: React.FC = () => {
 										사진과 글
 									</button>
 									<button
-										className="w-[200px] bg-red-500 text-white font-bold py-2 px-4 rounded"
+										className="w-[200px] bg-red-500 text-white font-bold py-2 px-4 rounded flex justify-center items-center"
 										onClick={postData}
+										disabled={isLoading}
 									>
-										남기기
+										{isLoading ? (
+											<svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+												<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+												<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+											</svg>
+										) : (
+											"남기기"
+										)}
 									</button>
 								</div>
 							</div>
@@ -134,6 +166,7 @@ const GuestBookCreate: React.FC = () => {
 					)}
 				</div>
 			</div>
+			<Modal isOpen={modalOpen} onClose={closeModal} message={modalMessage} />
 		</div>
 	);
 };
