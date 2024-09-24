@@ -90,7 +90,7 @@ const DiaryRead: React.FC<Props> = (props) => {
 								>
 									<div className="w-full h-3/5 flex justify-center pt-4">
 										<Image
-											src={`data:image/jpeg;base64,${diary.diary_photo}`}
+											src={`data:image/jpeg;base64,${diary.diary_photos.ticket_photo}`}
 											alt="diary entry"
 											width={150}
 											height={100}
