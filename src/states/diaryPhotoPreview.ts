@@ -6,9 +6,25 @@ export interface DiaryPhotoData {
 	originalFile: File;
 	compressedFile: File;
 	uploadTime: string;
+	url: string;
 }
+
+export const ticketPreviewState = atom<DiaryPhotoData[]>({
+	key: "ticketPreviewState",
+	default: [],
+});
+
+export const viewPreviewState = atom<DiaryPhotoData[]>({
+	key: "viewPreviewState",
+	default: [],
+});
+
+export const additionalPreviewState = atom<DiaryPhotoData[]>({
+	key: "additionalPreviewState",
+	default: [],
+});
 
 export const DiaryPhotoPreviewState = atom<DiaryPhotoData[]>({
 	key: "DiaryPhotoPreviewState",
-	default: [], // 기본값을 빈 배열로 설정
+	default: [],
 });

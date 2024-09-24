@@ -1,22 +1,30 @@
 import React, { useRef, ChangeEvent } from "react";
 import { useRecoilState } from "recoil";
 import {
-	DiaryPhotoPreviewState,
+	ticketPreviewState,
+	viewPreviewState,
+	additionalPreviewState,
 	DiaryPhotoData,
 } from "@/states/diaryPhotoPreview";
 import Image from "next/image";
 
 interface DiaryPhotoUploadProps {
-	onDiaryPhotoUpload: (photoUrl: string) => void;
+	onDiaryPhotoUpload: (photoUrl: string, type: 'ticket' | 'view' | 'additional') => void;
+	type: 'ticket' | 'view' | 'additional'; // Add type prop
 }
 
 const DiaryPhotoUpload: React.FC<DiaryPhotoUploadProps> = ({
 	onDiaryPhotoUpload,
+	type, // Destructure type prop
 }) => {
-	const [photos, setPhotos] = useRecoilState(DiaryPhotoPreviewState);
-	const fileInputRef = useRef<HTMLInputElement>(null);
+	const [ticketPhoto, setTicketPhoto] = useRecoilState(ticketPreviewState);
+	const [viewPhoto, setViewPhoto] = useRecoilState(viewPreviewState);
+	const [additionalPhoto, setAdditionalPhoto] = useRecoilState(additionalPreviewState);
+	const ticketInputRef = useRef<HTMLInputElement>(null);
+	const viewInputRef = useRef<HTMLInputElement>(null);
+	const additionalInputRef = useRef<HTMLInputElement>(null);
 
-	const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+	const handleFileChange = async (event: ChangeEvent<HTMLInputElement>, type: 'ticket' | 'view' | 'additional') => {
 		const file = event.target.files?.[0];
 		if (file) {
 			const reader = new FileReader();
@@ -26,50 +34,55 @@ const DiaryPhotoUpload: React.FC<DiaryPhotoUploadProps> = ({
 					id: new Date().toISOString(),
 					preview: base64String,
 					originalFile: file,
-					compressedFile: file, // 여기서는 원본 파일을 사용, 압축 처리는 필요에 따라 추가
+					compressedFile: file,
 					uploadTime: new Date().toISOString(),
+					url: base64String
 				};
-				setPhotos([newPhoto]); // 이전 사진 대신 새 사진을 추가하여 상태를 업데이트합니다.
-				onDiaryPhotoUpload(base64String);
+				if (type === 'ticket') {
+					setTicketPhoto((prevPhotos) => [...prevPhotos, newPhoto]);
+				} else if (type === 'view') {
+					setViewPhoto((prevPhotos) => [...prevPhotos, newPhoto]);
+				} else if (type === 'additional') {
+					setAdditionalPhoto((prevPhotos) => [...prevPhotos, newPhoto]);
+				}
+				onDiaryPhotoUpload(base64String, type);
 			};
 			reader.readAsDataURL(file);
 		}
 	};
 
 	const handleUploadClick = () => {
-		fileInputRef.current?.click();
+		if (type === 'ticket') ticketInputRef.current?.click();
+		else if (type === 'view') viewInputRef.current?.click();
+		else if (type === 'additional') additionalInputRef.current?.click();
 	};
 
-	// photos가 null 또는 undefined인 경우 기본값으로 빈 배열 사용
-	const latestPhoto =
-		photos?.length > 0 ? photos[photos.length - 1]?.preview : null;
+	const latestPhoto = type === 'ticket' ? ticketPhoto?.[ticketPhoto.length - 1]?.preview :
+		type === 'view' ? viewPhoto?.[viewPhoto.length - 1]?.preview :
+		additionalPhoto?.[additionalPhoto.length - 1]?.preview;
 
 	return (
-		<div
-			className="relative w-400 h-400  bg-white border-2 border-dashed border-gray-300 rounded-lg flex justify-center items-center cursor-pointer"
-			onClick={handleUploadClick}
-		>
+		<div className="relative w-[200px] h-[200px] bg-white border-2 border-dashed border-gray-300 rounded-lg flex justify-center items-center cursor-pointer"
+			onClick={handleUploadClick}>
 			<input
 				type="file"
-				ref={fileInputRef}
-				onChange={handleFileChange}
+				ref={type === 'ticket' ? ticketInputRef : type === 'view' ? viewInputRef : additionalInputRef}
+				onChange={(e) => handleFileChange(e, type)}
 				accept="image/*"
 				className="hidden"
 			/>
 			{latestPhoto ? (
-				<div className="w-[350px] h-[300px] relative rounded-lg overflow-hidden">
+				<div className="w-full h-full relative rounded-lg overflow-hidden">
 					<Image
 						src={latestPhoto}
-						alt="Preview"
-						fill
-						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 350px"
-						style={{ objectFit: "contain" }}
+						alt={`${type} Preview`}
+						layout="fill"
+						objectFit="cover"
 					/>
 				</div>
 			) : (
-				<div className="relative flex justify-center items-center text-center space-y-2">
-					<svg className="w-[350px] h-[300px] mx-auto"></svg>
-					<p className="absolute text-black">사진 업로드 (클릭)</p>
+				<div className="text-center">
+					<p className="text-black">{type === 'ticket' ? '티켓 사진 업로드 (클릭)' : type === 'view' ? '경기장 사진 업로드 (클릭)' : '추가 사진 업로드 (클릭)'}</p>
 				</div>
 			)}
 		</div>

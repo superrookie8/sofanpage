@@ -23,11 +23,16 @@ import SelectedRow from "@/components/selectedRow";
 import SelectedNumber from "@/components/selectedNumber";
 import { locatonState } from "@/states/locationState";
 import Modal from "@/components/alertModal";
+import { DiaryPhotoData } from "@/states/diaryPhotoPreview";
+
+// Define DiaryPhotoData if it's not already defined
 
 interface Props {}
 
 const BasketballDiary: React.FC<Props> = (props) => {
-	const [photo, setPhoto] = useState<string | null>(null);
+	const [ticketphoto, setTicketPhoto] = useState<string | null>(null);
+	const [viewphoto, setViewPhoto] = useState<string | null>(null);
+	const [additionalphoto, setAdditionalPhoto] = useState<string | null>(null);
 	const [date, setDate] = useState<string>("");
 	const [weather, setWeather] = useState<string>("");
 	const [together, setTogether] = useState<string>("");
@@ -40,6 +45,7 @@ const BasketballDiary: React.FC<Props> = (props) => {
 		number: "",
 	});
 	const [preview, setPreview] = useRecoilState(DiaryPhotoPreviewState);
+
 	const user = useAuth();
 	const router = useRouter(); // 페이지 이동을 위한 Router
 
@@ -58,9 +64,18 @@ const BasketballDiary: React.FC<Props> = (props) => {
 		window.location.reload();
 	};
 
-	const handlePhotoChange = (photoUrl: string) => {
-		setPhoto(photoUrl);
+	const handleDiaryPhotoChange = (photoUrl: string, type: 'ticket' | 'view' | 'additional') => {
+		if (type === 'ticket') {
+			setTicketPhoto(photoUrl);
+		} else if (type === 'view') {
+			setViewPhoto(photoUrl);
+		} else if (type === 'additional') {
+			setAdditionalPhoto(photoUrl);
+		}
+		setPreview((prev) => [...prev, { url: photoUrl } as DiaryPhotoData]);
+		console.log(`${type} photo updated:`, photoUrl);
 	};
+
 
 	useEffect(() => {
 		const today = new Date();
@@ -90,6 +105,14 @@ const BasketballDiary: React.FC<Props> = (props) => {
 			return;
 		}
 
+		console.log("Current ticket photo:", ticketphoto);
+		console.log("Current view photo:", viewphoto);
+
+		if (!ticketphoto || !viewphoto) {
+			handleOpenModal("티켓 사진과 경기장 사진을 업로드해주세요.");
+			return;
+		}
+
 		setIsLoading(true); // Start loading
 
 		// FormData 객체 생성
@@ -106,17 +129,24 @@ const BasketballDiary: React.FC<Props> = (props) => {
 		formData.append("row", seatInfo.row);
 		formData.append("number", seatInfo.number);
 
-		// 사진이 있는 경우
-		if (photo) {
-			const response = await fetch(photo);
-			const blob = await response.blob();
+		// 티켓 사진 추가
+		const ticketResponse = await fetch(ticketphoto);
+		const ticketBlob = await ticketResponse.blob();
+		const ticketFile = new File([ticketBlob], `ticket_${new Date().toISOString()}.jpg`, { type: ticketBlob.type });
+		formData.append("ticket_photo", ticketFile);
 
-			// 현재 시간이나 고유 ID 등을 사용해서 동적 파일명 생성
-			const timestamp = new Date().toISOString();
-			const fileName = `photo_${timestamp}.jpg`;
+		// 경기장 사진 추가
+		const viewResponse = await fetch(viewphoto);
+		const viewBlob = await viewResponse.blob();
+		const viewFile = new File([viewBlob], `view_${new Date().toISOString()}.jpg`, { type: viewBlob.type });
+		formData.append("view_photo", viewFile);
 
-			const file = new File([blob], fileName, { type: blob.type });
-			formData.append("diary_photo", file); // 사진 파일 추가
+		// 추가 사진이 있는 경우
+		if (additionalphoto) {
+			const additionalResponse = await fetch(additionalphoto);
+			const additionalBlob = await additionalResponse.blob();
+			const additionalFile = new File([additionalBlob], `additional_${new Date().toISOString()}.jpg`, { type: additionalBlob.type });
+			formData.append("additional_photo", additionalFile);
 		}
 
 		formData.append("message", message);
@@ -138,7 +168,9 @@ const BasketballDiary: React.FC<Props> = (props) => {
 			handleOpenModal("일지가 성공적으로 추가되었습니다");
 
 			// 성공 후 상태 초기화
-			setPhoto("");
+			setTicketPhoto(null);
+			setViewPhoto(null);
+			setAdditionalPhoto(null);
 			setDate("default");
 			setWeather("");
 			setTogether("");
@@ -147,6 +179,7 @@ const BasketballDiary: React.FC<Props> = (props) => {
 			setMessage("");
 			setSeatInfo({ section: "", row: "", number: "" });
 			setPreview([]);
+		
 		} catch (error) {
 			console.error("일지 등록중 오류 발생:", error);
 			handleOpenModal("일지를 등록하는 동안 오류가 발생했습니다.");
@@ -157,7 +190,7 @@ const BasketballDiary: React.FC<Props> = (props) => {
 
 	return (
 		<div className="pl-4 pr-4 gap-4 flex flex-col md:flex-col lg:flex-row xl:flex-row justify-center items-center w-full rounded">
-			<div className="w-1/2 sm:w-full md:w-full h-[700px]  bg-gray-200 bg-opacity-75 rounded  flex flex-col justify-center items-center">
+			<div className="w-1/2 sm:w-full md:w-full h-[700px] sm:h-[1100px] sm:justify-between bg-gray-200 bg-opacity-75 rounded  flex flex-col justify-center items-center">
 				<div className="w-full h-50 gap-2 flex flex-col">
 					<div className="flex flex-row w-full">
 						<div className="w-1/3 h-10 p-8 flex flex-col justify-center items-center  ">
@@ -247,9 +280,19 @@ const BasketballDiary: React.FC<Props> = (props) => {
 						</div>
 					</div>
 				</div>
-				<div className="w-full mt-2 mb-2 rounded h-1/2 flex flex-row">
-					<div className="w-full h-full rounded-lg flex justify-center items-center cursor-pointer p-10">
-						<DiaryPhotoUpload onDiaryPhotoUpload={handlePhotoChange} />
+				
+				<div className=" w-full mb-2 rounded flex flex-col justify-center sm:justify-between items-center gap-4 p-4  sm:h-[800px] ">
+					<div className="w-full  p-2 rounded flex justify-center"><p>티켓 사진과 경기장 사진은 필수 입니다! </p></div>
+					<div className="w-full flex flex-row justify-center items-center gap-4 sm:h-[700px]">
+						<div className="w-[200px] h-[200px] rounded-lg flex flex-row justify-center items-center cursor-pointer mb-4 sm:mb-0">
+							<DiaryPhotoUpload onDiaryPhotoUpload={handleDiaryPhotoChange} type="ticket" />
+						</div>
+						<div className="w-[200px] h-[200px] rounded-lg flex flex-row justify-center items-center cursor-pointer mb-4 sm:mb-0">
+							<DiaryPhotoUpload onDiaryPhotoUpload={handleDiaryPhotoChange} type="view" />
+						</div>
+						<div className="w-[200px] h-[200px] rounded-lg flex flex-row justify-center items-center cursor-pointer mb-4 sm:mb-0">
+							<DiaryPhotoUpload onDiaryPhotoUpload={handleDiaryPhotoChange} type="additional" />
+						</div>
 					</div>
 				</div>
 				<div className="w-full h-20 bg-black bg-opacity-75 rounded ">
