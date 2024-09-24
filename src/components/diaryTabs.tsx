@@ -56,11 +56,11 @@ export const fetchPersonalDiaries = async (filter: {
 		if (Array.isArray(data)) {
 			return data;
 		} else {
-			console.error("Expected array but got:", data);
+		
 			return [];
 		}
 	} catch (error) {
-		console.error("Error fetching diaries:", error);
+	
 		return []; // 오류 발생 시 빈 배열 반환
 	}
 };
@@ -90,11 +90,11 @@ export const fetchAllDiaries = async (
 		if (Array.isArray(data)) {
 			return data;
 		} else {
-			console.error("Expected array but got:", data);
+		
 			return [];
 		}
 	} catch (error) {
-		console.error("Error fetching all diaries:", error);
+
 		return [];
 	}
 };
@@ -347,8 +347,8 @@ const DiaryTabs: React.FC = () => {
 									<div className="mt-2 w-full bg-red-200 flex flex-row items-center p-2 rounded-md relative">
 										<div className="w-[100px] h-[70px] bg-gray-300 flex items-center justify-center rounded-lg">
 											<Image
-												src={`data:image/jpeg;base64,${diary.diary_photos.ticket_photo}`}
-												alt="diary entry"
+												src={`data:image/jpeg;base64,${diary.diary_photos?.ticket_photo}`}
+												alt="diary ticket photo"
 												width={70}
 												height={50}
 												style={{ objectFit: "cover", width: "auto", height: "auto"  }}
@@ -380,7 +380,7 @@ const DiaryTabs: React.FC = () => {
 									>
 										<div className="w-full h-3/5 bg-red-200 rounded-t-lg flex justify-center items-center">
 											<Image
-												src={`data:image/jpeg;base64,${diary.diary_photos.ticket_photo}`}
+												src={`data:image/jpeg;base64,${diary.diary_photos?.ticket_photo}`}
 												alt="diary entry"
 												width={100}
 												height={100}
