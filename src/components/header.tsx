@@ -42,7 +42,7 @@ const Header: React.FC = () => {
 	return (
 		<header className="w-full bg-white text-red-500 p-4 z-50 relative">
 			<nav className="container mx-auto flex justify-between items-center">
-				<div className="sm:hidden md:flex lg:flex items-center space-x-8 ml-auto ">
+				<div className="sm:hidden md:hidden lg:flex items-center space-x-8 ml-auto ">
 					<Link href="/home" className={linkStyle("/home")}>
 						Home
 					</Link>
@@ -92,7 +92,7 @@ const Header: React.FC = () => {
 						</>
 					)}
 				</div>
-				<div className="flex items-center space-x-4 md:hidden lg:hidden ml-auto bg-gray-200">
+				<div className="flex items-center space-x-4  lg:hidden ml-auto bg-gray-200">
 					<button
 						onClick={toggleMenu}
 						className="px-2 py-1 rounded hover:bg-red-200 active:bg-red-600 focus:outline-none"
@@ -102,7 +102,7 @@ const Header: React.FC = () => {
 				</div>
 			</nav>
 			{isMenuOpen && (
-				<div className="md:hidden bg-white absolute top-full left-0 w-full shadow-lg z-40">
+				<div className=" bg-white absolute top-full left-0 w-full shadow-lg z-40">
 					<div className="flex flex-col items-start p-4 space-y-2">
 						<Link
 							href="/home"

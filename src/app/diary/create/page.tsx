@@ -189,8 +189,8 @@ const BasketballDiary: React.FC<Props> = (props) => {
 	};
 
 	return (
-		<div className="pl-4 pr-4 gap-4 flex flex-col md:flex-col lg:flex-row xl:flex-row justify-center items-center w-full rounded">
-			<div className="w-1/2 sm:w-full md:w-full h-[700px] sm:h-[1100px] sm:justify-between bg-gray-200 bg-opacity-75 rounded  flex flex-col justify-center items-center">
+		<div className="pl-4 pr-4 gap-4 flex flex-col md:flex-col lg:flex-col xl:flex-row justify-center items-center w-full rounded">
+			<div className="w-1/2 sm:w-full md:w-full lg:w-full h-[700px] sm:h-[1100px] sm:justify-between bg-gray-200 bg-opacity-75 rounded  flex flex-col justify-center items-center">
 				<div className="w-full h-50 gap-2 flex flex-col">
 					<div className="flex flex-row w-full">
 						<div className="w-1/3 h-10 p-8 flex flex-col justify-center items-center  ">
@@ -281,9 +281,9 @@ const BasketballDiary: React.FC<Props> = (props) => {
 					</div>
 				</div>
 				
-				<div className=" w-full mb-2 rounded flex flex-col justify-center sm:justify-between items-center gap-4 p-4  sm:h-[800px] ">
+				<div className=" w-full mb-2 rounded flex flex-col justify-center sm:justify-between  items-center gap-4 p-4  sm:h-[800px]   xl:h-[800px] ">
 					<div className="w-full  p-2 rounded flex justify-center"><p>티켓 사진과 경기장 사진은 필수 입니다! </p></div>
-					<div className="w-full flex flex-row justify-center items-center gap-4 sm:h-[700px]">
+					<div className="w-full flex flex-row justify-center items-center gap-4 sm:h-[700px] sm:flex-col md:flex-row lg:flex-row xl:flex-row">
 						<div className="w-[200px] h-[200px] rounded-lg flex flex-row justify-center items-center cursor-pointer mb-4 sm:mb-0">
 							<DiaryPhotoUpload onDiaryPhotoUpload={handleDiaryPhotoChange} type="ticket" />
 						</div>
@@ -320,7 +320,7 @@ const BasketballDiary: React.FC<Props> = (props) => {
 					</button>
 				</div>
 			</div>
-			<div className="w-1/2 sm:w-full md:w-full h-[700px] bg-gray-200 bg-opacity-75 rounded flex flex-col justify-center items-center  ">
+			<div className="w-1/2 sm:w-full md:w-full lg:w-full h-[700px] bg-gray-200 bg-opacity-75 rounded flex flex-col justify-center items-center  ">
 				<div>Live Game</div>
 				<DiaryTabs />
 			</div>
