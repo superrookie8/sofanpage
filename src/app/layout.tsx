@@ -2,7 +2,6 @@
 import type { Metadata } from "next";
 import Script from "next/script"; // Import Script from next
 import "./globals.css";
-import { QueryClient, QueryClientProvider } from 'react-query';
 import RecoilRootProvider from "@/utils/recoilRootProvider";
 import ScriptProvider from "@/utils/scriptProvider";
 import ClientWrapper from "@/components/clientWrapper";
@@ -35,7 +34,6 @@ export const metadata: Metadata = {
 	],
 };
 
-const queryClient = new QueryClient();
 
 export default function RootLayout({
 	children,
@@ -60,13 +58,13 @@ export default function RootLayout({
 			</Script>
 			<ScriptProvider />
 			<body>
-				<QueryClientProvider client={queryClient}>
+				
 					<RecoilRootProvider>
 						<Background />
 						<Header />
 						<ClientWrapper>{children}</ClientWrapper>
 					</RecoilRootProvider>
-				</QueryClientProvider>
+				
 			</body>
 		</html>
 	);
