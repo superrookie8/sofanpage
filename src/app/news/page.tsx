@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import MainNews from "@/components/newsLatest";
+import MainNews from "@/components/news/newsLatest";
 import { Article } from "@/types/articles";
-import JumpballSection from "@/components/newsJumpball";
-import RookieSection from "@/components/newsRookie";
+import JumpballSection from "@/components/news/newsJumpball";
+import RookieSection from "@/components/news/newsRookie";
 
 interface NewsData {
 	main_article: Article;

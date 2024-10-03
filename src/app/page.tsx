@@ -1,5 +1,5 @@
 "use client";
-import Opening from "@/components/opening";
+import Opening from "@/components/opening/opening";
 import Link from "next/link";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";

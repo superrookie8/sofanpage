@@ -4,9 +4,9 @@ import { useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { pageState } from "@/states/pageState";
 import { photoPreviewState } from "@/states/photoPreviewState";
-import PhotoUpload from "@/components/photoUpload";
+import PhotoUpload from "@/components/shared/photoUpload";
 import useAuth from "@/hooks/useAuth";
-import Modal from "@/components/alertModal";
+import AlertModal from "@/components/shared/alertModal";
 
 const GuestBookCreate: React.FC = () => {
 	const user = useAuth();
@@ -68,7 +68,7 @@ const GuestBookCreate: React.FC = () => {
 			setWrite("");
 			setPhotos([]);
 			setPage("default");
-			router.push(`/guestbooks/read`);
+			// router.push(`/guestbooks/read`);
 		} catch (error) {
 			console.error("There was a problem with the fetch operation:", error);
 			setModalMessage("방명록 추가 중 오류가 발생했습니다.");
@@ -80,6 +80,7 @@ const GuestBookCreate: React.FC = () => {
 
 	const closeModal = () => {
 		setModalOpen(false);
+		router.push(`/guestbooks/read`);
 	};
 
 	return (
@@ -105,15 +106,15 @@ const GuestBookCreate: React.FC = () => {
 									</div>
 									<div className="flex flex-row w-full justify-center items-center space-x-4 lg:mt-4">
 										<button
-											className="w-[200px] bg-green-500 text-white font-bold py-2 px-4 rounded"
+											className="w-[200px] bg-gray-500 hover:bg-pink-500 text-white font-bold py-2 px-4 rounded"
 											onClick={() => setPage("default")}
 										>
 											그냥 글
 										</button>
 										<button
-											className="w-[200px] bg-red-500 text-white font-bold py-2 px-4 rounded ml-0 lg:ml-4 flex justify-center items-center"
+											className={`w-[200px] text-white font-bold py-2 px-4 rounded ml-0 lg:ml-4 flex justify-center items-center ${isLoading||!write && !photo? 'bg-gray-500': 'bg-gray-500 hover:bg-red-500' }`}
 											onClick={postData}
-											disabled={isLoading}
+											disabled={isLoading || !write && !photo}
 										>
 											{isLoading ? (
 												<svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -141,15 +142,15 @@ const GuestBookCreate: React.FC = () => {
 								</div>
 								<div className="flex flex-row w-full justify-center items-center space-x-4 lg:mt-4">
 									<button
-										className="w-[200px] bg-violet-500 text-white font-bold py-2 px-4 rounded"
+										className="w-[200px] bg-gray-500 hover:bg-pink-500 text-white font-bold py-2 px-4 rounded"
 										onClick={() => setPage("photoAndText")}
 									>
 										사진과 글
 									</button>
 									<button
-										className="w-[200px] bg-red-500 text-white font-bold py-2 px-4 rounded flex justify-center items-center"
+										className={`w-[200px] text-white font-bold py-2 px-4 rounded flex justify-center items-center ${isLoading||!write? 'bg-gray-500': 'bg-gray-500 hover:bg-red-500' }`}
 										onClick={postData}
-										disabled={isLoading}
+										disabled={isLoading || !write}
 									>
 										{isLoading ? (
 											<svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -166,7 +167,7 @@ const GuestBookCreate: React.FC = () => {
 					)}
 				</div>
 			</div>
-			<Modal isOpen={modalOpen} onClose={closeModal} message={modalMessage} />
+			<AlertModal isOpen={modalOpen} onClose={closeModal} message={modalMessage} />
 		</div>
 	);
 };

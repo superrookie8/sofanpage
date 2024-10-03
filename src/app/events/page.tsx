@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import EventDetail from "@/components/eventDetail";
-import EventPhotos from "@/components/eventPhotos";
+import EventDetail from "@/components/events/eventDetail";
+import EventPhotos from "@/components/events/eventPhotos";
 import { Event, EventDetails, PhotosResponse } from "@/data/events";
 import Image from "next/image";
 

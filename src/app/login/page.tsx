@@ -7,7 +7,6 @@ import { nicknameState } from "@/states/nicknameState";
 import { passwordState } from "@/states/passwordState";
 import { loginState } from "@/states/loginState"; // Import the login state
 import EyeIcon from "@/icons/eyeicon";
-import Image from "next/image";
 
 interface ValidationState {
 	message: string;
@@ -29,7 +28,7 @@ const Login: React.FC = () => {
 		color: "red",
 	});
 	const [showPassword, setShowPassword] = useState<boolean>(false);
-	const [nickname, setNickname] = useRecoilState<string>(nicknameState);
+	const [nickname, setNickname] = useState<string>("");
 	const [password, setPassword] = useRecoilState<string>(passwordState);
 	const [passwordValid, setPasswordValid] = useState<ValidationState>({
 		message: "",

@@ -1,12 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import ProfileModal from "@/components/profileModal";
+import ProfileModal from "@/components/shared/profileModal";
 import { GuestBookEntry } from "@/data/guestbook";
 import { format } from "date-fns";
 import Image from "next/image";
 import { fetchUserStats } from "@/api";
-import Modal from "./alertModal";// Modal 컴포넌트 import
+import AlertModal from "@/components/shared/alertModal";
 
 export const fetchUserInfo = async (): Promise<{
 	nickname: string;
@@ -437,7 +437,7 @@ const MyPageComp: React.FC = () => {
 				onSave={handleSaveProfile}
 				profile={profile}
 			/>
-			<Modal
+			<AlertModal
 				isOpen={isAlertModalOpen}
 				message={alertMessage}
 				onClose={closeAlertModal}

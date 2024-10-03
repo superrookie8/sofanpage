@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import BrickBreakerGame from "@/components/brickbreakergame";
-import UnityGame from "@/components/unityGame";
+import BrickBreakerGame from "@/components/arcade/brickbreakergame";
+import UnityGame from "@/components/arcade/unityGame";
 
 interface Props {}
 

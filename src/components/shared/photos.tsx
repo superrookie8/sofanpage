@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ImageGrid from "./imageGrid";
+import ImageGrid from "@/components/shared/imageGrid";
 import Image from "next/image";
 
 interface Photo {

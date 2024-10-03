@@ -1,28 +1,28 @@
 "use client";
-import DiaryPhotoUpload from "@/components/diaryPhotoUpload";
+import DiaryPhotoUpload from "@/components/diary/diaryPhotoUpload";
 import React, { FormEvent, useEffect, useState } from "react";
 import { format } from "date-fns";
-import WeatherToggleMenu from "@/components/weatherMenu";
-import SelectedWeather from "@/components/selectedWeather";
-import SelectedTogether from "@/components/selectedWith";
-import TogetherToggleMenu from "@/components/togetherToggle";
-import LocationToggleMenu from "@/components/locationToggle";
-import SelectedLocation from "@/components/selectedLocation";
-import WinningToggleMenu from "@/components/winningToggle";
-import SelectedWinningMode from "@/components/selectedWinLose";
+import WeatherToggleMenu from "@/components/diary/weatherMenu";
+import SelectedWeather from "@/components/diary/selectedWeather";
+import SelectedTogether from "@/components/diary/selectedWith";
+import TogetherToggleMenu from "@/components/diary/togetherToggle";
+import LocationToggleMenu from "@/components/diary/locationToggle";
+import SelectedLocation from "@/components/diary/selectedLocation";
+import WinningToggleMenu from "@/components/diary/winningToggle";
+import SelectedWinningMode from "@/components/diary/selectedWinLose";
 import { useRouter } from "next/navigation";
 import { useRecoilState } from "recoil";
 import { DiaryPhotoPreviewState } from "@/states/diaryPhotoPreview";
-import DiaryTabs from "@/components/diaryTabs";
+import DiaryTabs from "@/components/diary/diaryTabs";
 import useAuth from "@/hooks/useAuth";
-import SectionToggleMenu from "@/components/sectionToggleMenu";
-import RowToggleMenu from "@/components/rowToggleMenu";
-import NumberToggleMenu from "@/components/numberToggleMenu";
-import SelectedSection from "@/components/selectedSection";
-import SelectedRow from "@/components/selectedRow";
-import SelectedNumber from "@/components/selectedNumber";
+import SectionToggleMenu from "@/components/diary/sectionToggleMenu";
+import RowToggleMenu from "@/components/diary/rowToggleMenu";
+import NumberToggleMenu from "@/components/diary/numberToggleMenu";
+import SelectedSection from "@/components/diary/selectedSection";
+import SelectedRow from "@/components/diary/selectedRow";
+import SelectedNumber from "@/components/diary/selectedNumber";
 import { locatonState } from "@/states/locationState";
-import Modal from "@/components/alertModal";
+import AlertModal from "@/components/shared/alertModal";
 import { DiaryPhotoData } from "@/states/diaryPhotoPreview";
 
 // Define DiaryPhotoData if it's not already defined
@@ -305,9 +305,9 @@ const BasketballDiary: React.FC<Props> = (props) => {
 				</div>
 				<div className="w-full h-[100px] flex justify-center items-center">
 					<button
-						className="bg-gray-400 rounded-lg w-[100px] h-[40px] hover:bg-red-500 flex justify-center items-center"
+						className={`rounded-lg w-[100px] h-[40px] flex justify-center items-center ${isLoading || !ticketphoto || !viewphoto || !message || !date || !weather || !location || !together || !isWinning? 'bg-gray-400': 'bg-gray-400 hover:bg-red-500'}`}
 						onClick={postData}
-						disabled={isLoading} // 로딩 중일 때 버튼 비활성화
+						disabled={isLoading || !ticketphoto || !viewphoto || !message || !date || !weather || !location || !together || !isWinning} // 로딩 중일 때 버튼 비활성화
 					>
 						{isLoading ? (
 							<svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -326,7 +326,7 @@ const BasketballDiary: React.FC<Props> = (props) => {
 			</div>
 
 			{/*Modal 컴포넌트*/}
-			<Modal
+			<AlertModal
 				isOpen={isOpen}
 				message={modalMessage}
 				onClose={handleCloseModal}
