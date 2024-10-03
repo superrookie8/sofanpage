@@ -24,10 +24,10 @@ export async function GET(req: NextRequest) {
 				headers: {
 					// Authorization: token,
 					"Content-Type": "application/json",
-					Pragma: "no-cache",
-					"Cache-Control": "no-cache, no-store, must-revalidate",
+					// Pragma: "no-cache",
+					// "Cache-Control": "no-cache, no-store, must-revalidate",
 				},
-				cache: "no-store",
+			
 			}
 		);
 
