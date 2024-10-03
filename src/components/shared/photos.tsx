@@ -19,7 +19,6 @@ const GetPhotos: React.FC = () => {
       setLoading(true);
       const response = await fetch('/api/getphotos', {
         method: "GET",
-        cache: "no-store",
       });
       const data = await response.json();
       console.log("Full API response:", data);
