@@ -1,16 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export async function OPTIONS() {
+	return NextResponse.json(
+		{},
+		{
+			headers: {
+				"Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+				"Access-Control-Allow-Headers": "Content-Type, Authorization",
+			},
+		}
+	);
+}
+
 export async function GET(req: NextRequest) {
 	try {
-		const url = new URL(req.url);
-		const page = url.searchParams.get("page") || "1";
-		const pageSize = url.searchParams.get("page_size") || "10";
+		// const token = req.headers.get("Authorization") || "";
 
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/get/photos?page=${page}&page_size=${pageSize}`,
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get/photos`,
 			{
 				method: "GET",
 				headers: {
+					// Authorization: token,
 					"Content-Type": "application/json",
 					Pragma: "no-cache",
 					"Cache-Control": "no-cache, no-store, must-revalidate",
