@@ -1,12 +1,12 @@
 // src/components/Schedule.tsx
 "use client";
 import { useEffect } from "react";
-import Calendar from "@/components/calender";
+import Calendar from "@/components/schedule/calender";
 import { locations } from "@/data/schedule";
-import Map from "@/components/kakaoMap";
+import Map from "@/components/schedule/kakaoMap";
 import { useSetRecoilState } from "recoil";
 import { selectedLocationState } from "@/states/locationState";
-import DirectionsGuide from "@/components/directionsGuide";
+import DirectionsGuide from "@/components/schedule/directionsGuide";
 
 const Schedule: React.FC = () => {
 	const setSelectedLocation = useSetRecoilState(selectedLocationState);

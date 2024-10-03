@@ -4,9 +4,9 @@ import Script from "next/script"; // Import Script from next
 import "./globals.css";
 import RecoilRootProvider from "@/utils/recoilRootProvider";
 import ScriptProvider from "@/utils/scriptProvider";
-import ClientWrapper from "@/components/clientWrapper";
-import Header from "@/components/header";
-import Background from "@/components/background";
+import ClientWrapper from "@/components/shared/clientWrapper";
+import Header from "@/components/shared/header";
+import Background from "@/components/opening/background";
 
 export const metadata: Metadata = {
 	title: {

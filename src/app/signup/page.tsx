@@ -7,7 +7,7 @@ import { useRecoilState } from "recoil";
 import { nicknameState } from "@/states/nicknameState";
 import { passwordState } from "@/states/passwordState";
 import EyeIcon from "@/icons/eyeicon";
-import Modal from "@/components/alertModal";
+import AlertModal from "@/components/shared/alertModal";
 
 interface ValidationState {
 	message: string;
@@ -283,7 +283,7 @@ const SignUp: React.FC = () => {
 				<div className="text-blue-500 hover:text-blue-700 cursor-pointer mt-4 text-xs">
 					<Link href="/login">이미 아이디가 있습니다</Link>
 				</div>
-				<Modal
+				<AlertModal
 					isOpen={showModal}
 					onClose={handleModalClose}
 					message={modalMessage}

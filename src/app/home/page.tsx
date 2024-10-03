@@ -1,10 +1,10 @@
 "use client";
-import Profile from "@/components/profile";
-import Stats from "@/components/stats";
-import GetPhotos from "@/components/photos";
+import Profile from "@/components/mypage/profile";
+import Stats from "@/components/home/stats";
+import GetPhotos from "@/components/shared/photos";
 import { useState } from "react";
 
-import MainImage from "@/components/mainImage";
+import MainImage from "@/components/opening/mainImage";
 
 const MainPage: React.FC = () => {
 	return (

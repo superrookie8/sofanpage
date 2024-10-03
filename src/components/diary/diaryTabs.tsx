@@ -4,8 +4,10 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { where, weather, together, result } from "@/data/constants";
 import { fetchUserStats } from "@/api";
-import UserProfileModal from "./userProfileModal";
-import Modal from "./alertModal";
+import UserProfileModal from "@/components/mypage/userProfileModal";
+import AlertModal from "@/components/shared/alertModal";
+import Slider from "react-slick";
+import Modal from "react-modal"
 
 // 사용자 정보를 가져오는 함수 (토큰 기반)
 export const fetchUserInfo = async (): Promise<{
@@ -34,13 +36,12 @@ export const fetchPersonalDiaries = async (filter: {
 	const token = sessionStorage.getItem("token");
 
 	try {
-		// 비동기 fetch 요청
 		const response = await fetch(
 			`/api/getuserdiaries?user=${filter.nickname}&page=${filter.page}&page_size=${filter.pageSize}`,
 			{
 				method: "GET",
 				headers: {
-					Authorization: `Bearer ${token}`, // JWT 토큰을 Authorization 헤더에 포함
+					Authorization: `Bearer ${token}`,
 				},
 			}
 		);
@@ -49,19 +50,15 @@ export const fetchPersonalDiaries = async (filter: {
 			throw new Error("Failed to fetch diary entries");
 		}
 
-		// 서버에서 받은 데이터를 JSON으로 파싱
 		const data = await response.json();
 
-		// 배열로 직접 반환 (data가 배열일 경우)
 		if (Array.isArray(data)) {
 			return data;
 		} else {
-		
 			return [];
 		}
 	} catch (error) {
-	
-		return []; // 오류 발생 시 빈 배열 반환
+		return [];
 	}
 };
 
@@ -90,55 +87,56 @@ export const fetchAllDiaries = async (
 		if (Array.isArray(data)) {
 			return data;
 		} else {
-		
 			return [];
 		}
 	} catch (error) {
-
 		return [];
 	}
 };
 
 export const deleteDiaryEntry = async (entryId: string): Promise<void> => {
-	const response = await fetch(`/api/deletediary?entry_id=${entryId}`,{
+	const response = await fetch(`/api/deletediary?entry_id=${entryId}`, {
 		method: "DELETE",
 		headers: {
 			Authorization: `Bearer ${sessionStorage.getItem("token")}`,
 		},
 	});
-	if (!response.ok){
-        const errorData = await response.json();
+	if (!response.ok) {
+		const errorData = await response.json();
 		throw new Error(errorData.message);
 	}
-}
+};
 
 const DiaryTabs: React.FC = () => {
-	const [activeTab, setActiveTab] = useState<"A" | "B">("A"); // 기본 A탭
+	const [activeTab, setActiveTab] = useState<"A" | "B">("A");
 	const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
+	const [personalDiaries, setPersonalDiaries] = useState<DiaryEntry[]>([]);
+	const [allDiaries, setAllDiaries] = useState<DiaryEntry[]>([]);
 	const [page, setPage] = useState(1);
 	const [pageSize] = useState(10);
-	const [user, setUser] = useState<string | null>(null); // 사용자 정보 상태 추가
-	const [loading, setLoading] = useState<boolean>(true); // 로딩 상태 추가
+	const [user, setUser] = useState<string | null>(null);
+	const [loading, setLoading] = useState<boolean>(true);
 	const [userStats, setUserStats] = useState({
 		win_percentage: 0,
 		sunny_percentage: 0,
 		home_win_percentage: 0,
 		away_win_percentage: 0,
 		attendance_percentage: 0,
-	}); // 통계 데이터 상태 추가
-	const [isModalOpen, setIsModalOpen] = useState(false); // 모달 열림 상태 추가
+	});
+	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedProfile, setSelectedProfile] = useState({
 		nickname: "",
 		description: "",
 		photoUrl: "",
-	}); // 선택된 유저의 프로필 상태 추가
+	});
 	const [diaryToDelete, setDiaryToDelete] = useState<string | null>(null);
 	const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
 	const [alertMessage, setAlertMessage] = useState("");
 	const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
+	const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+	const [currentImages, setCurrentImages] = useState<string[]>([]);
 
 	const handleProfileClick = async (nickname: string) => {
-		// 토큰 가져오기
 		const token = sessionStorage.getItem("token");
 
 		if (!token) {
@@ -147,12 +145,11 @@ const DiaryTabs: React.FC = () => {
 		}
 
 		try {
-			// 선택된 유저의 정보를 가져오기
 			const profileResponse = await fetch(
 				`/api/getuserinfo?nickname=${nickname}`,
 				{
 					headers: {
-						Authorization: `Bearer ${token}`, // 토큰을 헤더에 포함
+						Authorization: `Bearer ${token}`,
 					},
 				}
 			);
@@ -162,11 +159,8 @@ const DiaryTabs: React.FC = () => {
 			}
 
 			const profileData = await profileResponse.json();
-
-			// 통계 정보 가져오기
 			const statsData = await fetchUserStats(nickname);
 
-			// 상태 업데이트
 			setSelectedProfile({
 				nickname: profileData.nickname,
 				description: profileData.description || "",
@@ -174,7 +168,7 @@ const DiaryTabs: React.FC = () => {
 			});
 
 			setUserStats(statsData);
-			setIsModalOpen(true); // 모달 열기
+			setIsModalOpen(true);
 		} catch (error) {
 			console.error("Error fetching profile or stats:", error);
 		}
@@ -185,31 +179,30 @@ const DiaryTabs: React.FC = () => {
 			try {
 				setLoading(true);
 
-				// 사용자 정보를 먼저 가져옴
 				const userInfo = await fetchUserInfo();
 				setUser(userInfo.nickname);
 
-				// 사용자 정보가 있을 경우 통계 데이터 가져오기
 				if (userInfo.nickname) {
 					const stats = await fetchUserStats(userInfo.nickname);
-					
 					setUserStats(stats);
 
-					// A탭일 때만 개인 일지를 가져옴
-					if (activeTab === "A") {
-						const personalDiaries = await fetchPersonalDiaries({
+					const [personalDiaries, allDiaries] = await Promise.all([
+						fetchPersonalDiaries({
 							nickname: userInfo.nickname,
 							page,
 							pageSize,
-						});
-						setDiaries(personalDiaries);
-					}
-				}
+						}),
+						fetchAllDiaries(page, pageSize),
+					]);
 
-				// B탭일 때는 전체 일지를 가져옴
-				if (activeTab === "B") {
-					const allDiaries = await fetchAllDiaries(page, pageSize);
-					setDiaries(allDiaries);
+					setPersonalDiaries(personalDiaries);
+					setAllDiaries(allDiaries);
+
+					if (activeTab === "A") {
+						setDiaries(personalDiaries);
+					} else if (activeTab === "B") {
+						setDiaries(allDiaries);
+					}
 				}
 			} catch (error) {
 				console.error("Error fetching diaries:", error);
@@ -218,7 +211,6 @@ const DiaryTabs: React.FC = () => {
 			}
 		};
 
-		// fetchUserAndDiaries 함수 실행
 		fetchUserAndDiaries();
 	}, [page, pageSize, activeTab]); // activeTab, page, pageSize 변경 시에만 실행
 
@@ -227,10 +219,12 @@ const DiaryTabs: React.FC = () => {
 		return <div>Loading...</div>;
 	}
 
+	
+
 	const handleDeleteEntry = async (entryId: string) => {
 		setDiaryToDelete(entryId);
 		setIsAlertModalOpen(true);
-		setAlertMessage("일지를 삭제하시겠습니까?")
+		setAlertMessage("일지를 삭제하시겠습니까?");
 		setIsDeleteConfirm(true);
 	};
 
@@ -238,7 +232,13 @@ const DiaryTabs: React.FC = () => {
 		if (diaryToDelete) {
 			try {
 				await deleteDiaryEntry(diaryToDelete);
-				setDiaries(diaries.filter((diary) => diary._id !== diaryToDelete));
+				setPersonalDiaries(personalDiaries.filter((diary) => diary._id !== diaryToDelete));
+				setAllDiaries(allDiaries.filter((diary) => diary._id !== diaryToDelete));
+				if (activeTab === "A") {
+					setDiaries(personalDiaries.filter((diary) => diary._id !== diaryToDelete));
+				} else if (activeTab === "B") {
+					setDiaries(allDiaries.filter((diary) => diary._id !== diaryToDelete));
+				}
 				setAlertMessage("일지가 성공적으로 삭제되었습니다.");
 				setIsDeleteConfirm(false);
 				setIsAlertModalOpen(false);
@@ -254,12 +254,52 @@ const DiaryTabs: React.FC = () => {
 		setDiaryToDelete(null);
 	};
 
+	const handleTabClick = (tab: "A" | "B") => {
+		setActiveTab(tab);
+		if (tab === "A") {
+			setDiaries(personalDiaries);
+		} else if (tab === "B") {
+			setDiaries(allDiaries);
+		}
+	};
+
+	if (loading) {
+		return <div>Loading...</div>;
+	}
+
+	const handleImageClick = (diary:DiaryEntry) => {
+		const images = [
+			diary.diary_photos?.ticket_photo,
+			diary.diary_photos?.view_photo,
+			diary.diary_photos?.additional_photo,
+		].filter((image): image is string => Boolean(image));
+		setCurrentImages(images);
+		setIsImageModalOpen(true);
+	}
+
+	const closeImageModal = () => {
+		setIsImageModalOpen(false);
+		setCurrentImages([]);
+	}
+
+	const sliderSettings = {
+		dots: true,
+		infinite: true,
+		speed: 500,
+		slidesToShow: 1,
+		slidesToScroll: 1,
+		draggable: true,
+		swipe: true,
+		swipeToSlide: true,
+	};
+
+
+
 	return (
 		<div className="w-full h-[600px] p-4">
-			{/* 탭 버튼들 */}
 			<div className="flex justify-center space-x-4">
 				<button
-					onClick={() => setActiveTab("A")}
+					onClick={() => handleTabClick("A")}
 					className={`px-4 py-2 ${
 						activeTab === "A" ? "border-b-2 border-red-500" : ""
 					}`}
@@ -267,7 +307,7 @@ const DiaryTabs: React.FC = () => {
 					내가 기록한 직관일지
 				</button>
 				<button
-					onClick={() => setActiveTab("B")}
+					onClick={() => handleTabClick("B")}
 					className={`px-4 py-2 ${
 						activeTab === "B" ? "border-b-2 border-red-500" : ""
 					}`}
@@ -276,10 +316,9 @@ const DiaryTabs: React.FC = () => {
 				</button>
 			</div>
 
-			{/* 통계 정보는 상단에 한 번만 표시 */}
 			{activeTab === "A" && (
 				<div className="mt-4">
-					<div className="flex flex-row justify-between items-center w-full text-sm pl-4 pr-4 border-b-2 border-red-500  shadow-md">
+					<div className="flex flex-row justify-between items-center w-full text-sm pl-4 pr-4 border-b-2 border-red-500 shadow-md">
 						<span>농구마니아지수: {userStats.attendance_percentage}%</span>
 						<span>날씨요정지수: {userStats.sunny_percentage}%</span>
 						<span>직관승요지수: {userStats.win_percentage}%</span>
@@ -289,17 +328,14 @@ const DiaryTabs: React.FC = () => {
 			)}
 
 			<div className="h-[500px] overflow-y-auto">
-				{/* 탭에 따른 내용 */}
 				<div className="mt-4">
-					{/* A 탭 처리 */}
 					{activeTab === "A" && Array.isArray(diaries) && diaries.length > 0 ? (
 						diaries.map((diary) => (
 							<div
-								key={diary._id} // 고유 ID로 키 설정
+								key={diary._id}
 								className="w-full text-xs mb-4 p-4 border-2 border-red-500 rounded-lg bg-white"
 							>
 								<div className="grid grid-cols-3 gap-4 p-2 w-full">
-									{/* 첫 번째 행 */}
 									<div className="flex justify-between items-center sm:flex-col sm:justify-center sm:items-start">
 										<span className="flex justify-end w-1/3 min-w-[70px] sm:w-full sm:justify-start">
 											관람일자:
@@ -321,7 +357,6 @@ const DiaryTabs: React.FC = () => {
 												"알 수 없는 장소"}
 										</span>
 									</div>
-									{/* 두 번째 행 */}
 									<div className="flex justify-between items-center sm:flex-col sm:justify-center sm:items-start">
 										<span className="flex justify-end w-1/3 min-w-[70px]">
 											함께 본 사람:
@@ -351,14 +386,16 @@ const DiaryTabs: React.FC = () => {
 												alt="diary ticket photo"
 												width={70}
 												height={50}
-												style={{ objectFit: "cover", width: "auto", height: "auto"  }}
+												style={{ objectFit: "cover", width: "auto", height: "70px" }}
 												className="object-cover"
+												onClick={() => handleImageClick(diary)}
 											/>
 										</div>
 										<div className="w-auto pl-4">{diary.diary_message}</div>
-										<button 
-										onClick={()=>handleDeleteEntry(diary._id)}
-										className="bg-gray-400 rounded-lg w-[100px] h-[40px] hover:bg-red-500 flex justify-center items-center absolute bottom-2 right-2">
+										<button
+											onClick={() => handleDeleteEntry(diary._id)}
+											className="bg-gray-400 rounded-lg w-[100px] h-[40px] hover:bg-red-500 flex justify-center items-center absolute bottom-2 right-2"
+										>
 											삭제
 										</button>
 									</div>
@@ -369,30 +406,30 @@ const DiaryTabs: React.FC = () => {
 						<div>일지가 없습니다</div>
 					) : null}
 
-					{/* B 탭 처리 */}
 					{activeTab === "B" && (
-						<div className="w-full grid grid-cols-3 sm:grid-cols-1 md:grid-row-3 gap-4">
+						<div className="w-full sm:flex-col sm:flex sm:justify-center sm:items-center grid grid-cols-3 sm:grid-cols-1 md:grid-row-3 gap-4">
 							{diaries && diaries.length > 0 ? (
 								diaries.map((diary) => (
 									<div
 										key={diary._id}
-										className="flex flex-col justify-center items-center w-[200px] h-[300px] bg-gray-300 rounded-lg shadow-md"
+										className="flex flex-col justify-center items-center w-[200px] h-[300px] bg-gray-200 rounded-lg shadow-md"
 									>
-										<div className="w-full h-3/5 bg-red-200 rounded-t-lg flex justify-center items-center">
+										<div className="w-full h-3/5 bg-white rounded-t-lg flex justify-center items-center">
 											<Image
 												src={`data:image/jpeg;base64,${diary.diary_photos?.ticket_photo}`}
 												alt="diary entry"
 												width={100}
 												height={100}
-												style={{ objectFit: "cover" }}
+												style={{ objectFit: "cover", cursor: "pointer" }}
 												className="object-cover rounded-t-lg"
+												onClick={() => handleImageClick(diary)}
 											/>
 										</div>
 										<div className="flex flex-col w-full h-2/5 p-2 text-sm justify-center pl-8">
 											<div>
 												<span>아이디: </span>
 												<span
-													onClick={() => handleProfileClick(diary.name)} // 클릭 시 프로필 정보 로드
+													onClick={() => handleProfileClick(diary.name)}
 													className="cursor-pointer text-blue-500 hover:underline"
 												>
 													{diary.name}
@@ -416,20 +453,44 @@ const DiaryTabs: React.FC = () => {
 							)}
 						</div>
 					)}
-					{/* 프로필 모달 컴포넌트 */}
 					<UserProfileModal
 						isOpen={isModalOpen}
 						onClose={() => setIsModalOpen(false)}
 						profile={selectedProfile}
 						userStats={userStats}
 					/>
-					<Modal
+					<AlertModal
 						isOpen={isAlertModalOpen}
 						message={alertMessage}
 						onClose={closeAlertModal}
 						buttonText={isDeleteConfirm ? "확인" : "닫기"}
 						onConfirm={isDeleteConfirm ? confirmDelete : closeAlertModal}
 					/>
+					<Modal
+						isOpen={isImageModalOpen}
+						onRequestClose={closeImageModal}
+						contentLabel="Image Modal"
+						className="modal"
+						overlayClassName="overlay"
+						
+
+					>
+					<Slider {...sliderSettings}>
+						{currentImages.map((image, index) => (
+							<div key={index} className="w-full h-full">
+								<Image
+									src={`data:image/jpeg;base64,${image}`}
+									alt={`diary photo ${index + 1}`}
+									width={100}
+									height={50}
+									style={{ objectFit: "cover", width: "100%", height: "100%" }}
+									className="object-cover"
+								/>
+							</div>
+						))}
+					</Slider>
+					<button onClick={closeImageModal} style={{ cursor: 'pointer', marginTop: '10px', padding: '10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '5px' }}>닫기</button> 
+					</Modal>
 				</div>
 			</div>
 		</div>
