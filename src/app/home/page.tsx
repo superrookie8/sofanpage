@@ -43,7 +43,7 @@ const MainPage: React.FC = () => {
 						사진
 					</div>
 					<section className="w-full bg-white bg-opacity-75 p-4 mb-4 rounded overflow-x-auto">
-						<div className="flex flex-wrap justify-center">
+						<div className="w-full flex flex-wrap justify-center">
 							<GetPhotos />
 						</div>
 					</section>

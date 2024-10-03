@@ -105,3 +105,34 @@ body {
 		background-attachment: fixed;
 	}
 }
+
+@keyframes scroll-left {
+	0% {
+	  transform: translateX(0%);
+	}
+	100% {
+	  transform: translateX(-50%);
+	}
+  }
+  
+  @keyframes scroll-right {
+	0% {
+	  transform: translateX(0%);
+	}
+	100% {
+	  transform: translateX(100%);
+	}
+  }
+  
+  .photo-row {
+	display: flex;
+	width: max-content;
+	animation: scroll-left 45s linear infinite;
+  }
+
+  /* .photo-row {
+	display: flex;
+	white-space: nowrap;
+	transition: transform 0.1s linear;
+  }
+   */
