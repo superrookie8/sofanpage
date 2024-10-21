@@ -4,6 +4,7 @@ import MainNews from "@/components/news/newsLatest";
 import { Article } from "@/types/articles";
 import JumpballSection from "@/components/news/newsJumpball";
 import RookieSection from "@/components/news/newsRookie";
+import { useLoading } from "@/context/LoadingContext";
 
 interface NewsData {
 	main_article: Article;
@@ -13,6 +14,7 @@ interface SectionData {
 }
 
 export default function News() {
+	const { setIsLoading } = useLoading();
 	const [data, setData] = useState<NewsData | null>(null);
 	const [jump, setJump] = useState<SectionData | null>(null);
 	const [rookie, setRookie] = useState<SectionData | null>(null);
@@ -21,20 +23,24 @@ export default function News() {
 	const articlesPerPage = 5;
 
 	useEffect(() => {
+		setIsLoading(true);
 		async function fetchData() {
 			const res = await fetch("/api/getnewslatest");
 			const data = await res.json();
 			setData(data);
+			setIsLoading(false);
 		}
 		async function fetchJumpballData() {
 			const res = await fetch("/api/getnewsjumpball?q=이소희");
 			const data = await res.json();
 			setJump({ articles: data });
+			setIsLoading(false);
 		}
 		async function fetchRookieData() {
 			const res = await fetch("/api/getnewsrookie?q=이소희");
 			const data = await res.json();
 			setRookie({ articles: data });
+			setIsLoading(false);
 		}
 		fetchData();
 		fetchJumpballData();

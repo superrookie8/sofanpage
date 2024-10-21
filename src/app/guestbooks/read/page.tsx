@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useRecoilValue } from "recoil";
 import { loginState } from "@/states/loginState";
+import { useLoading } from "@/context/LoadingContext";
 
 const fetchGuestbookEntries = async (): Promise<{
 	photo_entries: GuestBookEntry[];
@@ -41,18 +42,22 @@ const GuestBookList: React.FC = () => {
 	const pageSize = 10;
 	const router = useRouter();
 	const isLoggedIn = useRecoilValue(loginState);
+	const { setIsLoading } = useLoading();
 
 	useEffect(() => {
+		setIsLoading(true);
 		setLoading(true);
 		fetchGuestbookEntries()
 			.then((data) => {
 				setPhotoEntries(data.photo_entries);
 				setNoPhotoEntries(data.no_photo_entries);
 				setLoading(false);
+				setIsLoading(false);
 			})
 			.catch((error) => {
 				console.error("Failed to fetch guestbook entries:", error);
 				setLoading(false);
+				setIsLoading(false);
 			});
 	}, []);
 
@@ -61,12 +66,12 @@ const GuestBookList: React.FC = () => {
 	};
 
 	const handleCreateClick = () => {
-		if (isLoggedIn){
+		if (isLoggedIn) {
 			router.push("/guestbooks/create");
 		} else {
 			router.push("/login");
 		}
-	}
+	};
 
 	const displayEntries =
 		activeTab === "photos"
@@ -129,8 +134,13 @@ const GuestBookList: React.FC = () => {
 								{entry.photo_data && (
 									<div className="relative w-full h-[70%] overflow-hidden">
 										<div className="w-full h-full relative">
+											{/* <img
+												src="/api/guestbook/photo/6697f9ea6b62b510259604bc"
+												alt="Guestbook Photo"
+											/> */}
 											<Image
 												src={`data:image/jpeg;base64,${entry.photo_data}`}
+												// src={entry.photo_data}
 												alt="Guestbook entry"
 												fill
 												sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 100vw"
