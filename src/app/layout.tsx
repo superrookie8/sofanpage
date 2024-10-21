@@ -7,6 +7,8 @@ import ScriptProvider from "@/utils/scriptProvider";
 import ClientWrapper from "@/components/shared/clientWrapper";
 import Header from "@/components/shared/header";
 import Background from "@/components/opening/background";
+import { LoadingProvider } from "@/context/LoadingContext";
+import LoadingSpinner from "@/components/shared/loadingSpinner";
 
 export const metadata: Metadata = {
 	title: {
@@ -34,7 +36,6 @@ export const metadata: Metadata = {
 	],
 };
 
-
 export default function RootLayout({
 	children,
 }: {
@@ -58,13 +59,14 @@ export default function RootLayout({
 			</Script>
 			<ScriptProvider />
 			<body>
-				
+				<LoadingProvider>
+					<LoadingSpinner />
 					<RecoilRootProvider>
 						<Background />
 						<Header />
 						<ClientWrapper>{children}</ClientWrapper>
 					</RecoilRootProvider>
-				
+				</LoadingProvider>
 			</body>
 		</html>
 	);

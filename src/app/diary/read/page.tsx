@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { DiaryEntry } from "@/data/diary";
 import { where, weather, together, result } from "@/data/constants";
 import Image from "next/image";
+import { useLoading } from "@/context/LoadingContext";
 
 interface Props {}
 
@@ -43,15 +44,19 @@ const DiaryRead: React.FC<Props> = (props) => {
 	const [page, setPage] = useState(1);
 	const [pageSize] = useState(10);
 	const [user, setUser] = useState<string | null>(null);
+	const { setIsLoading } = useLoading();
 	const [loading, setLoading] = useState<boolean>(true);
 	const router = useRouter();
 
 	useEffect(() => {
+		setIsLoading(true);
 		const fetchDiaries = async () => {
 			setLoading(true); // 로딩 시작
+			setIsLoading(true);
 			const allDiaries = await fetchAllDiariesPage(page, pageSize);
 			setDiaries(allDiaries);
 			setLoading(false); // 로딩 완료
+			setIsLoading(false);
 		};
 
 		fetchDiaries();
