@@ -9,6 +9,7 @@ import Image from "next/image";
 import { useRecoilValue } from "recoil";
 import { loginState } from "@/states/loginState";
 import { useLoading } from "@/context/LoadingContext";
+import LoadingSpinner from "@/components/shared/loadingSpinner";
 
 const fetchGuestbookEntries = async (): Promise<{
 	photo_entries: GuestBookEntry[];
@@ -164,9 +165,7 @@ const GuestBookList: React.FC = () => {
 								</div>
 							</div>
 						))}
-						{loading && (
-							<div className="w-full text-center py-4">Loading...</div>
-						)}
+						{loading && <LoadingSpinner />}
 					</div>
 				</div>
 

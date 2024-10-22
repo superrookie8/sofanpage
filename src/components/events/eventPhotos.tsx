@@ -1,6 +1,6 @@
 // components/eventPhotos.tsx
 import Image from "next/image";
-
+import LoadingSpinner from "@/components/shared/loadingSpinner";
 interface EventPhotosProps {
 	eventId: string;
 	eventPhotos: string[];
@@ -64,7 +64,7 @@ const EventPhotos: React.FC<EventPhotosProps> = ({
 			)}
 			{loadingPhotos && eventPhotos.length > 0 && (
 				<div className="flex justify-center items-center mt-4">
-					<p>Loading more photos...</p>
+					<LoadingSpinner />
 				</div>
 			)}
 		</div>

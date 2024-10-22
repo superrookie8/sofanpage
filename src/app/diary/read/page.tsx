@@ -1,10 +1,11 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { DiaryEntry } from "@/data/diary";
 import { where, weather, together, result } from "@/data/constants";
 import Image from "next/image";
 import { useLoading } from "@/context/LoadingContext";
+import LoadingSpinner from "@/components/shared/loadingSpinner";
 
 interface Props {}
 
@@ -46,25 +47,45 @@ const DiaryRead: React.FC<Props> = (props) => {
 	const [user, setUser] = useState<string | null>(null);
 	const { setIsLoading } = useLoading();
 	const [loading, setLoading] = useState<boolean>(true);
+	const [hasMore, setHasMore] = useState<boolean>(true);
 	const router = useRouter();
 
-	useEffect(() => {
+	const loadMoreDiaries = useCallback(async () => {
+		if (loading || !hasMore) return;
+
+		setLoading(true);
 		setIsLoading(true);
-		const fetchDiaries = async () => {
-			setLoading(true); // 로딩 시작
-			setIsLoading(true);
-			const allDiaries = await fetchAllDiariesPage(page, pageSize);
-			setDiaries(allDiaries);
-			setLoading(false); // 로딩 완료
-			setIsLoading(false);
+
+		const newDiaries = await fetchAllDiariesPage(page, pageSize);
+
+		if (newDiaries.length > 0) {
+			setDiaries((prevDiaries) => [...prevDiaries, ...newDiaries]);
+			setPage((prevPage) => prevPage + 1);
+		} else {
+			setHasMore(false);
+		}
+
+		setLoading(false);
+		setIsLoading(false);
+	}, [page, pageSize, loading, hasMore]);
+
+	useEffect(() => {
+		loadMoreDiaries();
+	}, []);
+
+	useEffect(() => {
+		const handleScroll = () => {
+			if (
+				window.innerHeight + document.documentElement.scrollTop >=
+				document.documentElement.offsetHeight - 100
+			) {
+				loadMoreDiaries();
+			}
 		};
 
-		fetchDiaries();
-	}, [page, pageSize]); // 의존성 배열 설정
-
-	if (loading) {
-		return <div>Loading...</div>;
-	}
+		window.addEventListener("scroll", handleScroll);
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, [loadMoreDiaries]);
 
 	// 로그인 페이지로 이동하는 함수
 	const goToLogin = () => {
@@ -123,6 +144,8 @@ const DiaryRead: React.FC<Props> = (props) => {
 					) : (
 						<p>일지가 없습니다.</p>
 					)}
+					{loading && <LoadingSpinner />}
+					{!hasMore && <div>No more diaries to load</div>}
 				</div>
 			</div>
 		</>
