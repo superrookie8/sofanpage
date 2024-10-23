@@ -56,7 +56,7 @@ const RookieSection: React.FC<RookieProps> = ({
 
 	return (
 		<div className="flex flex-col justify-center p-4 h-[320vh] sm:h-[150vh] overflow-y-scroll">
-			<h2 className="flex justify-center mb-4">Rookie Section</h2>
+			<h2 className="flex justify-center mb-4">루키 더 바스켓</h2>
 			<div className="grid grid-cols-1 gap-4 h-full overflow-y-scroll">
 				{articles.map((article) => (
 					<div

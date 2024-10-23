@@ -76,7 +76,7 @@ export default function News() {
 			<div className="flex justify-center items-center">
 				<div className="bg-white bg-opacity-75 min-h-screen w-full flex-col justify-center p-8 relative">
 					<div className="min-h-[50vh] w-full flex flex-col items-center p-8">
-						<h2>Main Article</h2>
+						<h2>최신기사</h2>
 						<div className="bg-white grid rounded-lg shadow-md">
 							<MainNews article={data.main_article} />
 						</div>
