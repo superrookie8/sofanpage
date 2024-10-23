@@ -5,7 +5,7 @@ import { Article } from "@/types/articles";
 import JumpballSection from "@/components/news/newsJumpball";
 import RookieSection from "@/components/news/newsRookie";
 import { useLoading } from "@/context/LoadingContext";
-import LoadingSpinner from "@/components/shared/loadingSpinner";
+// import LoadingSpinner from "@/components/shared/loadingSpinner";
 
 interface NewsData {
 	main_article: Article;
@@ -48,8 +48,9 @@ export default function News() {
 		fetchRookieData();
 	}, []);
 
-	if (!data || !jump || !jump.articles || !rookie || !rookie.articles) {
-		return <LoadingSpinner />;
+	if (!(data && jump && jump.articles && rookie && rookie.articles)) {
+		// return <LoadingSpinner />;
+		return null;
 	}
 
 	const paginate = (articles: Article[], page: number, perPage: number) => {
