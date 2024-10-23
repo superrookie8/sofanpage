@@ -10,7 +10,19 @@ import {
 	getDay,
 } from "date-fns";
 
-const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+// 월 이름을 한글로 반환하는 함수
+const getKoreanMonth = (date: Date): string => {
+	return new Intl.DateTimeFormat("ko-KR", { month: "long" }).format(date);
+};
+
+// 년도와 월을 문자열로 반환하는 함수
+const formatYearMonth = (date: Date): string => {
+	const year = date.getFullYear();
+	const month = getKoreanMonth(date);
+	return `${year}년 ${month}`;
+};
+
+const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 
 const Calendar: React.FC = () => {
 	const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -48,16 +60,20 @@ const Calendar: React.FC = () => {
 		</div>
 	));
 
-	const previousMonth = () => {
-		setCurrentMonth(
-			new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
-		);
+	const prevMonth = () => {
+		setCurrentMonth((prevState) => {
+			const year = prevState.getFullYear();
+			const month = prevState.getMonth();
+			return new Date(year, month - 1, 1);
+		});
 	};
 
 	const nextMonth = () => {
-		setCurrentMonth(
-			new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
-		);
+		setCurrentMonth((prevState) => {
+			const year = prevState.getFullYear();
+			const month = prevState.getMonth();
+			return new Date(year, month + 1, 1);
+		});
 	};
 
 	const emptyDays = Array(getDay(startDay)).fill(null);
@@ -78,7 +94,6 @@ const Calendar: React.FC = () => {
 			(schedule) => schedule.date === formattedDate
 		);
 
-
 		return todaySchedules.map((schedule, index) => (
 			<div
 				key={index}
@@ -88,14 +103,13 @@ const Calendar: React.FC = () => {
 				onClick={() => handleDateClick(schedule.date)}
 			>
 				<div>
-				<span>
-					{schedule.opponent}
-				</span>
+					<span>{schedule.opponent}</span>
 
-				
-				<span>{` ${schedule.time}`}</span>
-			</div>
-			<div className="mt-2 screen-y-scroll">{schedule.specialGame ? <span>{schedule.specialGame}</span> : ""}</div>
+					<span>{` ${schedule.time}`}</span>
+				</div>
+				<div className="mt-2 screen-y-scroll">
+					{schedule.specialGame ? <span>{schedule.specialGame}</span> : ""}
+				</div>
 			</div>
 		));
 	};
@@ -104,13 +118,13 @@ const Calendar: React.FC = () => {
 		<div className="w-full max-w-[700px] flex flex-col items-center p-5">
 			<div className="flex justify-between w-full mb-5">
 				<button
-					onClick={previousMonth}
+					onClick={prevMonth}
 					className="bg-transparent border-none text-xl font-semibold cursor-pointer"
 				>
 					{"<"}
 				</button>
 				<span className="text-xl font-semibold">
-					{format(currentMonth, "MMMM yyyy")}
+					{formatYearMonth(currentMonth)}
 				</span>
 				<button
 					onClick={nextMonth}

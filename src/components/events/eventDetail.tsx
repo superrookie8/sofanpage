@@ -14,7 +14,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
 	if (loadingDetails) {
 		return (
 			<div className="flex justify-center items-center">
-				<p>Loading details...</p>
+				<p>어라 왜 이렇게 오래 걸리지...</p>
 			</div>
 		);
 	}

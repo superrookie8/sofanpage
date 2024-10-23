@@ -145,7 +145,7 @@ const DiaryRead: React.FC<Props> = (props) => {
 						<p>일지가 없습니다.</p>
 					)}
 					{loading && <LoadingSpinner />}
-					{!hasMore && <div>No more diaries to load</div>}
+					{!hasMore && <div>더이상 없어요..</div>}
 				</div>
 			</div>
 		</>

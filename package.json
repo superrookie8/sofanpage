@@ -37,6 +37,7 @@
 		"uuid": "^10.0.0"
 	},
 	"devDependencies": {
+		"@locator/babel-jsx": "^0.4.4",
 		"@types/formidable": "^3.4.5",
 		"@types/multiparty": "^0.0.36",
 		"@types/node": "^20",

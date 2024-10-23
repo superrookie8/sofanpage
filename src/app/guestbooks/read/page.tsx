@@ -101,7 +101,7 @@ const GuestBookList: React.FC = () => {
 									: "bg-gray-200 text-gray-700"
 							}`}
 						>
-							With Photos
+							사진방명록
 						</button>
 						<button
 							onClick={() => handleTabChange("noPhotos")}
@@ -111,7 +111,7 @@ const GuestBookList: React.FC = () => {
 									: "bg-gray-200 text-gray-700"
 							}`}
 						>
-							Without Photos
+							글방명록
 						</button>
 					</div>
 					<div className="flex ">
