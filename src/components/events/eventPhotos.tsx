@@ -75,7 +75,7 @@ const EventPhotos: React.FC<EventPhotosProps> = ({
 					</button>
 					{isLoadingMore && (
 						<div className="flex justify-center items-center mt-4 bg-white bg-opacity-70">
-							<LoadingSpinner size={40} fullScreen={false} />
+							<LoadingSpinner />
 						</div>
 					)}
 				</div>
