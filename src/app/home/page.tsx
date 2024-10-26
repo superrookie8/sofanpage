@@ -14,12 +14,12 @@ const MainPage: React.FC = () => {
 			</div>
 
 			<div className="w-full flex justify-center z-10">
-				<div className="w-full max-w-6xl">
-					<div className="bg-white text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
+				<div className="w-full">
+					<div className="bg-red-600 text-white sm: border-b-2  sm: border-t-2 sm:bg-white sm:text-red-500 sm:bg-opacity-75 border-red-500 h-[50px] w-full flex justify-center items-center">
 						프로필
 					</div>
-					<section className="w-full bg-white bg-opacity-75 pb-4 mb-4 rounded">
-						<div className="flex flex-wrap ">
+					<section className="flex justify-center">
+						<div className="w-[80%] sm:w-full bg-white bg-opacity-75 pb-4  rounded flex flex-wrap ">
 							<Profile />
 						</div>
 					</section>
@@ -27,23 +27,25 @@ const MainPage: React.FC = () => {
 			</div>
 
 			<div className="w-full flex justify-center z-10">
-				<div className="w-full max-w-6xl">
-					<div className="bg-white text-red-500 bg-opacity-75 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
+				<div className="w-full">
+					<div className="bg-red-600 text-white sm:bg-white sm:text-red-500  sm:border-b-2 sm:border-t-2 sm:bg-opacity-75 border-red-500 h-[50px] w-full flex justify-center items-center">
 						기록
 					</div>
-					<section className="w-full bg-white bg-opacity-75 p-4 mb-4 rounded overflow-x-auto">
-						<Stats />
+					<section className="flex justify-center bg-white bg-opacity-75">
+						<div className="w-[80%] sm:w-[90%] bg-white bg-opacity-75 pb-4 pt-4 rounded overflow-x-auto">
+							<Stats />
+						</div>
 					</section>
 				</div>
 			</div>
 
 			<div className="w-full flex justify-center z-10">
-				<div className="w-full max-w-6xl">
-					<div className="bg-white bg-opacity-75 text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
+				<div className="w-full">
+					<div className="bg-red-600 text-white sm:bg-white sm:text-red-500  sm:border-b-2 sm:border-t-2 sm:bg-opacity-75 border-red-500 h-[50px] w-full flex justify-center items-center">
 						사진
 					</div>
-					<section className="w-full bg-white bg-opacity-75 p-4 mb-4 rounded overflow-x-auto">
-						<div className="w-full flex flex-wrap justify-center">
+					<section className="flex justify-center">
+						<div className="w-[80%] sm:w-full bg-white bg-opacity-75 pb-4 pt-4 rounded overflow-x-auto">
 							<GetPhotos />
 						</div>
 					</section>
