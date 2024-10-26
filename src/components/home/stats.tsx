@@ -89,13 +89,13 @@ const Stats: React.FC = () => {
 		<table className="min-w-full ">
 			<thead>
 				<tr>
-					<th className="py-2 px-4 border-b-2 border-red-200 bg-red-100 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+					<th className="py-2 px-4 border-b-2 border-red-200 bg-red-600 text-left text-[10px] lg:text-xs font-semibold text-white uppercase tracking-wider">
 						Season
 					</th>
 					{keys.map((key) => (
 						<th
 							key={String(key)}
-							className="py-2 px-4 border-b-2 border-red-200 bg-red-100 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+							className="py-2 px-4 border-b-2 border-red-200 bg-red-600 text-left text-[10px] lg:text-xs font-semibold text-white uppercase tracking-wider"
 						>
 							{String(key).replace(/^(Average|Total)/, "")}
 						</th>
@@ -105,13 +105,13 @@ const Stats: React.FC = () => {
 			<tbody>
 				{data.map((stat) => (
 					<tr key={stat.season}>
-						<td className="py-2 px-4 border-b border-red-200 text-gray-500">
+						<td className="py-1 px-1  border-b border-red-200 text-gray-500 text-[10px] lg:text-sm">
 							{stat.season}
 						</td>
 						{keys.map((key) => (
 							<td
 								key={String(key)}
-								className="py-2 px-4 border-b border-red-200 text-gray-500"
+								className="py-1 px-1 border-b border-red-200 text-gray-500 text-[10px] lg:text-sm"
 							>
 								{(stat[type] as any)[key]}
 							</td>

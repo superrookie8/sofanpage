@@ -115,41 +115,43 @@ const Calendar: React.FC = () => {
 	};
 
 	return (
-		<div className="w-full max-w-[700px] flex flex-col items-center p-5">
-			<div className="flex justify-between w-full mb-5">
-				<button
-					onClick={prevMonth}
-					className="bg-transparent border-none text-xl font-semibold cursor-pointer"
-				>
-					{"<"}
-				</button>
-				<span className="text-xl font-semibold">
-					{formatYearMonth(currentMonth)}
-				</span>
-				<button
-					onClick={nextMonth}
-					className="bg-transparent border-none text-xl font-semibold cursor-pointer"
-				>
-					{">"}
-				</button>
-			</div>
-			<div className="grid grid-cols-7 gap-1 w-full">
-				{weekDayHeader}
-				{emptyDays.map((_, index) => (
-					<div
-						key={`empty-${index}`}
-						className="bg-gray-200 h-20 md:h-24 lg:h-28"
-					></div>
-				))}
-				{daysInCurrentMonth.map((day) => (
-					<div
-						key={day.toString()}
-						className="bg-gray-200 flex flex-col p-1 h-20 md:h-24 lg:h-28"
+		<div className="w-full flex justify-center items-center">
+			<div className="w-full max-w-[700px] flex flex-col justify-center items-center p-5">
+				<div className="flex justify-between w-full mb-5">
+					<button
+						onClick={prevMonth}
+						className="bg-transparent border-none text-xl font-semibold cursor-pointer"
 					>
-						<span className="text-xs md:text-sm">{format(day, "d")}</span>
-						{renderGameSchedule(day)}
-					</div>
-				))}
+						{"<"}
+					</button>
+					<span className="text-xl font-semibold">
+						{formatYearMonth(currentMonth)}
+					</span>
+					<button
+						onClick={nextMonth}
+						className="bg-transparent border-none text-xl font-semibold cursor-pointer"
+					>
+						{">"}
+					</button>
+				</div>
+				<div className="grid grid-cols-7 gap-1 w-full">
+					{weekDayHeader}
+					{emptyDays.map((_, index) => (
+						<div
+							key={`empty-${index}`}
+							className="bg-gray-200 h-20 md:h-24 lg:h-28"
+						></div>
+					))}
+					{daysInCurrentMonth.map((day) => (
+						<div
+							key={day.toString()}
+							className="bg-gray-200 flex flex-col p-1 h-20 md:h-24 lg:h-28"
+						>
+							<span className="text-xs md:text-sm">{format(day, "d")}</span>
+							{renderGameSchedule(day)}
+						</div>
+					))}
+				</div>
 			</div>
 		</div>
 	);
