@@ -119,7 +119,7 @@ const GuestBookList: React.FC = () => {
 							onClick={handleCreateClick}
 							className="border-red-500 border-2 text-red-500 font-bold py-2 px-4 rounded top-4 right-4 hover:bg-red-500 hover:text-white "
 						>
-							Create
+							방명록 남기기
 						</button>
 					</div>
 				</div>
