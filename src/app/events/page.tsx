@@ -174,7 +174,7 @@ const Events: React.FC = () => {
 					onClick={handleOutsideClick}
 				>
 					<div
-						className="relative bg-gray-200 p-4 rounded-lg shadow-xl"
+						className="relative bg-gray-200 p-4 rounded-lg shadow-xl flex justify-center items-center"
 						style={{ maxWidth: "90vw", maxHeight: "90vh" }}
 					>
 						<button
@@ -184,7 +184,7 @@ const Events: React.FC = () => {
 							&times;
 						</button>
 						<div
-							className="relative"
+							className="relative flex justify-center items-center mx-auto px-4"
 							style={{
 								backgroundColor: "transparent",
 								width: "500px",

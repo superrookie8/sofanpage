@@ -27,9 +27,14 @@ const EventPhotos: React.FC<EventPhotosProps> = ({
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 
 	const handleLoadMore = async () => {
-		setIsLoadingMore(true); // 전역 로딩 상태 설정
-		await loadMorePhotos();
-		setIsLoadingMore(false); // 전역 로딩 상태 해제
+		try {
+			setIsLoadingMore(true);
+			await loadMorePhotos();
+		} catch (error) {
+			console.error("Error loading more photos:", error);
+		} finally {
+			setIsLoadingMore(false);
+		}
 	};
 
 	return (
@@ -65,17 +70,21 @@ const EventPhotos: React.FC<EventPhotosProps> = ({
 				!loadingPhotos && <span>로딩중일거예요..</span>
 			)}
 			{page < totalPages && !loadingPhotos && (
-				<div>
+				<div className="w-full max-w-screen-lg mx-auto">
 					<button
 						onClick={handleLoadMore}
 						className="mt-4 bg-red-500 text-white font-bold py-2 px-4 rounded w-full"
 						disabled={isLoadingMore}
 					>
-						{isLoadingMore ? "로딩 중..." : "더보기"}
+						더보기
 					</button>
+
 					{isLoadingMore && (
-						<div className="flex justify-center items-center mt-4 bg-white bg-opacity-70">
+						<div className="mt-4 flex flex-col items-center gap-2 p-4 bg-white bg-opacity-70 rounded">
 							<LoadingSpinner />
+							<span className="text-gray-700">
+								추가 사진을 불러오는 중입니다...
+							</span>
 						</div>
 					)}
 				</div>
