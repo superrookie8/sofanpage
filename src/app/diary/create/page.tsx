@@ -404,13 +404,10 @@ const BasketballDiary: React.FC<Props> = (props) => {
 					<div className="flex flex-col md:flex-row lg:flex-row xl:flex-row 2xl:flex-row w-full gap-4">
 						{" "}
 						{/* sm:flex-row 제거, gap 추가 */}
-						<div className="w-full md:w-1/3 lg:w-1/3 xl:w-1/3 2xl:w-1/3 h-10 p-4 flex flex-col bg-red-500">
+						<div className="w-full md:w-1/3 lg:w-1/3 xl:w-1/3 2xl:w-1/3 h-15 p-4 sm:p-0 flex flex-col">
 							{" "}
 							{/* sm:w-1/3 제거 */}
-							<label
-								htmlFor="datePicker"
-								className="flex w-full sm:w-screen sm:bg-red-500"
-							>
+							<label htmlFor="datePicker" className="flex w-full sm:bg-red-500">
 								관람일자
 							</label>
 							<input
@@ -420,10 +417,10 @@ const BasketballDiary: React.FC<Props> = (props) => {
 								onChange={handleDateChange}
 							/>
 						</div>
-						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-40">
+						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-50">
 							{" "}
 							{/* sm:w-1/3 제거 */}
-							<label className="flex w-full sm:w-screen sm:bg-red-500 sm:ml-0 ml-8 mt-2 ">
+							<label className="flex w-full  sm:bg-red-500 sm:ml-0 ml-8 mt-2 ">
 								날씨
 							</label>
 							<div className="w-full flex flex-row justify-center items-center mr-4">
@@ -438,7 +435,7 @@ const BasketballDiary: React.FC<Props> = (props) => {
 						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-40">
 							{" "}
 							{/* sm:w-1/3 제거 */}
-							<label className="flex w-full sm:w-screen sm:bg-red-500 sm:ml-0 ml-8 mt-2">
+							<label className="flex w-full  sm:bg-red-500 sm:ml-0 ml-8 mt-2">
 								장소
 							</label>
 							<div className="w-full flex flex-row justify-between items-center">
@@ -457,7 +454,7 @@ const BasketballDiary: React.FC<Props> = (props) => {
 						<div className="w-full md:w-1/3 h-15 border-l-2 flex flex-col justify-between items-center relative z-30">
 							{" "}
 							{/* sm:w-1/3 제거 */}
-							<label className="flex w-full sm:w-screen sm:bg-red-500 sm:ml-0 ml-8 mt-2">
+							<label className="flex w-full  sm:bg-red-500 sm:ml-0 ml-8 mt-2">
 								함께 본 사람
 							</label>
 							<div className="w-full flex flex-row justify-between items-center gap-2">
@@ -472,7 +469,7 @@ const BasketballDiary: React.FC<Props> = (props) => {
 						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-20">
 							{" "}
 							{/* sm:w-1/3 제거 */}
-							<label className="flex w-full sm:w-screen sm:bg-red-500 sm:ml-0 ml-8 mt-2">
+							<label className="flex w-full  sm:bg-red-500 sm:ml-0 ml-8 mt-2">
 								승패선택
 							</label>
 							<div className="w-full flex flex-row justify-center items-center gap-2">
@@ -487,7 +484,7 @@ const BasketballDiary: React.FC<Props> = (props) => {
 						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-10">
 							{" "}
 							{/* sm:w-1/3 제거 */}
-							<div className="w-full sm:w-screen sm:bg-red-500 flex flex-row justify-between items-center">
+							<div className="w-full  sm:bg-red-500 flex flex-row justify-between items-center">
 								<label className="ml-4 mt-2">좌석</label>
 								<div className="w-1/3 mr-4 flex justify-center items-center">
 									<SectionToggleMenu
