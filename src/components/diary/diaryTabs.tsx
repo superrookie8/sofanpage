@@ -7,7 +7,7 @@ import { fetchUserStats } from "@/api";
 import UserProfileModal from "@/components/mypage/userProfileModal";
 import AlertModal from "@/components/shared/alertModal";
 import Slider from "react-slick";
-import Modal from "react-modal"
+import Modal from "react-modal";
 
 // 사용자 정보를 가져오는 함수 (토큰 기반)
 export const fetchUserInfo = async (): Promise<{
@@ -216,10 +216,8 @@ const DiaryTabs: React.FC = () => {
 
 	// 로딩 중일 때는 로딩 메시지를 출력
 	if (loading) {
-		return <div>Loading...</div>;
+		return <div>불러오는 중입니다...</div>;
 	}
-
-	
 
 	const handleDeleteEntry = async (entryId: string) => {
 		setDiaryToDelete(entryId);
@@ -232,10 +230,16 @@ const DiaryTabs: React.FC = () => {
 		if (diaryToDelete) {
 			try {
 				await deleteDiaryEntry(diaryToDelete);
-				setPersonalDiaries(personalDiaries.filter((diary) => diary._id !== diaryToDelete));
-				setAllDiaries(allDiaries.filter((diary) => diary._id !== diaryToDelete));
+				setPersonalDiaries(
+					personalDiaries.filter((diary) => diary._id !== diaryToDelete)
+				);
+				setAllDiaries(
+					allDiaries.filter((diary) => diary._id !== diaryToDelete)
+				);
 				if (activeTab === "A") {
-					setDiaries(personalDiaries.filter((diary) => diary._id !== diaryToDelete));
+					setDiaries(
+						personalDiaries.filter((diary) => diary._id !== diaryToDelete)
+					);
 				} else if (activeTab === "B") {
 					setDiaries(allDiaries.filter((diary) => diary._id !== diaryToDelete));
 				}
@@ -267,7 +271,7 @@ const DiaryTabs: React.FC = () => {
 		return <div>Loading...</div>;
 	}
 
-	const handleImageClick = (diary:DiaryEntry) => {
+	const handleImageClick = (diary: DiaryEntry) => {
 		const images = [
 			diary.diary_photos?.ticket_photo,
 			diary.diary_photos?.view_photo,
@@ -275,12 +279,12 @@ const DiaryTabs: React.FC = () => {
 		].filter((image): image is string => Boolean(image));
 		setCurrentImages(images);
 		setIsImageModalOpen(true);
-	}
+	};
 
 	const closeImageModal = () => {
 		setIsImageModalOpen(false);
 		setCurrentImages([]);
-	}
+	};
 
 	const sliderSettings = {
 		dots: true,
@@ -293,11 +297,9 @@ const DiaryTabs: React.FC = () => {
 		swipeToSlide: true,
 	};
 
-
-
 	return (
 		<div className="w-full h-[600px] p-4">
-			<div className="flex justify-center space-x-4">
+			<div className="flex justify-center space-x-4 text-sm">
 				<button
 					onClick={() => handleTabClick("A")}
 					className={`px-4 py-2 ${
@@ -318,7 +320,7 @@ const DiaryTabs: React.FC = () => {
 
 			{activeTab === "A" && (
 				<div className="mt-4">
-					<div className="flex flex-row justify-between items-center w-full text-sm pl-4 pr-4 border-b-2 border-red-500 shadow-md">
+					<div className="flex flex-row justify-between items-center w-full text-sm sm:text-xs pl-4 pr-4 border-b-2 border-red-500 shadow-md">
 						<span>농구마니아지수: {userStats.attendance_percentage}%</span>
 						<span>날씨요정지수: {userStats.sunny_percentage}%</span>
 						<span>직관승요지수: {userStats.win_percentage}%</span>
@@ -386,7 +388,11 @@ const DiaryTabs: React.FC = () => {
 												alt="diary ticket photo"
 												width={70}
 												height={50}
-												style={{ objectFit: "cover", width: "auto", height: "70px" }}
+												style={{
+													objectFit: "cover",
+													width: "auto",
+													height: "70px",
+												}}
 												className="object-cover"
 												onClick={() => handleImageClick(diary)}
 											/>
@@ -472,24 +478,38 @@ const DiaryTabs: React.FC = () => {
 						contentLabel="Image Modal"
 						className="modal"
 						overlayClassName="overlay"
-						
-
 					>
-					<Slider {...sliderSettings}>
-						{currentImages.map((image, index) => (
-							<div key={index} className="w-full h-full">
-								<Image
-									src={`data:image/jpeg;base64,${image}`}
-									alt={`diary photo ${index + 1}`}
-									width={100}
-									height={50}
-									style={{ objectFit: "cover", width: "100%", height: "100%" }}
-									className="object-cover"
-								/>
-							</div>
-						))}
-					</Slider>
-					<button onClick={closeImageModal} style={{ cursor: 'pointer', marginTop: '10px', padding: '10px', backgroundColor: '#f0f0f0', border: 'none', borderRadius: '5px' }}>닫기</button> 
+						<Slider {...sliderSettings}>
+							{currentImages.map((image, index) => (
+								<div key={index} className="w-full h-full">
+									<Image
+										src={`data:image/jpeg;base64,${image}`}
+										alt={`diary photo ${index + 1}`}
+										width={100}
+										height={50}
+										style={{
+											objectFit: "cover",
+											width: "100%",
+											height: "100%",
+										}}
+										className="object-cover"
+									/>
+								</div>
+							))}
+						</Slider>
+						<button
+							onClick={closeImageModal}
+							style={{
+								cursor: "pointer",
+								marginTop: "10px",
+								padding: "10px",
+								backgroundColor: "#f0f0f0",
+								border: "none",
+								borderRadius: "5px",
+							}}
+						>
+							닫기
+						</button>
 					</Modal>
 				</div>
 			</div>

@@ -64,18 +64,20 @@ const BasketballDiary: React.FC<Props> = (props) => {
 		window.location.reload();
 	};
 
-	const handleDiaryPhotoChange = (photoUrl: string, type: 'ticket' | 'view' | 'additional') => {
-		if (type === 'ticket') {
+	const handleDiaryPhotoChange = (
+		photoUrl: string,
+		type: "ticket" | "view" | "additional"
+	) => {
+		if (type === "ticket") {
 			setTicketPhoto(photoUrl);
-		} else if (type === 'view') {
+		} else if (type === "view") {
 			setViewPhoto(photoUrl);
-		} else if (type === 'additional') {
+		} else if (type === "additional") {
 			setAdditionalPhoto(photoUrl);
 		}
 		setPreview((prev) => [...prev, { url: photoUrl } as DiaryPhotoData]);
 		console.log(`${type} photo updated:`, photoUrl);
 	};
-
 
 	useEffect(() => {
 		const today = new Date();
@@ -132,20 +134,32 @@ const BasketballDiary: React.FC<Props> = (props) => {
 		// 티켓 사진 추가
 		const ticketResponse = await fetch(ticketphoto);
 		const ticketBlob = await ticketResponse.blob();
-		const ticketFile = new File([ticketBlob], `ticket_${new Date().toISOString()}.jpg`, { type: ticketBlob.type });
+		const ticketFile = new File(
+			[ticketBlob],
+			`ticket_${new Date().toISOString()}.jpg`,
+			{ type: ticketBlob.type }
+		);
 		formData.append("ticket_photo", ticketFile);
 
 		// 경기장 사진 추가
 		const viewResponse = await fetch(viewphoto);
 		const viewBlob = await viewResponse.blob();
-		const viewFile = new File([viewBlob], `view_${new Date().toISOString()}.jpg`, { type: viewBlob.type });
+		const viewFile = new File(
+			[viewBlob],
+			`view_${new Date().toISOString()}.jpg`,
+			{ type: viewBlob.type }
+		);
 		formData.append("view_photo", viewFile);
 
 		// 추가 사진이 있는 경우
 		if (additionalphoto) {
 			const additionalResponse = await fetch(additionalphoto);
 			const additionalBlob = await additionalResponse.blob();
-			const additionalFile = new File([additionalBlob], `additional_${new Date().toISOString()}.jpg`, { type: additionalBlob.type });
+			const additionalFile = new File(
+				[additionalBlob],
+				`additional_${new Date().toISOString()}.jpg`,
+				{ type: additionalBlob.type }
+			);
 			formData.append("additional_photo", additionalFile);
 		}
 
@@ -179,7 +193,6 @@ const BasketballDiary: React.FC<Props> = (props) => {
 			setMessage("");
 			setSeatInfo({ section: "", row: "", number: "" });
 			setPreview([]);
-		
 		} catch (error) {
 			console.error("일지 등록중 오류 발생:", error);
 			handleOpenModal("일지를 등록하는 동안 오류가 발생했습니다.");
@@ -188,13 +201,216 @@ const BasketballDiary: React.FC<Props> = (props) => {
 		}
 	};
 
+	// return (
+	// 	<div className="pl-4 pr-4 gap-4 flex flex-col md:flex-col lg:flex-col xl:flex-row justify-center items-center w-full rounded">
+	// 		<div className="w-1/2 sm:w-full md:w-full lg:w-full h-[700px] sm:h-[1100px] sm:justify-between bg-gray-200 bg-opacity-75 rounded  flex flex-col justify-center items-center">
+	// 			<div className="w-full h-50 gap-2 flex flex-col">
+	// 				<div className="flex flex-row w-full">
+	// 					<div className="w-1/3 h-10 p-8 flex flex-col justify-center items-center  ">
+	// 						<label htmlFor="datePicker" className="flex w-full">
+	// 							관람일자
+	// 						</label>
+	// 						<input
+	// 							type="date"
+	// 							id="datePicker"
+	// 							value={date}
+	// 							onChange={handleDateChange}
+	// 						/>
+	// 					</div>
+	// 					<div className="w-1/3 h-15  flex flex-col justify-between items-center relative z-30">
+	// 						<label className="flex w-full ml-8 mt-2">날씨</label>
+	// 						<div className="w-full flex flex-row justify-center items-center mr-4">
+	// 							<div className="w-1/3 flex justify-center items-center relative z-30">
+	// 								<WeatherToggleMenu onSelect={setWeather} />
+	// 							</div>
+	// 							<div className="w-2/3 min-w-[70px] flex justify-center">
+	// 								<SelectedWeather weather={weather} />
+	// 							</div>
+	// 						</div>
+	// 					</div>
+	// 					<div className="w-1/3 h-15  flex flex-col justify-between items-center relative z-30">
+	// 						<label className="flex w-full ml-8 mt-2">장소</label>
+	// 						<div className="w-full flex flex-row justify-between items-center">
+	// 							<div className="w-1/3 flex justify-center items-center">
+	// 								<LocationToggleMenu onSelect={setLocation} />
+	// 							</div>
+	// 							<div className="w-2/3 flex justify-center items-center">
+	// 								<SelectedLocation location={location} />
+	// 							</div>
+	// 						</div>
+	// 					</div>
+	// 				</div>
+
+	// 				<div className="flex flex-row">
+	// 					<div className="w-1/3 h-15 border-l-2  flex flex-col justify-between items-center relative z-10">
+	// 						<label className="flex w-full ml-8 mt-2">함께 본 사람</label>
+	// 						<div className="w-full flex flex-row justify-between items-center gap-2">
+	// 							<div className="w-1/3 flex justify-center items-center">
+	// 								<TogetherToggleMenu onSelect={setTogether} />
+	// 							</div>
+	// 							<div className="w-2/3 flex justify-center items-center">
+	// 								<SelectedTogether together={together} />
+	// 							</div>
+	// 						</div>
+	// 					</div>
+	// 					<div className="w-1/3 h-15  flex flex-col justify-between items-center relative z-10">
+	// 						<label className="flex w-full ml-8 mt-2">승패선택</label>
+	// 						<div className="w-full flex flex-row justify-center items-center gap-2">
+	// 							<div className="w-1/3 flex justify-center items-center">
+	// 								<WinningToggleMenu onSelect={setIsWinning} />
+	// 							</div>
+	// 							<div className="w-2/3 flex justify-center items-center">
+	// 								<SelectedWinningMode winningmode={isWinning} />
+	// 							</div>
+	// 						</div>
+	// 					</div>
+	// 					<div className="w-1/3 h-15  flex flex-col justify-between items-center relative z-10">
+	// 						<div className="w-full flex flex-row justify-between items-center">
+	// 							<label className="ml-4 mt-2">좌석</label>
+	// 							<div className="w-1/3 mr-4 flex justify-center items-center">
+	// 								<SectionToggleMenu
+	// 									location={location}
+	// 									onSelect={(value) => updateSeatInfo("section", value)}
+	// 								/>
+	// 								<RowToggleMenu
+	// 									onSelect={(value) => updateSeatInfo("row", value)}
+	// 								/>
+	// 								<NumberToggleMenu
+	// 									onSelect={(value) => updateSeatInfo("number", value)}
+	// 								/>
+	// 							</div>
+	// 						</div>
+	// 						<div className="w-full flex flex-row justify-center items-center gap-2">
+	// 							<div className="pl-4 pr-4 pb-2 w-full flex justify-between items-center">
+	// 								<SelectedSection
+	// 									location={location}
+	// 									section={seatInfo.section}
+	// 								/>
+	// 								<SelectedRow row={seatInfo.row} />
+	// 								<SelectedNumber number={seatInfo.number} />
+	// 							</div>
+	// 						</div>
+	// 					</div>
+	// 				</div>
+	// 			</div>
+
+	// 			<div className=" w-full mb-2 rounded flex flex-col justify-center sm:justify-between  items-center gap-4 p-4  sm:h-[800px]   xl:h-[800px] ">
+	// 				<div className="w-full  p-2 rounded flex justify-center">
+	// 					<p>티켓 사진과 경기장 사진은 필수 입니다! </p>
+	// 				</div>
+	// 				<div className="w-full flex flex-row justify-center items-center gap-4 sm:h-[700px] sm:flex-col md:flex-row lg:flex-row xl:flex-row">
+	// 					<div className="w-[200px] h-[200px] rounded-lg flex flex-row justify-center items-center cursor-pointer mb-4 sm:mb-0">
+	// 						<DiaryPhotoUpload
+	// 							onDiaryPhotoUpload={handleDiaryPhotoChange}
+	// 							type="ticket"
+	// 						/>
+	// 					</div>
+	// 					<div className="w-[200px] h-[200px] rounded-lg flex flex-row justify-center items-center cursor-pointer mb-4 sm:mb-0">
+	// 						<DiaryPhotoUpload
+	// 							onDiaryPhotoUpload={handleDiaryPhotoChange}
+	// 							type="view"
+	// 						/>
+	// 					</div>
+	// 					<div className="w-[200px] h-[200px] rounded-lg flex flex-row justify-center items-center cursor-pointer mb-4 sm:mb-0">
+	// 						<DiaryPhotoUpload
+	// 							onDiaryPhotoUpload={handleDiaryPhotoChange}
+	// 							type="additional"
+	// 						/>
+	// 					</div>
+	// 				</div>
+	// 			</div>
+	// 			<div className="w-full h-20 bg-black bg-opacity-75 rounded ">
+	// 				<textarea
+	// 					value={message}
+	// 					className="w-full h-full rounded p-4 focus:outline-none"
+	// 					placeholder="간단한 메시지"
+	// 					onChange={onChangeMessage}
+	// 				></textarea>
+	// 			</div>
+	// 			<div className="w-full h-[100px] flex justify-center items-center">
+	// 				<button
+	// 					className={`rounded-lg w-[100px] h-[40px] flex justify-center items-center ${
+	// 						isLoading ||
+	// 						!ticketphoto ||
+	// 						!viewphoto ||
+	// 						!message ||
+	// 						!date ||
+	// 						!weather ||
+	// 						!location ||
+	// 						!together ||
+	// 						!isWinning
+	// 							? "bg-gray-400"
+	// 							: "bg-gray-400 hover:bg-red-500"
+	// 					}`}
+	// 					onClick={postData}
+	// 					disabled={
+	// 						isLoading ||
+	// 						!ticketphoto ||
+	// 						!viewphoto ||
+	// 						!message ||
+	// 						!date ||
+	// 						!weather ||
+	// 						!location ||
+	// 						!together ||
+	// 						!isWinning
+	// 					} // 로딩 중일 때 버튼 비활성화
+	// 				>
+	// 					{isLoading ? (
+	// 						<svg
+	// 							className="animate-spin h-5 w-5 text-white"
+	// 							xmlns="http://www.w3.org/2000/svg"
+	// 							fill="none"
+	// 							viewBox="0 0 24 24"
+	// 						>
+	// 							<circle
+	// 								className="opacity-25"
+	// 								cx="12"
+	// 								cy="12"
+	// 								r="10"
+	// 								stroke="currentColor"
+	// 								strokeWidth="4"
+	// 							></circle>
+	// 							<path
+	// 								className="opacity-75"
+	// 								fill="currentColor"
+	// 								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+	// 							></path>
+	// 						</svg>
+	// 					) : (
+	// 						"올리기"
+	// 					)}
+	// 				</button>
+	// 			</div>
+	// 		</div>
+	// 		<div className="w-1/2 sm:w-full md:w-full lg:w-full h-[700px] bg-gray-200 bg-opacity-75 rounded flex flex-col justify-center items-center  ">
+	// 			<div>Live Game</div>
+	// 			<DiaryTabs />
+	// 		</div>
+
+	// 		{/*Modal 컴포넌트*/}
+	// 		<AlertModal
+	// 			isOpen={isOpen}
+	// 			message={modalMessage}
+	// 			onClose={handleCloseModal}
+	// 		/>
+	// 	</div>
+	// );
 	return (
-		<div className="pl-4 pr-4 gap-4 flex flex-col md:flex-col lg:flex-col xl:flex-row justify-center items-center w-full rounded">
-			<div className="w-1/2 sm:w-full md:w-full lg:w-full h-[700px] sm:h-[1100px] sm:justify-between bg-gray-200 bg-opacity-75 rounded  flex flex-col justify-center items-center">
-				<div className="w-full h-50 gap-2 flex flex-col">
-					<div className="flex flex-row w-full">
-						<div className="w-1/3 h-10 p-8 flex flex-col justify-center items-center  ">
-							<label htmlFor="datePicker" className="flex w-full">
+		<div className="pl-4 pr-4 gap-4 flex flex-col md:flex-col lg:flex-col xl:flex-row 2xl:flex-row justify-center items-center w-full rounded">
+			<div className="w-1/2 sm:w-full md:w-full lg:w-full h-[700px] sm:pt-8 sm:h-[1700px] sm:justify-between bg-gray-200 bg-opacity-75 rounded flex flex-col justify-center items-center">
+				<div className="w-full h-50 gap-4 flex flex-col">
+					{" "}
+					{/* gap-2를 gap-4로 변경 */}
+					<div className="flex flex-col md:flex-row lg:flex-row xl:flex-row 2xl:flex-row w-full gap-4">
+						{" "}
+						{/* sm:flex-row 제거, gap 추가 */}
+						<div className="w-full md:w-1/3 lg:w-1/3 xl:w-1/3 2xl:w-1/3 h-10 p-4 flex flex-col bg-red-500">
+							{" "}
+							{/* sm:w-1/3 제거 */}
+							<label
+								htmlFor="datePicker"
+								className="flex w-full sm:w-screen sm:bg-red-500"
+							>
 								관람일자
 							</label>
 							<input
@@ -204,8 +420,12 @@ const BasketballDiary: React.FC<Props> = (props) => {
 								onChange={handleDateChange}
 							/>
 						</div>
-						<div className="w-1/3 h-15  flex flex-col justify-between items-center relative z-30">
-							<label className="flex w-full ml-8 mt-2">날씨</label>
+						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-40">
+							{" "}
+							{/* sm:w-1/3 제거 */}
+							<label className="flex w-full sm:w-screen sm:bg-red-500 sm:ml-0 ml-8 mt-2 ">
+								날씨
+							</label>
 							<div className="w-full flex flex-row justify-center items-center mr-4">
 								<div className="w-1/3 flex justify-center items-center relative z-30">
 									<WeatherToggleMenu onSelect={setWeather} />
@@ -215,8 +435,12 @@ const BasketballDiary: React.FC<Props> = (props) => {
 								</div>
 							</div>
 						</div>
-						<div className="w-1/3 h-15  flex flex-col justify-between items-center relative z-30">
-							<label className="flex w-full ml-8 mt-2">장소</label>
+						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-40">
+							{" "}
+							{/* sm:w-1/3 제거 */}
+							<label className="flex w-full sm:w-screen sm:bg-red-500 sm:ml-0 ml-8 mt-2">
+								장소
+							</label>
 							<div className="w-full flex flex-row justify-between items-center">
 								<div className="w-1/3 flex justify-center items-center">
 									<LocationToggleMenu onSelect={setLocation} />
@@ -227,10 +451,15 @@ const BasketballDiary: React.FC<Props> = (props) => {
 							</div>
 						</div>
 					</div>
-
-					<div className="flex flex-row">
-						<div className="w-1/3 h-15 border-l-2  flex flex-col justify-between items-center relative z-10">
-							<label className="flex w-full ml-8 mt-2">함께 본 사람</label>
+					<div className="flex flex-col md:flex-row lg:flex-row xl:flex-row 2xl:flex-row gap-4 ">
+						{" "}
+						{/* sm:flex-row 제거, gap 추가 */}
+						<div className="w-full md:w-1/3 h-15 border-l-2 flex flex-col justify-between items-center relative z-30">
+							{" "}
+							{/* sm:w-1/3 제거 */}
+							<label className="flex w-full sm:w-screen sm:bg-red-500 sm:ml-0 ml-8 mt-2">
+								함께 본 사람
+							</label>
 							<div className="w-full flex flex-row justify-between items-center gap-2">
 								<div className="w-1/3 flex justify-center items-center">
 									<TogetherToggleMenu onSelect={setTogether} />
@@ -240,8 +469,12 @@ const BasketballDiary: React.FC<Props> = (props) => {
 								</div>
 							</div>
 						</div>
-						<div className="w-1/3 h-15  flex flex-col justify-between items-center relative z-10">
-							<label className="flex w-full ml-8 mt-2">승패선택</label>
+						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-20">
+							{" "}
+							{/* sm:w-1/3 제거 */}
+							<label className="flex w-full sm:w-screen sm:bg-red-500 sm:ml-0 ml-8 mt-2">
+								승패선택
+							</label>
 							<div className="w-full flex flex-row justify-center items-center gap-2">
 								<div className="w-1/3 flex justify-center items-center">
 									<WinningToggleMenu onSelect={setIsWinning} />
@@ -251,8 +484,10 @@ const BasketballDiary: React.FC<Props> = (props) => {
 								</div>
 							</div>
 						</div>
-						<div className="w-1/3 h-15  flex flex-col justify-between items-center relative z-10">
-							<div className="w-full flex flex-row justify-between items-center">
+						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-10">
+							{" "}
+							{/* sm:w-1/3 제거 */}
+							<div className="w-full sm:w-screen sm:bg-red-500 flex flex-row justify-between items-center">
 								<label className="ml-4 mt-2">좌석</label>
 								<div className="w-1/3 mr-4 flex justify-center items-center">
 									<SectionToggleMenu
@@ -280,22 +515,34 @@ const BasketballDiary: React.FC<Props> = (props) => {
 						</div>
 					</div>
 				</div>
-				
-				<div className=" w-full mb-2 rounded flex flex-col justify-center sm:justify-between  items-center gap-4 p-4  sm:h-[800px]   xl:h-[800px] ">
-					<div className="w-full  p-2 rounded flex justify-center"><p>티켓 사진과 경기장 사진은 필수 입니다! </p></div>
+
+				<div className="w-full mb-2 rounded flex flex-col justify-center sm:justify-between items-center gap-4 p-4 sm:h-[800px]">
+					<div className="w-full p-2 rounded flex justify-center">
+						<p>티켓 사진과 경기장 사진은 필수 입니다!</p>
+					</div>
 					<div className="w-full flex flex-row justify-center items-center gap-4 sm:h-[700px] sm:flex-col md:flex-row lg:flex-row xl:flex-row">
 						<div className="w-[200px] h-[200px] rounded-lg flex flex-row justify-center items-center cursor-pointer mb-4 sm:mb-0">
-							<DiaryPhotoUpload onDiaryPhotoUpload={handleDiaryPhotoChange} type="ticket" />
+							<DiaryPhotoUpload
+								onDiaryPhotoUpload={handleDiaryPhotoChange}
+								type="ticket"
+							/>
 						</div>
 						<div className="w-[200px] h-[200px] rounded-lg flex flex-row justify-center items-center cursor-pointer mb-4 sm:mb-0">
-							<DiaryPhotoUpload onDiaryPhotoUpload={handleDiaryPhotoChange} type="view" />
+							<DiaryPhotoUpload
+								onDiaryPhotoUpload={handleDiaryPhotoChange}
+								type="view"
+							/>
 						</div>
 						<div className="w-[200px] h-[200px] rounded-lg flex flex-row justify-center items-center cursor-pointer mb-4 sm:mb-0">
-							<DiaryPhotoUpload onDiaryPhotoUpload={handleDiaryPhotoChange} type="additional" />
+							<DiaryPhotoUpload
+								onDiaryPhotoUpload={handleDiaryPhotoChange}
+								type="additional"
+							/>
 						</div>
 					</div>
 				</div>
-				<div className="w-full h-20 bg-black bg-opacity-75 rounded ">
+
+				<div className="w-full h-20 bg-black bg-opacity-75 rounded">
 					<textarea
 						value={message}
 						className="w-full h-full rounded p-4 focus:outline-none"
@@ -303,16 +550,55 @@ const BasketballDiary: React.FC<Props> = (props) => {
 						onChange={onChangeMessage}
 					></textarea>
 				</div>
+
 				<div className="w-full h-[100px] flex justify-center items-center">
 					<button
-						className={`rounded-lg w-[100px] h-[40px] flex justify-center items-center ${isLoading || !ticketphoto || !viewphoto || !message || !date || !weather || !location || !together || !isWinning? 'bg-gray-400': 'bg-gray-400 hover:bg-red-500'}`}
+						className={`rounded-lg w-[100px] h-[40px] flex justify-center items-center ${
+							isLoading ||
+							!ticketphoto ||
+							!viewphoto ||
+							!message ||
+							!date ||
+							!weather ||
+							!location ||
+							!together ||
+							!isWinning
+								? "bg-gray-400"
+								: "bg-gray-400 hover:bg-red-500"
+						}`}
 						onClick={postData}
-						disabled={isLoading || !ticketphoto || !viewphoto || !message || !date || !weather || !location || !together || !isWinning} // 로딩 중일 때 버튼 비활성화
+						disabled={
+							isLoading ||
+							!ticketphoto ||
+							!viewphoto ||
+							!message ||
+							!date ||
+							!weather ||
+							!location ||
+							!together ||
+							!isWinning
+						}
 					>
 						{isLoading ? (
-							<svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-								<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-								<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+							<svg
+								className="animate-spin h-5 w-5 text-white"
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+							>
+								<circle
+									className="opacity-25"
+									cx="12"
+									cy="12"
+									r="10"
+									stroke="currentColor"
+									strokeWidth="4"
+								></circle>
+								<path
+									className="opacity-75"
+									fill="currentColor"
+									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+								></path>
 							</svg>
 						) : (
 							"올리기"
@@ -320,12 +606,12 @@ const BasketballDiary: React.FC<Props> = (props) => {
 					</button>
 				</div>
 			</div>
-			<div className="w-1/2 sm:w-full md:w-full lg:w-full h-[700px] bg-gray-200 bg-opacity-75 rounded flex flex-col justify-center items-center  ">
+
+			<div className="w-1/2 sm:w-full md:w-full lg:w-full  h-[700px] bg-gray-200 bg-opacity-75 rounded flex flex-col justify-center items-center">
 				<div>Live Game</div>
 				<DiaryTabs />
 			</div>
 
-			{/*Modal 컴포넌트*/}
 			<AlertModal
 				isOpen={isOpen}
 				message={modalMessage}

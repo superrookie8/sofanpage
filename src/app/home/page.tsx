@@ -32,7 +32,7 @@ const MainPage: React.FC = () => {
 						기록
 					</div>
 					<section className="flex justify-center bg-white bg-opacity-75">
-						<div className="w-[80%] sm:w-[90%] bg-white bg-opacity-75 pb-4 pt-4 rounded overflow-x-auto">
+						<div className="w-[80%] sm:w-[100%] xsm:w-[100%] bg-white bg-opacity-75 pb-4 pt-4 rounded overflow-x-auto">
 							<Stats />
 						</div>
 					</section>

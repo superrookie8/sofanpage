@@ -91,11 +91,11 @@ const GuestBookList: React.FC = () => {
 		<div className=" w-full flex justify-center items-center p-4 rounded-lg shadow-lg">
 			<div className="relative p-4 w-full flex flex-col">
 				{/* Tabs */}
-				<div className="flex justify-between space-x-4 mb-4">
-					<div className="flex space-x-2 flex wrap">
+				<div className="flex justify-between space-x-4 mb-4 w-full">
+					<div className="w-full flex space-x-2 flex wrap">
 						<button
 							onClick={() => handleTabChange("photos")}
-							className={`px-4 py-2 rounded ${
+							className={`px-2 py-2 rounded w-full sm:text-sm xsm:text-sm ${
 								activeTab === "photos"
 									? "bg-red-500 text-white"
 									: "bg-gray-200 text-gray-700"
@@ -105,21 +105,21 @@ const GuestBookList: React.FC = () => {
 						</button>
 						<button
 							onClick={() => handleTabChange("noPhotos")}
-							className={`px-4 py-2 rounded ${
+							className={`px-2 py-2 rounded w-full sm:text-sm xsm:text-sm ${
 								activeTab === "noPhotos"
 									? "bg-red-500 text-white"
 									: "bg-gray-200 text-gray-700"
 							}`}
 						>
-							글방명록
+						  글방명록
 						</button>
 					</div>
 					<div className="flex ">
 						<button
 							onClick={handleCreateClick}
-							className="border-red-500 border-2 text-red-500 font-bold py-2 px-4 rounded top-4 right-4 hover:bg-red-500 hover:text-white "
+							className="border-red-500 border-2 text-red-500 font-bold py-2 px-4 rounded top-4 right-4 hover:bg-red-500 hover:text-white w-full sm:text-sm xsm:text-sm "
 						>
-							방명록 남기기
+							방명록남기기
 						</button>
 					</div>
 				</div>
@@ -175,14 +175,14 @@ const GuestBookList: React.FC = () => {
 						onClick={() => setPage(currentPage - 1)}
 						className="px-4 py-2 bg-gray-200 text-gray-700 rounded"
 					>
-						Previous
+						이전
 					</button>
 					<button
 						disabled={currentPage * pageSize >= totalEntries}
 						onClick={() => setPage(currentPage + 1)}
 						className="px-4 py-2 bg-gray-200 text-gray-700 rounded"
 					>
-						Next
+						다음
 					</button>
 				</div>
 			</div>
