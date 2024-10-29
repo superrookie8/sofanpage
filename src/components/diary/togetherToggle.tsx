@@ -5,20 +5,20 @@ interface Props {
 }
 
 const TogetherToggleMenu: React.FC<Props> = ({ onSelect }) => {
-	const [isTogetherWatchingOpen, setIsTogetherWatchingOpen] = useState<boolean>(false);
+	const [isTogetherWatchingOpen, setIsTogetherWatchingOpen] =
+		useState<boolean>(false);
 
 	const TogetherMenu = () => {
 		setIsTogetherWatchingOpen(!isTogetherWatchingOpen);
 	};
 
-    const togetherWatching: { [key: string]: string } = {
-		alone :"나와 함께",
-        family : "가족",
-        friend : "친구",
-        friends : "친구들",
-        co_worker: "동료", 
-        couples: "연인",
-
+	const togetherWatching: { [key: string]: string } = {
+		alone: "나와 함께",
+		family: "가족",
+		friend: "친구",
+		friends: "친구들",
+		co_worker: "동료",
+		couples: "연인",
 	};
 
 	return (

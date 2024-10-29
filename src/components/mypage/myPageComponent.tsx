@@ -192,7 +192,7 @@ const MyPageComp: React.FC = () => {
 			}
 
 			const data = await response.json();
-			
+
 			setProfile((prevProfile) => ({
 				...prevProfile,
 				description: data.description || prevProfile.description,
@@ -236,8 +236,9 @@ const MyPageComp: React.FC = () => {
 				setAlertMessage("항목이 성공적으로 삭제되었습니다.");
 				setIsDeleteConfirm(false);
 			} catch (error) {
-
-				setAlertMessage(`Failed to delete guestbook entry: ${(error as Error).message}`);
+				setAlertMessage(
+					`Failed to delete guestbook entry: ${(error as Error).message}`
+				);
 				setIsDeleteConfirm(false);
 			}
 		}
@@ -318,10 +319,12 @@ const MyPageComp: React.FC = () => {
 			</div>
 
 			<div className="mb-4 flex flex-col pl-2 pr-2">
-				<div className="flex flex-col space-y-8">
-					<h2 className="text-xl mb-2">My GuestBooks</h2>
+				<div className="flex flex-col space-y-8 ">
+					<h2 className="text-xl mb-2  border-b-2 border-red-500 w-full h-full p-4">
+						내가 쓴 방명록
+					</h2>
 					<div className="h-1/2 pl-2 pr-2">
-						<h3 className="text-lg mb-2">With Photos</h3>
+						<h3 className="text-lg mb-2">사진방명록</h3>
 						<div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 max-h-96 overflow-y-scroll justify-center">
 							{photoGuestbookEntries.map((entry) => (
 								<div
@@ -354,7 +357,7 @@ const MyPageComp: React.FC = () => {
 										onClick={() => handleDeleteEntry(entry._id)}
 										className="px-2 py-1 text-red-500 border border-red-500 rounded hover:bg-red-500 hover:text-white mt-2"
 									>
-										Delete
+										삭제
 									</button>
 								</div>
 							))}
@@ -365,18 +368,18 @@ const MyPageComp: React.FC = () => {
 									disabled={photoPage === 1}
 									onClick={() => setPhotoPage(photoPage - 1)}
 								>
-									Previous
+									이전
 								</button>
 							</div>
 							<div className="mt-4 text-gray-400 hover:bg-red-500 hover:text-white rounded p-1 mb-2">
 								<button onClick={() => setPhotoPage(photoPage + 1)}>
-									Next
+									다음
 								</button>
 							</div>
 						</div>
 					</div>
 					<div className="h-1/2 pl-2 pr-2">
-						<h3 className="text-lg mb-2">Without Photos</h3>
+						<h3 className="text-lg mb-2">글방명록</h3>
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 max-h-96 overflow-y-scroll justify-center">
 							{noPhotoGuestbookEntries.map((entry) => (
 								<div
@@ -396,7 +399,7 @@ const MyPageComp: React.FC = () => {
 										onClick={() => handleDeleteEntry(entry._id)}
 										className="px-2 py-1 text-red-500 border border-red-500 rounded hover:bg-red-500 hover:text-white mt-2"
 									>
-										Delete
+										삭제
 									</button>
 								</div>
 							))}
@@ -407,12 +410,12 @@ const MyPageComp: React.FC = () => {
 									disabled={noPhotoPage === 1}
 									onClick={() => setNoPhotoPage(noPhotoPage - 1)}
 								>
-									Previous
+									이전
 								</button>
 							</div>
 							<div className="mt-4 text-gray-400 hover:bg-red-500 hover:text-white rounded p-1 mb-2">
 								<button onClick={() => setNoPhotoPage(noPhotoPage + 1)}>
-									Next
+									다음
 								</button>
 							</div>
 						</div>
