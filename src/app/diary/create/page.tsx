@@ -414,6 +414,7 @@ const BasketballDiary: React.FC<Props> = (props) => {
 								type="date"
 								id="datePicker"
 								value={date}
+								className="w-full"
 								onChange={handleDateChange}
 							/>
 						</div>
