@@ -6,6 +6,7 @@ import { where, weather, together, result } from "@/data/constants";
 import Image from "next/image";
 import { useLoading } from "@/context/LoadingContext";
 import LoadingSpinner from "@/components/shared/loadingSpinner";
+import AlertModal from "@/components/shared/alertModal";
 
 interface Props {}
 
@@ -49,6 +50,12 @@ const DiaryRead: React.FC<Props> = (props) => {
 	const [loading, setLoading] = useState<boolean>(true);
 	const [hasMore, setHasMore] = useState<boolean>(true);
 	const router = useRouter();
+	const [modalOpen, setModalOpen] = useState(false);
+	const [modalMessage, setModalMessage] = useState("");
+
+	const closeModal = () => {
+		setModalOpen(false);
+	};
 
 	const loadMoreDiaries = useCallback(async () => {
 		if (loading || !hasMore) return;
@@ -147,6 +154,11 @@ const DiaryRead: React.FC<Props> = (props) => {
 					{loading && <LoadingSpinner />}
 					{!hasMore && <div>더이상 없어요..</div>}
 				</div>
+				<AlertModal
+					isOpen={modalOpen}
+					onClose={closeModal}
+					message={modalMessage}
+				/>
 			</div>
 		</>
 	);

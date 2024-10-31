@@ -111,7 +111,7 @@ const GuestBookList: React.FC = () => {
 									: "bg-gray-200 text-gray-700"
 							}`}
 						>
-						  글방명록
+							글방명록
 						</button>
 					</div>
 					<div className="flex ">
@@ -173,14 +173,22 @@ const GuestBookList: React.FC = () => {
 					<button
 						disabled={currentPage === 1}
 						onClick={() => setPage(currentPage - 1)}
-						className="px-4 py-2 bg-gray-200 text-gray-700 rounded"
+						className={`px-4 py-2 rounded ${
+							currentPage === 1
+								? "bg-gray-100 text-gray-400 cursor-not-allowed" // disabled 상태
+								: "bg-red-400 text-gray-700 hover:bg-gray-500" // 활성화 상태
+						}`}
 					>
 						이전
 					</button>
 					<button
 						disabled={currentPage * pageSize >= totalEntries}
 						onClick={() => setPage(currentPage + 1)}
-						className="px-4 py-2 bg-gray-200 text-gray-700 rounded"
+						className={`px-4 py-2 rounded ${
+							currentPage * pageSize >= totalEntries
+								? "bg-gray-100 text-gray-400 cursor-not-allowed" // disabled 상태
+								: "bg-red-400 text-gray-700 hover:bg-gray-500" // 활성화 상태
+						}`}
 					>
 						다음
 					</button>

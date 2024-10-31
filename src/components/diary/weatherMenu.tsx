@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface Props {
 	onSelect: (weather: string) => void;
@@ -6,6 +6,20 @@ interface Props {
 
 const WeatherToggleMenu: React.FC<Props> = ({ onSelect }) => {
 	const [isWeatherOpen, setIsWeatherOpen] = useState<boolean>(false);
+	const menuRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+				setIsWeatherOpen(false);
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, []);
 
 	const weatherMenu = () => {
 		setIsWeatherOpen(!isWeatherOpen);
@@ -21,7 +35,7 @@ const WeatherToggleMenu: React.FC<Props> = ({ onSelect }) => {
 	};
 
 	return (
-		<div className="relative z-10">
+		<div className="relative z-10" ref={menuRef}>
 			<button
 				onClick={weatherMenu}
 				className="px-2 py-1 ml-6 hover:bg-red-200  focus:outline-none"

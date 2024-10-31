@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface Props {
 	onSelect: (rows: string) => void;
@@ -6,6 +6,20 @@ interface Props {
 
 const RowToggleMenu: React.FC<Props> = ({ onSelect }) => {
 	const [isRowOpen, setIsRowOpen] = useState<boolean>(false);
+	const menuRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+				setIsRowOpen(false);
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, []);
 
 	const RowMenu = () => {
 		setIsRowOpen(!isRowOpen);
@@ -39,7 +53,7 @@ const RowToggleMenu: React.FC<Props> = ({ onSelect }) => {
 	};
 
 	return (
-		<div className="relative">
+		<div className="relative" ref={menuRef}>
 			<button
 				onClick={RowMenu}
 				className="text-sm px-2 py-1 hover:bg-red-200 focus:outline-none"

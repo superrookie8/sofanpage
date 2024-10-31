@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface Props {
 	onSelect: (winningmode: string) => void;
@@ -6,19 +6,32 @@ interface Props {
 
 const WinningToggleMenu: React.FC<Props> = ({ onSelect }) => {
 	const [isWinningOpen, setIsWinningOpen] = useState<boolean>(false);
+	const menuRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+				setIsWinningOpen(false);
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, []);
 
 	const WinningMenu = () => {
 		setIsWinningOpen(!isWinningOpen);
 	};
 
-    const winningmode: { [key: string]: string } = {
-		win : "승요",
-        lose : "패요"
-
+	const winningmode: { [key: string]: string } = {
+		win: "승요",
+		lose: "패요",
 	};
 
 	return (
-		<div className="relative">
+		<div className="relative" ref={menuRef}>
 			<button
 				onClick={WinningMenu}
 				className="px-2 py-1 hover:bg-red-200  focus:outline-none"

@@ -8,7 +8,13 @@ interface ModalProps {
 	onConfirm?: () => void; // onConfirm prop 추가
 }
 
-const AlertModal: React.FC<ModalProps> = ({ isOpen, message, onClose, buttonText = "닫기", onConfirm }) => {
+const AlertModal: React.FC<ModalProps> = ({
+	isOpen,
+	message,
+	onClose,
+	buttonText = "닫기",
+	onConfirm,
+}) => {
 	if (!isOpen) return null; // 모달이 열리지 않으면 렌더링 안 함
 
 	return (
