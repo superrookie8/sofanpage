@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface Props {
 	onSelect: (together: string) => void;
@@ -7,6 +7,20 @@ interface Props {
 const TogetherToggleMenu: React.FC<Props> = ({ onSelect }) => {
 	const [isTogetherWatchingOpen, setIsTogetherWatchingOpen] =
 		useState<boolean>(false);
+	const menuRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+				setIsTogetherWatchingOpen(false);
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, []);
 
 	const TogetherMenu = () => {
 		setIsTogetherWatchingOpen(!isTogetherWatchingOpen);
@@ -22,7 +36,7 @@ const TogetherToggleMenu: React.FC<Props> = ({ onSelect }) => {
 	};
 
 	return (
-		<div className="relative">
+		<div className="relative" ref={menuRef}>
 			<button
 				onClick={TogetherMenu}
 				className="px-2 py-1 hover:bg-red-200  focus:outline-none"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface Props {
 	onSelect: (numbers: string) => void;
@@ -6,6 +6,20 @@ interface Props {
 
 const NumberToggleMenu: React.FC<Props> = ({ onSelect }) => {
 	const [isNumberOpen, setIsNumberOpen] = useState<boolean>(false);
+	const menuRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+				setIsNumberOpen(false);
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, []);
 
 	const NumberMenu = () => {
 		setIsNumberOpen(!isNumberOpen);
@@ -55,7 +69,7 @@ const NumberToggleMenu: React.FC<Props> = ({ onSelect }) => {
 	};
 
 	return (
-		<div className="relative">
+		<div className="relative" ref={menuRef}>
 			<button
 				onClick={NumberMenu}
 				className="text-sm px-2 py-1 hover:bg-red-200 focus:outline-none"
