@@ -465,13 +465,31 @@ const DiaryTabs: React.FC = () => {
 												onClick={(event) => handleImageClick(diary, event)}
 											/>
 										</div>
-										<div className="w-auto pl-4">{diary.diary_message}</div>
-										<button
-											onClick={() => handleDeleteEntry(diary._id)}
-											className="bg-gray-400 rounded-lg w-[100px] h-[40px] hover:bg-red-500 flex justify-center items-center absolute bottom-2 right-2"
-										>
-											삭제
-										</button>
+										<div className="flex flex-1 justify-between items-center">
+											<div className="pl-4 pr-4 flex-1 sm:h-[70px] sm:overflow-y-auto">
+												{diary.diary_message}
+											</div>
+											<button
+												onClick={() => handleDeleteEntry(diary._id)}
+												className="bg-gray-400 rounded-lg w-10 h-10 hover:bg-red-500 flex justify-center items-center transition-colors duration-200 shrink-0"
+												title="삭제"
+											>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													className="w-5 h-5 text-white"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													strokeWidth="2"
+													strokeLinecap="round"
+													strokeLinejoin="round"
+												>
+													<path d="M3 6h18" />
+													<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+													<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+												</svg>
+											</button>
+										</div>
 									</div>
 								</div>
 							</div>
