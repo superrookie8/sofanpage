@@ -201,200 +201,6 @@ const BasketballDiary: React.FC<Props> = (props) => {
 		}
 	};
 
-	// return (
-	// 	<div className="pl-4 pr-4 gap-4 flex flex-col md:flex-col lg:flex-col xl:flex-row justify-center items-center w-full rounded">
-	// 		<div className="w-1/2 sm:w-full md:w-full lg:w-full h-[700px] sm:h-[1100px] sm:justify-between bg-gray-200 bg-opacity-75 rounded  flex flex-col justify-center items-center">
-	// 			<div className="w-full h-50 gap-2 flex flex-col">
-	// 				<div className="flex flex-row w-full">
-	// 					<div className="w-1/3 h-10 p-8 flex flex-col justify-center items-center  ">
-	// 						<label htmlFor="datePicker" className="flex w-full">
-	// 							관람일자
-	// 						</label>
-	// 						<input
-	// 							type="date"
-	// 							id="datePicker"
-	// 							value={date}
-	// 							onChange={handleDateChange}
-	// 						/>
-	// 					</div>
-	// 					<div className="w-1/3 h-15  flex flex-col justify-between items-center relative z-30">
-	// 						<label className="flex w-full ml-8 mt-2">날씨</label>
-	// 						<div className="w-full flex flex-row justify-center items-center mr-4">
-	// 							<div className="w-1/3 flex justify-center items-center relative z-30">
-	// 								<WeatherToggleMenu onSelect={setWeather} />
-	// 							</div>
-	// 							<div className="w-2/3 min-w-[70px] flex justify-center">
-	// 								<SelectedWeather weather={weather} />
-	// 							</div>
-	// 						</div>
-	// 					</div>
-	// 					<div className="w-1/3 h-15  flex flex-col justify-between items-center relative z-30">
-	// 						<label className="flex w-full ml-8 mt-2">장소</label>
-	// 						<div className="w-full flex flex-row justify-between items-center">
-	// 							<div className="w-1/3 flex justify-center items-center">
-	// 								<LocationToggleMenu onSelect={setLocation} />
-	// 							</div>
-	// 							<div className="w-2/3 flex justify-center items-center">
-	// 								<SelectedLocation location={location} />
-	// 							</div>
-	// 						</div>
-	// 					</div>
-	// 				</div>
-
-	// 				<div className="flex flex-row">
-	// 					<div className="w-1/3 h-15 border-l-2  flex flex-col justify-between items-center relative z-10">
-	// 						<label className="flex w-full ml-8 mt-2">함께 본 사람</label>
-	// 						<div className="w-full flex flex-row justify-between items-center gap-2">
-	// 							<div className="w-1/3 flex justify-center items-center">
-	// 								<TogetherToggleMenu onSelect={setTogether} />
-	// 							</div>
-	// 							<div className="w-2/3 flex justify-center items-center">
-	// 								<SelectedTogether together={together} />
-	// 							</div>
-	// 						</div>
-	// 					</div>
-	// 					<div className="w-1/3 h-15  flex flex-col justify-between items-center relative z-10">
-	// 						<label className="flex w-full ml-8 mt-2">승패선택</label>
-	// 						<div className="w-full flex flex-row justify-center items-center gap-2">
-	// 							<div className="w-1/3 flex justify-center items-center">
-	// 								<WinningToggleMenu onSelect={setIsWinning} />
-	// 							</div>
-	// 							<div className="w-2/3 flex justify-center items-center">
-	// 								<SelectedWinningMode winningmode={isWinning} />
-	// 							</div>
-	// 						</div>
-	// 					</div>
-	// 					<div className="w-1/3 h-15  flex flex-col justify-between items-center relative z-10">
-	// 						<div className="w-full flex flex-row justify-between items-center">
-	// 							<label className="ml-4 mt-2">좌석</label>
-	// 							<div className="w-1/3 mr-4 flex justify-center items-center">
-	// 								<SectionToggleMenu
-	// 									location={location}
-	// 									onSelect={(value) => updateSeatInfo("section", value)}
-	// 								/>
-	// 								<RowToggleMenu
-	// 									onSelect={(value) => updateSeatInfo("row", value)}
-	// 								/>
-	// 								<NumberToggleMenu
-	// 									onSelect={(value) => updateSeatInfo("number", value)}
-	// 								/>
-	// 							</div>
-	// 						</div>
-	// 						<div className="w-full flex flex-row justify-center items-center gap-2">
-	// 							<div className="pl-4 pr-4 pb-2 w-full flex justify-between items-center">
-	// 								<SelectedSection
-	// 									location={location}
-	// 									section={seatInfo.section}
-	// 								/>
-	// 								<SelectedRow row={seatInfo.row} />
-	// 								<SelectedNumber number={seatInfo.number} />
-	// 							</div>
-	// 						</div>
-	// 					</div>
-	// 				</div>
-	// 			</div>
-
-	// 			<div className=" w-full mb-2 rounded flex flex-col justify-center sm:justify-between  items-center gap-4 p-4  sm:h-[800px]   xl:h-[800px] ">
-	// 				<div className="w-full  p-2 rounded flex justify-center">
-	// 					<p>티켓 사진과 경기장 사진은 필수 입니다! </p>
-	// 				</div>
-	// 				<div className="w-full flex flex-row justify-center items-center gap-4 sm:h-[700px] sm:flex-col md:flex-row lg:flex-row xl:flex-row">
-	// 					<div className="w-[200px] h-[200px] rounded-lg flex flex-row justify-center items-center cursor-pointer mb-4 sm:mb-0">
-	// 						<DiaryPhotoUpload
-	// 							onDiaryPhotoUpload={handleDiaryPhotoChange}
-	// 							type="ticket"
-	// 						/>
-	// 					</div>
-	// 					<div className="w-[200px] h-[200px] rounded-lg flex flex-row justify-center items-center cursor-pointer mb-4 sm:mb-0">
-	// 						<DiaryPhotoUpload
-	// 							onDiaryPhotoUpload={handleDiaryPhotoChange}
-	// 							type="view"
-	// 						/>
-	// 					</div>
-	// 					<div className="w-[200px] h-[200px] rounded-lg flex flex-row justify-center items-center cursor-pointer mb-4 sm:mb-0">
-	// 						<DiaryPhotoUpload
-	// 							onDiaryPhotoUpload={handleDiaryPhotoChange}
-	// 							type="additional"
-	// 						/>
-	// 					</div>
-	// 				</div>
-	// 			</div>
-	// 			<div className="w-full h-20 bg-black bg-opacity-75 rounded ">
-	// 				<textarea
-	// 					value={message}
-	// 					className="w-full h-full rounded p-4 focus:outline-none"
-	// 					placeholder="간단한 메시지"
-	// 					onChange={onChangeMessage}
-	// 				></textarea>
-	// 			</div>
-	// 			<div className="w-full h-[100px] flex justify-center items-center">
-	// 				<button
-	// 					className={`rounded-lg w-[100px] h-[40px] flex justify-center items-center ${
-	// 						isLoading ||
-	// 						!ticketphoto ||
-	// 						!viewphoto ||
-	// 						!message ||
-	// 						!date ||
-	// 						!weather ||
-	// 						!location ||
-	// 						!together ||
-	// 						!isWinning
-	// 							? "bg-gray-400"
-	// 							: "bg-gray-400 hover:bg-red-500"
-	// 					}`}
-	// 					onClick={postData}
-	// 					disabled={
-	// 						isLoading ||
-	// 						!ticketphoto ||
-	// 						!viewphoto ||
-	// 						!message ||
-	// 						!date ||
-	// 						!weather ||
-	// 						!location ||
-	// 						!together ||
-	// 						!isWinning
-	// 					} // 로딩 중일 때 버튼 비활성화
-	// 				>
-	// 					{isLoading ? (
-	// 						<svg
-	// 							className="animate-spin h-5 w-5 text-white"
-	// 							xmlns="http://www.w3.org/2000/svg"
-	// 							fill="none"
-	// 							viewBox="0 0 24 24"
-	// 						>
-	// 							<circle
-	// 								className="opacity-25"
-	// 								cx="12"
-	// 								cy="12"
-	// 								r="10"
-	// 								stroke="currentColor"
-	// 								strokeWidth="4"
-	// 							></circle>
-	// 							<path
-	// 								className="opacity-75"
-	// 								fill="currentColor"
-	// 								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-	// 							></path>
-	// 						</svg>
-	// 					) : (
-	// 						"올리기"
-	// 					)}
-	// 				</button>
-	// 			</div>
-	// 		</div>
-	// 		<div className="w-1/2 sm:w-full md:w-full lg:w-full h-[700px] bg-gray-200 bg-opacity-75 rounded flex flex-col justify-center items-center  ">
-	// 			<div>Live Game</div>
-	// 			<DiaryTabs />
-	// 		</div>
-
-	// 		{/*Modal 컴포넌트*/}
-	// 		<AlertModal
-	// 			isOpen={isOpen}
-	// 			message={modalMessage}
-	// 			onClose={handleCloseModal}
-	// 		/>
-	// 	</div>
-	// );
 	return (
 		<div className="pl-4 pr-4 gap-4 flex flex-col md:flex-col lg:flex-col xl:flex-row 2xl:flex-row justify-center items-center w-full rounded">
 			<div className="w-1/2 sm:w-full md:w-full lg:w-full h-[700px] sm:pt-8 sm:h-[1700px] sm:justify-between bg-gray-200 bg-opacity-75 rounded flex flex-col justify-center items-center">
@@ -551,19 +357,20 @@ const BasketballDiary: React.FC<Props> = (props) => {
 
 				<div className="w-full h-[100px] flex justify-center items-center">
 					<button
-						className={`rounded-lg w-[100px] h-[40px] flex justify-center items-center ${
-							isLoading ||
-							!ticketphoto ||
-							!viewphoto ||
-							!message ||
-							!date ||
-							!weather ||
-							!location ||
-							!together ||
-							!isWinning
-								? "bg-gray-400"
-								: "bg-gray-400 hover:bg-red-500"
-						}`}
+						className={`rounded-lg w-[100px] h-[40px] flex justify-center items-center transition-colors duration-200
+        ${
+					isLoading ||
+					!ticketphoto ||
+					!viewphoto ||
+					!message ||
+					!date ||
+					!weather ||
+					!location ||
+					!together ||
+					!isWinning
+						? "bg-gray-400 cursor-not-allowed" // 비활성화 상태
+						: "bg-red-500 hover:bg-black text-white" // 활성화 상태
+				}`}
 						onClick={postData}
 						disabled={
 							isLoading ||
@@ -599,7 +406,7 @@ const BasketballDiary: React.FC<Props> = (props) => {
 								></path>
 							</svg>
 						) : (
-							"올리기"
+							<span className="font-medium">올리기</span>
 						)}
 					</button>
 				</div>

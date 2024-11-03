@@ -141,7 +141,7 @@ const DiaryRead: React.FC<Props> = (props) => {
 											날씨: {weather[diary.weather as keyof typeof weather]}
 										</span>
 										<span>
-											좌석:{" "}
+											좌석:
 											{`${diary.seat_info.section}/${diary.seat_info.row}/${diary.seat_info.number}`}
 										</span>
 									</div>
