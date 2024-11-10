@@ -73,6 +73,15 @@ const SignUp: React.FC = () => {
 	};
 
 	const nicknameHandler = () => {
+		// 닉네임 유효성 검사 추가
+		if (!nickname || !nickname.trim()) {
+			setNicknameMessage({
+				message: "닉네임을 입력해주세요",
+				color: "red",
+			});
+			setNicknameChecked(false);
+			return; // 빈 닉네임일 경우 API 호출하지 않고 종료
+		}
 		const option = {
 			method: "POST",
 			headers: {
