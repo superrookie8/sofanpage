@@ -21,6 +21,8 @@ export default function News() {
 	const [rookie, setRookie] = useState<SectionData | null>(null);
 	const [jumpPage, setJumpPage] = useState(1);
 	const [rookiePage, setRookiePage] = useState(1);
+	const [jumpballArticles, setJumpballArticles] = useState<Article[]>([]);
+	const [jumpTotalArticles, setJumpTotalArticles] = useState(0);
 	const articlesPerPage = 5;
 
 	useEffect(() => {
@@ -67,7 +69,11 @@ export default function News() {
 	}, [setIsLoading]);
 
 	if (!data || !jump || !rookie) {
-		return <div className="flex justify-center items-center w-full h-screen bg-black bg-opacity-75 text-white">뉴스기사를 가져오고 있습니다...</div>; // 여기에 로딩 스피너 컴포넌트를 사용할 수 있습니다.
+		return (
+			<div className="flex justify-center items-center w-full h-screen bg-black bg-opacity-75 text-white">
+				뉴스기사를 가져오고 있습니다...
+			</div>
+		); // 여기에 로딩 스피너 컴포넌트를 사용할 수 있습니다.
 	}
 
 	const paginate = (articles: Article[], page: number, perPage: number) => {

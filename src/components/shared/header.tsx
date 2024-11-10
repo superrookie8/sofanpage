@@ -42,12 +42,16 @@ const Header: React.FC = () => {
 	}, [isMenuOpen]);
 
 	const linkStyle = (path: string) => {
+		if (!pathname) return "";
+
 		const isActive =
 			path === "/profile" ? pathname === path : pathname.startsWith(path);
 		return isActive ? "text-black" : "";
 	};
 
 	const mobileLinkStyle = (path: string) => {
+		if (!pathname) return "w-full flex justify-center items-center";
+
 		const isActive =
 			path === "/profile" ? pathname === path : pathname.startsWith(path);
 		return isActive
