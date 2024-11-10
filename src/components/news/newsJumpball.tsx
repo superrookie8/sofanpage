@@ -67,20 +67,22 @@ const JumpballSection: React.FC<JumpballProps> = ({
 					>
 						<div className="flex justify-center md:w-1/3 mb-4 md:mb-0 sm:pr-4">
 							{article.image_url ? (
-								<div className="relative flex flex-col items-center w-[200px] h-[400px]">
+								<div className="relative w-[300px] h-[200px]">
 									<Image
 										src={article.image_url}
 										alt={article.title || "기사 이미지"}
 										fill
-										sizes="200px"
+										sizes="(max-width: 768px) 100vw, 300px"
 										style={{
-											objectFit: "contain",
+											objectFit: "cover",
+											borderRadius: "0.5rem",
 										}}
 										priority={false}
+										className="hover:scale-105 transition-transform duration-300"
 									/>
 								</div>
 							) : (
-								<div className="w-[200px] h-[400px] bg-gray-200 flex items-center justify-center">
+								<div className="w-[300px] h-[200px] bg-gray-200 flex items-center justify-center rounded-lg">
 									<span className="text-gray-400">이미지 없음</span>
 								</div>
 							)}
