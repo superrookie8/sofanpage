@@ -83,10 +83,16 @@ const SignUp: React.FC = () => {
 		fetch("/api/nicknamecheck", option)
 			.then((res) => res.json())
 			.then((data) => {
-				const messageColor =
-					data.msg === "이미 존재하는 닉네임입니다" ? "red" : "blue";
-				setNicknameMessage({ message: data.msg, color: messageColor });
-				if (data.msg === "가능한 닉네임입니다") {
+				// 서버 응답 메시지를 명확한 상수로 정의
+				const NICKNAME_EXISTS = "이미 존재하는 닉네임입니다";
+				const NICKNAME_AVAILABLE = "가능한 닉네임입니다";
+
+				// 응답 메시지 정규화
+				const normalizedMsg = data.msg.trim();
+				const messageColor = normalizedMsg === NICKNAME_EXISTS ? "red" : "blue";
+				setNicknameMessage({ message: normalizedMsg, color: messageColor });
+
+				if (normalizedMsg === NICKNAME_AVAILABLE) {
 					setNicknameChecked(true);
 					setFormValid(checkFormValid());
 				} else {
@@ -150,12 +156,12 @@ const SignUp: React.FC = () => {
 
 	const handleNicknameBlur = () => {
 		if (!nickname.trim()) {
-            setModalMessage("닉네임을 입력해 주세요.");
-            setShowModal(true);
-        } else if (!nicknameChecked) {
-            setModalMessage("닉네임 중복확인을 해주시기 바랍니다.");
-            setShowModal(true);
-        }
+			setModalMessage("닉네임을 입력해 주세요.");
+			setShowModal(true);
+		} else if (!nicknameChecked) {
+			setModalMessage("닉네임 중복확인을 해주시기 바랍니다.");
+			setShowModal(true);
+		}
 	};
 
 	const handleModalClose = () => {
@@ -169,7 +175,7 @@ const SignUp: React.FC = () => {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				},
+			},
 			body: JSON.stringify({ nickname, password, passwordConfirm }),
 		};
 
@@ -198,7 +204,7 @@ const SignUp: React.FC = () => {
 				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
 					<div className="w-full max-w-[400px] flex justify-center items-center mt-5 relative">
 						<input
-							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md"
+							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md font-[GmarketSansMedium]"
 							name="nickname"
 							value={nickname}
 							onChange={handleNicknameChange}
@@ -206,7 +212,7 @@ const SignUp: React.FC = () => {
 							placeholder="닉네임"
 						/>
 						<button
-							className="absolute right-0 top-0 h-full px-3 bg-red-500 text-white rounded-md"
+							className="absolute right-0 top-0 h-full px-3 bg-red-500 text-white rounded-md font-[GmarketSansMedium]"
 							type="button"
 							onClick={nicknameHandler}
 						>
@@ -214,7 +220,7 @@ const SignUp: React.FC = () => {
 						</button>
 					</div>
 					<div
-						className="w-full max-w-[400px] mt-2 text-xs"
+						className="w-full max-w-[400px] mt-2 text-xs font-[GmarketSansMedium]"
 						style={{ color: nicknameMessage.color }}
 					>
 						{nicknameMessage.message}
@@ -223,7 +229,7 @@ const SignUp: React.FC = () => {
 				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
 					<div className="relative w-full max-w-[400px] flex justify-center items-center mt-5">
 						<input
-							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md"
+							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md font-[GmarketSansMedium]"
 							type={showPassword ? "text" : "password"}
 							name="password"
 							onChange={handlePasswordChange}
@@ -231,7 +237,7 @@ const SignUp: React.FC = () => {
 						/>
 						<button
 							onClick={togglePasswordVisibility}
-							className="absolute right-0 top-0 bottom-0 px-3 flex items-center"
+							className="absolute right-0 top-0 bottom-0 px-3 flex items-center font-[GmarketSansMedium]"
 							aria-label="password visibility"
 							type="button"
 						>
@@ -239,7 +245,7 @@ const SignUp: React.FC = () => {
 						</button>
 					</div>
 					<div
-						className="w-full max-w-[400px] mt-2 text-xs"
+						className="w-full max-w-[400px] mt-2 text-xs font-[GmarketSansMedium]"
 						style={{ color: passwordValid.color }}
 					>
 						{passwordValid.message}
@@ -248,7 +254,7 @@ const SignUp: React.FC = () => {
 				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
 					<div className="relative w-full max-w-[400px] flex justify-center items-center mt-5">
 						<input
-							className="pl-3 pr-10 w-full focus:outline-none focus:border-transparent rounded-md"
+							className="pl-3 pr-10 w-full focus:outline-none focus:border-transparent rounded-md font-[GmarketSansMedium]"
 							type={showPasswordConfirm ? "text" : "password"}
 							name="passwordConfirm"
 							onChange={handlePasswordConfirmChange}
@@ -256,7 +262,7 @@ const SignUp: React.FC = () => {
 						/>
 						<button
 							onClick={togglePasswordConfirmVisibility}
-							className="absolute right-0 top-0 bottom-0 px-3 flex items-center"
+							className="absolute right-0 top-0 bottom-0 px-3 flex items-center font-[GmarketSansMedium]"
 							aria-label="passwordConfirm visibility"
 							type="button"
 						>
@@ -264,7 +270,7 @@ const SignUp: React.FC = () => {
 						</button>
 					</div>
 					<div
-						className="w-full max-w-[400px] mt-2 text-xs"
+						className="w-full max-w-[400px] mt-2 text-xs font-[GmarketSansMedium]"
 						style={{ color: passwordConfirmValid.color }}
 					>
 						{passwordConfirmValid.message}
@@ -272,7 +278,7 @@ const SignUp: React.FC = () => {
 				</div>
 				<div className="w-full h-[50px] flex justify-center items-center mt-4">
 					<button
-						className={`w-full max-w-[250px] h-[40px] flex justify-center items-center rounded-md ${
+						className={`w-full max-w-[250px] h-[40px] flex justify-center items-center rounded-md font-[GmarketSansMedium] ${
 							formValid ? "bg-red-500 text-white" : "bg-gray-300 text-gray-500"
 						}`}
 						disabled={!formValid}
@@ -280,7 +286,7 @@ const SignUp: React.FC = () => {
 						가입하기
 					</button>
 				</div>
-				<div className="text-blue-500 hover:text-blue-700 cursor-pointer mt-4 text-xs">
+				<div className="text-blue-500 hover:text-blue-700 cursor-pointer mt-4 text-xs font-[GmarketSansMedium]">
 					<Link href="/login">이미 아이디가 있습니다</Link>
 				</div>
 				<AlertModal
