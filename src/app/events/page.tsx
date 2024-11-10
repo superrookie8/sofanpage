@@ -41,7 +41,7 @@ const Events: React.FC = () => {
 			}
 		};
 		fetchEvents();
-	}, []);
+	}, [setIsLoading]);
 
 	const fetchEventDetails = async (eventId: string) => {
 		if (!eventDetails[eventId]) {

@@ -32,7 +32,7 @@ const GuestBookCreate: React.FC = () => {
 			setPhotos([]);
 			setPage("default");
 		};
-	}, []);
+	}, [setPage, setPhotos]);
 
 	const handlerOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setWrite(e.target.value);

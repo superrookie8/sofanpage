@@ -74,11 +74,11 @@ const DiaryRead: React.FC<Props> = (props) => {
 
 		setLoading(false);
 		setIsLoading(false);
-	}, [page, pageSize, loading, hasMore]);
+	}, [page, pageSize, loading, hasMore, setIsLoading]);
 
 	useEffect(() => {
 		loadMoreDiaries();
-	}, []);
+	}, [loadMoreDiaries]);
 
 	useEffect(() => {
 		const handleScroll = () => {

@@ -60,7 +60,7 @@ const GuestBookList: React.FC = () => {
 				setLoading(false);
 				setIsLoading(false);
 			});
-	}, []);
+	}, [setIsLoading]);
 
 	const handleTabChange = (tab: string) => {
 		setActiveTab(tab);
