@@ -63,7 +63,7 @@ const JumpballSection: React.FC<JumpballProps> = ({
 				{articles.map((article) => (
 					<div
 						key={article._id}
-						className="bg-gray-100 shadow-md rounded-lg p-4 flex flex-col sm:flex-row sm:h-[25vh]"
+						className="bg-gray-100 shadow-md rounded-lg p-4 flex flex-col sm:h-auto"
 					>
 						<div className="flex justify-center md:w-1/3 mb-4 md:mb-0 sm:pr-4">
 							{article.image_url ? (
@@ -74,7 +74,7 @@ const JumpballSection: React.FC<JumpballProps> = ({
 										fill
 										sizes="(max-width: 768px) 100vw, 300px"
 										style={{
-											objectFit: "cover",
+											objectFit: "contain",
 											borderRadius: "0.5rem",
 										}}
 										priority={false}
