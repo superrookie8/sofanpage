@@ -204,7 +204,7 @@ const SignUp: React.FC = () => {
 				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
 					<div className="w-full max-w-[400px] flex justify-center items-center mt-5 relative">
 						<input
-							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md"
+							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md font-[GmarketSansMedium]"
 							name="nickname"
 							value={nickname}
 							onChange={handleNicknameChange}
@@ -212,7 +212,7 @@ const SignUp: React.FC = () => {
 							placeholder="닉네임"
 						/>
 						<button
-							className="absolute right-0 top-0 h-full px-3 bg-red-500 text-white rounded-md"
+							className="absolute right-0 top-0 h-full px-3 bg-red-500 text-white rounded-md font-[GmarketSansMedium]"
 							type="button"
 							onClick={nicknameHandler}
 						>
@@ -220,7 +220,7 @@ const SignUp: React.FC = () => {
 						</button>
 					</div>
 					<div
-						className="w-full max-w-[400px] mt-2 text-xs"
+						className="w-full max-w-[400px] mt-2 text-xs font-[GmarketSansMedium]"
 						style={{ color: nicknameMessage.color }}
 					>
 						{nicknameMessage.message}
@@ -229,7 +229,7 @@ const SignUp: React.FC = () => {
 				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
 					<div className="relative w-full max-w-[400px] flex justify-center items-center mt-5">
 						<input
-							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md"
+							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md font-[GmarketSansMedium]"
 							type={showPassword ? "text" : "password"}
 							name="password"
 							onChange={handlePasswordChange}
@@ -237,7 +237,7 @@ const SignUp: React.FC = () => {
 						/>
 						<button
 							onClick={togglePasswordVisibility}
-							className="absolute right-0 top-0 bottom-0 px-3 flex items-center"
+							className="absolute right-0 top-0 bottom-0 px-3 flex items-center font-[GmarketSansMedium]"
 							aria-label="password visibility"
 							type="button"
 						>
@@ -245,7 +245,7 @@ const SignUp: React.FC = () => {
 						</button>
 					</div>
 					<div
-						className="w-full max-w-[400px] mt-2 text-xs"
+						className="w-full max-w-[400px] mt-2 text-xs font-[GmarketSansMedium]"
 						style={{ color: passwordValid.color }}
 					>
 						{passwordValid.message}
@@ -254,7 +254,7 @@ const SignUp: React.FC = () => {
 				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
 					<div className="relative w-full max-w-[400px] flex justify-center items-center mt-5">
 						<input
-							className="pl-3 pr-10 w-full focus:outline-none focus:border-transparent rounded-md"
+							className="pl-3 pr-10 w-full focus:outline-none focus:border-transparent rounded-md font-[GmarketSansMedium]"
 							type={showPasswordConfirm ? "text" : "password"}
 							name="passwordConfirm"
 							onChange={handlePasswordConfirmChange}
@@ -262,7 +262,7 @@ const SignUp: React.FC = () => {
 						/>
 						<button
 							onClick={togglePasswordConfirmVisibility}
-							className="absolute right-0 top-0 bottom-0 px-3 flex items-center"
+							className="absolute right-0 top-0 bottom-0 px-3 flex items-center font-[GmarketSansMedium]"
 							aria-label="passwordConfirm visibility"
 							type="button"
 						>
@@ -270,7 +270,7 @@ const SignUp: React.FC = () => {
 						</button>
 					</div>
 					<div
-						className="w-full max-w-[400px] mt-2 text-xs"
+						className="w-full max-w-[400px] mt-2 text-xs font-[GmarketSansMedium]"
 						style={{ color: passwordConfirmValid.color }}
 					>
 						{passwordConfirmValid.message}
@@ -278,7 +278,7 @@ const SignUp: React.FC = () => {
 				</div>
 				<div className="w-full h-[50px] flex justify-center items-center mt-4">
 					<button
-						className={`w-full max-w-[250px] h-[40px] flex justify-center items-center rounded-md ${
+						className={`w-full max-w-[250px] h-[40px] flex justify-center items-center rounded-md font-[GmarketSansMedium] ${
 							formValid ? "bg-red-500 text-white" : "bg-gray-300 text-gray-500"
 						}`}
 						disabled={!formValid}
@@ -286,7 +286,7 @@ const SignUp: React.FC = () => {
 						가입하기
 					</button>
 				</div>
-				<div className="text-blue-500 hover:text-blue-700 cursor-pointer mt-4 text-xs">
+				<div className="text-blue-500 hover:text-blue-700 cursor-pointer mt-4 text-xs font-[GmarketSansMedium]">
 					<Link href="/login">이미 아이디가 있습니다</Link>
 				</div>
 				<AlertModal
