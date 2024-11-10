@@ -83,10 +83,16 @@ const SignUp: React.FC = () => {
 		fetch("/api/nicknamecheck", option)
 			.then((res) => res.json())
 			.then((data) => {
-				const messageColor =
-					data.msg === "이미 존재하는 닉네임입니다" ? "red" : "blue";
-				setNicknameMessage({ message: data.msg, color: messageColor });
-				if (data.msg === "가능한 닉네임입니다") {
+				// 서버 응답 메시지를 명확한 상수로 정의
+				const NICKNAME_EXISTS = "이미 존재하는 닉네임입니다";
+				const NICKNAME_AVAILABLE = "가능한 닉네임입니다";
+
+				// 응답 메시지 정규화
+				const normalizedMsg = data.msg.trim();
+				const messageColor = normalizedMsg === NICKNAME_EXISTS ? "red" : "blue";
+				setNicknameMessage({ message: normalizedMsg, color: messageColor });
+
+				if (normalizedMsg === NICKNAME_AVAILABLE) {
 					setNicknameChecked(true);
 					setFormValid(checkFormValid());
 				} else {
@@ -150,12 +156,12 @@ const SignUp: React.FC = () => {
 
 	const handleNicknameBlur = () => {
 		if (!nickname.trim()) {
-            setModalMessage("닉네임을 입력해 주세요.");
-            setShowModal(true);
-        } else if (!nicknameChecked) {
-            setModalMessage("닉네임 중복확인을 해주시기 바랍니다.");
-            setShowModal(true);
-        }
+			setModalMessage("닉네임을 입력해 주세요.");
+			setShowModal(true);
+		} else if (!nicknameChecked) {
+			setModalMessage("닉네임 중복확인을 해주시기 바랍니다.");
+			setShowModal(true);
+		}
 	};
 
 	const handleModalClose = () => {
@@ -169,7 +175,7 @@ const SignUp: React.FC = () => {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				},
+			},
 			body: JSON.stringify({ nickname, password, passwordConfirm }),
 		};
 
