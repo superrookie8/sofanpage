@@ -171,10 +171,25 @@ const Login: React.FC = () => {
 							onChange={handleNicknameChange}
 							placeholder="닉네임"
 							autoComplete="username"
+							style={{
+								fontFamily:
+									'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+								wordBreak: "keep-all",
+								WebkitTextSizeAdjust: "100%",
+								textSizeAdjust: "100%",
+							}}
 						></input>
 						<div
 							className="w-full  mt-2"
-							style={{ fontSize: "10px", color: nicknameMessage.color }}
+							style={{
+								fontSize: "10px",
+								color: nicknameMessage.color,
+								fontFamily:
+									'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+								wordBreak: "keep-all",
+								WebkitTextSizeAdjust: "100%",
+								textSizeAdjust: "100%",
+							}}
 						>
 							{nicknameMessage.message}
 						</div>
@@ -190,6 +205,13 @@ const Login: React.FC = () => {
 							onChange={handlePasswordChange}
 							autoComplete="current-password"
 							placeholder="비밀번호"
+							style={{
+								fontFamily:
+									'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+								wordBreak: "keep-all",
+								WebkitTextSizeAdjust: "100%",
+								textSizeAdjust: "100%",
+							}}
 						/>
 						<button
 							onClick={togglePasswordVisibility}
@@ -202,7 +224,15 @@ const Login: React.FC = () => {
 					</div>
 					<div
 						className="w-full mt-2 ml-10"
-						style={{ fontSize: "10px", color: passwordValid.color }}
+						style={{
+							fontSize: "10px",
+							color: passwordValid.color,
+							fontFamily:
+								'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+							wordBreak: "keep-all",
+							WebkitTextSizeAdjust: "100%",
+							textSizeAdjust: "100%",
+						}}
 					>
 						{passwordValid.message}
 					</div>
