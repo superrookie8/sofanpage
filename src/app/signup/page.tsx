@@ -204,12 +204,19 @@ const SignUp: React.FC = () => {
 				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
 					<div className="w-full max-w-[400px] flex justify-center items-center mt-5 relative">
 						<input
-							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md font-[GmarketSansMedium]"
+							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md"
 							name="nickname"
 							value={nickname}
 							onChange={handleNicknameChange}
 							onBlur={handleNicknameBlur}
 							placeholder="닉네임"
+							style={{
+								fontFamily:
+									'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+								wordBreak: "keep-all",
+								WebkitTextSizeAdjust: "100%",
+								textSizeAdjust: "100%",
+							}}
 						/>
 						<button
 							className="absolute right-0 top-0 h-full px-3 bg-red-500 text-white rounded-md font-[GmarketSansMedium]"
@@ -220,8 +227,15 @@ const SignUp: React.FC = () => {
 						</button>
 					</div>
 					<div
-						className="w-full max-w-[400px] mt-2 text-xs font-[GmarketSansMedium]"
-						style={{ color: nicknameMessage.color }}
+						className="w-full max-w-[400px] mt-2 text-xs"
+						style={{
+							color: nicknameMessage.color,
+							fontFamily:
+								'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+							wordBreak: "keep-all",
+							WebkitTextSizeAdjust: "100%",
+							textSizeAdjust: "100%",
+						}}
 					>
 						{nicknameMessage.message}
 					</div>
@@ -229,7 +243,14 @@ const SignUp: React.FC = () => {
 				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
 					<div className="relative w-full max-w-[400px] flex justify-center items-center mt-5">
 						<input
-							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md font-[GmarketSansMedium]"
+							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md"
+							style={{
+								fontFamily:
+									'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+								wordBreak: "keep-all",
+								WebkitTextSizeAdjust: "100%",
+								textSizeAdjust: "100%",
+							}}
 							type={showPassword ? "text" : "password"}
 							name="password"
 							onChange={handlePasswordChange}
@@ -245,8 +266,15 @@ const SignUp: React.FC = () => {
 						</button>
 					</div>
 					<div
-						className="w-full max-w-[400px] mt-2 text-xs font-[GmarketSansMedium]"
-						style={{ color: passwordValid.color }}
+						className="w-full max-w-[400px] mt-2 text-xs"
+						style={{
+							color: passwordValid.color,
+							fontFamily:
+								'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+							wordBreak: "keep-all",
+							WebkitTextSizeAdjust: "100%",
+							textSizeAdjust: "100%",
+						}}
 					>
 						{passwordValid.message}
 					</div>
@@ -254,11 +282,18 @@ const SignUp: React.FC = () => {
 				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
 					<div className="relative w-full max-w-[400px] flex justify-center items-center mt-5">
 						<input
-							className="pl-3 pr-10 w-full focus:outline-none focus:border-transparent rounded-md font-[GmarketSansMedium]"
+							className="pl-3 pr-10 w-full focus:outline-none focus:border-transparent rounded-md"
 							type={showPasswordConfirm ? "text" : "password"}
 							name="passwordConfirm"
 							onChange={handlePasswordConfirmChange}
 							placeholder="비밀번호 확인"
+							style={{
+								fontFamily:
+									'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+								wordBreak: "keep-all",
+								WebkitTextSizeAdjust: "100%",
+								textSizeAdjust: "100%",
+							}}
 						/>
 						<button
 							onClick={togglePasswordConfirmVisibility}
@@ -271,7 +306,14 @@ const SignUp: React.FC = () => {
 					</div>
 					<div
 						className="w-full max-w-[400px] mt-2 text-xs font-[GmarketSansMedium]"
-						style={{ color: passwordConfirmValid.color }}
+						style={{
+							color: passwordConfirmValid.color,
+							fontFamily:
+								'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+							wordBreak: "keep-all",
+							WebkitTextSizeAdjust: "100%",
+							textSizeAdjust: "100%",
+						}}
 					>
 						{passwordConfirmValid.message}
 					</div>
