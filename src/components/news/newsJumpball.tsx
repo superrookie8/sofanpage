@@ -63,16 +63,27 @@ const JumpballSection: React.FC<JumpballProps> = ({
 				{articles.map((article) => (
 					<div
 						key={article._id}
-						className="bg-gray-100 shadow-md rounded-lg p-4 flex flex-col sm:flex-row sm:h-[25vh]"
+						className="bg-gray-100 shadow-md rounded-lg p-4 flex flex-col sm:flex-row sm:h-auto"
 					>
-						<div className="flex justify-center md:w-1/3 mb-4 md:mb-0 sm: pr-4">
-							<Image
-								src={article.image_url}
-								alt={article.title}
-								width={200}
-								height={380}
-								style={{ objectFit: "contain" }}
-							/>
+						<div className="flex justify-center md:w-1/3 mb-4 md:mb-0 sm:pr-4">
+							{article.image_url ? (
+								<div className="relative w-[200px] h-[400px]">
+									<Image
+										src={article.image_url}
+										alt={article.title || "기사 이미지"}
+										fill
+										sizes="200px"
+										style={{
+											objectFit: "contain",
+										}}
+										priority={false}
+									/>
+								</div>
+							) : (
+								<div className="w-[200px] h-[400px] bg-gray-200 flex items-center justify-center">
+									<span className="text-gray-400">이미지 없음</span>
+								</div>
+							)}
 						</div>
 						<div className="  sm:text-xs">
 							<p>{formatDate(article.created_at)}</p>
