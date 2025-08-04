@@ -7,6 +7,15 @@ interface EventDetailProps {
 	loadingDetails: boolean;
 }
 
+const getButtonText = (title: string) => {
+	// "데뷔 5주년", "6주년" 등의 패턴을 찾아서 버튼 텍스트 생성
+	const yearMatch = title.match(/(\d+)주년/);
+	if (yearMatch) {
+		return `데뷔 ${yearMatch[1]}주년 이벤트 사이트`;
+	}
+	return "이벤트 사이트";
+};
+
 const EventDetail: React.FC<EventDetailProps> = ({
 	eventDetails,
 	loadingDetails,
@@ -29,7 +38,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
 				{eventDetails.url && (
 					<Link href={eventDetails.url}>
 						<button className="w-auto bg-red-500 text-white font-bold py-2 px-4 rounded">
-							데뷔 5주년 이벤트 사이트
+							{getButtonText(eventDetails.title)}
 						</button>
 					</Link>
 				)}
