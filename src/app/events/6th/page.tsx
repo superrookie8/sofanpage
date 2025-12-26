@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import Header from "@/components/events/6thcomp/Header";
 import Image from "next/image";

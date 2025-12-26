@@ -1,7 +1,5 @@
 import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-const Youtube = () => {
+const YoutubeTwo = () => {
 	return (
 		<div className="video-container max-w-[800px] mx-auto">
 			<iframe
@@ -15,4 +13,4 @@ const Youtube = () => {
 	);
 };
 
-export default Youtube;
+export default YoutubeTwo;
