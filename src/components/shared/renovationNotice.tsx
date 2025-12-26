@@ -8,7 +8,7 @@ const RenovationNotice: React.FC = () => {
 	useEffect(() => {
 		// localStorage에서 팝업을 이미 닫았는지 확인
 		const hasSeenNotice = localStorage.getItem("renovationNotice2025");
-		
+
 		// 2025년 1월 1일 이후에도 표시할지 결정 (필요시 날짜 조건 추가 가능)
 		// 현재는 닫지 않았다면 항상 표시
 		if (!hasSeenNotice) {
@@ -42,13 +42,10 @@ const RenovationNotice: React.FC = () => {
 						🎉 리뉴얼 안내
 					</h2>
 					<div className="space-y-3 text-gray-700">
-						<p className="text-lg font-semibold">
-							2025년 1월 1일 리뉴얼 예정
-						</p>
+						<p className="text-lg font-semibold">2026년 1월 1일 리뉴얼 예정</p>
 						<p className="text-sm leading-relaxed">
 							현재 사이트는 리뉴얼 준비 중입니다.
-							<br />
-							더 나은 서비스로 찾아뵙겠습니다!
+							<br />더 나은 서비스로 찾아뵙겠습니다!
 						</p>
 						<p className="text-xs text-gray-500 mt-4">
 							* 백엔드 시스템 업그레이드 및 UI 개선 작업 진행 중
@@ -68,4 +65,3 @@ const RenovationNotice: React.FC = () => {
 };
 
 export default RenovationNotice;
-
