@@ -34,6 +34,9 @@ export const metadata: Metadata = {
 		"국가대표이소희",
 		"히쏘",
 		"농구이소희",
+		"슈퍼소히",
+		"슈퍼소희",
+		"supersohee",
 	],
 };
 

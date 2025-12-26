@@ -34,6 +34,7 @@
 		"sharp": "^0.33.3",
 		"slick-carousel": "^1.8.1",
 		"stream": "^0.0.2",
+		"styled-components": "^6.1.19",
 		"uuid": "^10.0.0"
 	},
 	"devDependencies": {
@@ -46,6 +47,7 @@
 		"@types/react-dom": "^18",
 		"@types/react-modal": "^3.16.3",
 		"@types/react-slick": "^0.23.13",
+		"@types/styled-components": "^5.1.36",
 		"@types/uuid": "^9.0.8",
 		"autoprefixer": "^10.4.20",
 		"eslint": "^8",

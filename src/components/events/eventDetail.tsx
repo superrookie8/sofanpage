@@ -16,6 +16,18 @@ const getButtonText = (title: string) => {
 	return "이벤트 사이트";
 };
 
+const getEventUrl = (title: string, originalUrl?: string) => {
+	// 제목에서 주년 정보 추출
+	const yearMatch = title.match(/(\d+)주년/);
+	if (yearMatch) {
+		const year = yearMatch[1];
+		// 5주년이면 /events/5th, 6주년이면 /events/6th
+		return `/events/${year}th`;
+	}
+	// 주년 정보가 없으면 원래 URL 사용
+	return originalUrl || "#";
+};
+
 const EventDetail: React.FC<EventDetailProps> = ({
 	eventDetails,
 	loadingDetails,
@@ -28,6 +40,8 @@ const EventDetail: React.FC<EventDetailProps> = ({
 		);
 	}
 
+	const buttonUrl = getEventUrl(eventDetails.title, eventDetails.url);
+
 	return (
 		<div className="lg:w-2/3">
 			<div className="text-lg font-bold">{eventDetails.title}</div>
@@ -35,8 +49,8 @@ const EventDetail: React.FC<EventDetailProps> = ({
 				{eventDetails.description}
 			</div>
 			<div className="flex justify-center items-center">
-				{eventDetails.url && (
-					<Link href={eventDetails.url}>
+				{buttonUrl !== "#" && (
+					<Link href={buttonUrl}>
 						<button className="w-auto bg-red-500 text-white font-bold py-2 px-4 rounded">
 							{getButtonText(eventDetails.title)}
 						</button>
