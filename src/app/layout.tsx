@@ -9,6 +9,7 @@ import Header from "@/components/shared/header";
 import Background from "@/components/opening/background";
 import { LoadingProvider } from "@/context/LoadingContext";
 import LoadingSpinner from "@/components/shared/loadingSpinner";
+import RenovationNotice from "@/components/shared/renovationNotice";
 
 export const metadata: Metadata = {
 	title: {
@@ -62,6 +63,7 @@ export default function RootLayout({
 				<LoadingProvider>
 					<LoadingSpinner />
 					<RecoilRootProvider>
+						<RenovationNotice />
 						<Background />
 						<Header />
 						<ClientWrapper>{children}</ClientWrapper>
