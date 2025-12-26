@@ -74,7 +74,7 @@ const RenovationNotice: React.FC = () => {
 						🎉 리뉴얼 안내
 					</h2>
 					<div className="space-y-3 text-gray-700">
-						<p className="text-lg font-semibold">2025년 1월 1일 리뉴얼 예정</p>
+						<p className="text-lg font-semibold">2026년 1월 1일 리뉴얼 예정</p>
 						<p className="text-sm leading-relaxed">
 							현재 사이트는 리뉴얼 준비 중입니다.
 							<br />더 나은 서비스로 찾아뵙겠습니다!
