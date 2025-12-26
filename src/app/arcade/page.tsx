@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import BrickBreakerGame from "@/components/arcade/brickbreakergame";
+// import BrickBreakerGame from "@/components/arcade/brickbreakergame";
 import UnityGame from "@/components/arcade/unityGame";
 
 interface Props {}
@@ -13,33 +13,33 @@ const Arcade: React.FC<Props> = (props) => {
 	const [difficulty, setDifficulty] = useState<string>("normal");
 	const totalGames = 5;
 
-	// 벽돌깨기 게임 종료 핸들러
-	const handleBrickBreakerGameOver = (won: boolean) => {
-		if (won) {
-			if (currentGame + 1 === totalGames) {
-				setCurrentGame(0);
-				setBrickBreakerGameOver(false);
-				setShowBrickBreaker(false);
-			} else {
-				setCurrentGame(currentGame + 1);
-			}
-		} else {
-			setBrickBreakerGameOver(true);
-			setShowBrickBreaker(false);
-		}
-	};
+	// // 벽돌깨기 게임 종료 핸들러
+	// const handleBrickBreakerGameOver = (won: boolean) => {
+	// 	if (won) {
+	// 		if (currentGame + 1 === totalGames) {
+	// 			setCurrentGame(0);
+	// 			setBrickBreakerGameOver(false);
+	// 			setShowBrickBreaker(false);
+	// 		} else {
+	// 			setCurrentGame(currentGame + 1);
+	// 		}
+	// 	} else {
+	// 		setBrickBreakerGameOver(true);
+	// 		setShowBrickBreaker(false);
+	// 	}
+	// };
 
-	// 벽돌깨기 게임 시작
-	const startBrickBreaker = () => {
-		setBrickBreakerGameOver(false);
-		setShowBrickBreaker(true);
-	};
+	// // 벽돌깨기 게임 시작
+	// const startBrickBreaker = () => {
+	// 	setBrickBreakerGameOver(false);
+	// 	setShowBrickBreaker(true);
+	// };
 
-	// 난이도 선택 후 벽돌깨기 게임 시작
-	const selectDifficulty = (level: string) => {
-		setDifficulty(level);
-		startBrickBreaker();
-	};
+	// // 난이도 선택 후 벽돌깨기 게임 시작
+	// const selectDifficulty = (level: string) => {
+	// 	setDifficulty(level);
+	// 	startBrickBreaker();
+	// };
 
 	// 유니티 게임 시작
 	const startUnity = () => {
@@ -52,8 +52,8 @@ const Arcade: React.FC<Props> = (props) => {
 	return (
 		<div className="flex flex-col md:flex-row  pt-16 pb-16 justify-center p-4 w-full max-w-screen-lg">
 			<div className="w-full flex flex-col md:flex-row justify-center items-center z-10">
-				<div className="w-full max-w-6xl flex flex-col md:flex-row lg:flex-row gap-4">
-					{/* 벽돌깨기 게임 섹션 */}
+				<div className="w-full max-w-6xl flex flex-col justify-center items-center gap-4">
+					{/* 벽돌깨기 게임 섹션
 					<div className="w-full md:w-1/2 lg:w-1/2">
 						<div className="bg-white bg-opacity-75 text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
 							벽돌깨기 게임
@@ -98,7 +98,7 @@ const Arcade: React.FC<Props> = (props) => {
 								</div>
 							)}
 						</section>
-					</div>
+					</div> */}
 
 					{/* 유니티 게임 섹션 */}
 					<div className="w-full md:w-1/2 lg:w-1/2">
