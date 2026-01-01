@@ -58,8 +58,8 @@ const EventPhotos: React.FC<EventPhotosProps> = ({
 								<Image
 									src={photo}
 									alt={eventTitle}
-									layout="fill"
-									objectFit="cover"
+									fill
+									style={{ objectFit: "cover" }}
 									className="object-cover"
 								/>
 							</div>

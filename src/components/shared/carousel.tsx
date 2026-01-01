@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Image from "next/legacy/image";
+import Image from "next/image";
 
 interface ImageCarouselProps {
 	images: string[];
@@ -24,8 +24,8 @@ const Carousel: React.FC<ImageCarouselProps> = ({ images }) => {
 				<Image
 					src={images[picture]}
 					alt="Carousel image"
-					layout="fill"
-					objectFit="contain"
+					fill
+					style={{ objectFit: "contain" }}
 				/>
 			</div>
 			<button onClick={nextImage} className="ml-[10px]">

@@ -76,8 +76,8 @@ const DiaryPhotoUpload: React.FC<DiaryPhotoUploadProps> = ({
 					<Image
 						src={latestPhoto}
 						alt={`${type} Preview`}
-						layout="fill"
-						objectFit="cover"
+						fill
+						style={{ objectFit: "cover" }}
 					/>
 				</div>
 			) : (

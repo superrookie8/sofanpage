@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import Script from "next/script"; // Import Script from next
 import "./globals.css";
-import RecoilRootProvider from "@/utils/recoilRootProvider";
+import SessionProviderWrapper from "@/components/providers/SessionProviderWrapper";
 import ScriptProvider from "@/utils/scriptProvider";
 import ClientWrapper from "@/components/shared/clientWrapper";
 import Header from "@/components/shared/header";
@@ -63,15 +63,15 @@ export default function RootLayout({
 			</Script>
 			<ScriptProvider />
 			<body>
-				<LoadingProvider>
-					<LoadingSpinner />
-					<RecoilRootProvider>
+				<SessionProviderWrapper>
+					<LoadingProvider>
+						<LoadingSpinner />
 						<RenovationNotice />
 						<Background />
 						<Header />
 						<ClientWrapper>{children}</ClientWrapper>
-					</RecoilRootProvider>
-				</LoadingProvider>
+					</LoadingProvider>
+				</SessionProviderWrapper>
 			</body>
 		</html>
 	);
