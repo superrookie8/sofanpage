@@ -6,8 +6,6 @@ import { format } from "date-fns";
 import { GuestBookEntry } from "@/data/guestbook";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useRecoilValue } from "recoil";
-import { loginState } from "@/states/loginState";
 import { useLoading } from "@/context/LoadingContext";
 import LoadingSpinner from "@/components/shared/loadingSpinner";
 
@@ -42,8 +40,15 @@ const GuestBookList: React.FC = () => {
 	const [noPhotoPage, setNoPhotoPage] = useState(1);
 	const pageSize = 10;
 	const router = useRouter();
-	const isLoggedIn = useRecoilValue(loginState);
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const { setIsLoading } = useLoading();
+
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			const token = sessionStorage.getItem("token");
+			setIsLoggedIn(!!token);
+		}
+	}, []);
 
 	useEffect(() => {
 		setIsLoading(true);

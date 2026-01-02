@@ -1,6 +1,5 @@
-import React, { useRef, ChangeEvent } from "react";
-import { useRecoilState } from "recoil";
-import { photoPreviewState, PhotoData } from "@/states/photoPreviewState";
+import React, { useRef, ChangeEvent, useState } from "react";
+import { PhotoData } from "@/states/photoPreviewState";
 import Image from "next/image";
 
 interface PhotoUploadProps {
@@ -8,7 +7,7 @@ interface PhotoUploadProps {
 }
 
 const PhotoUpload: React.FC<PhotoUploadProps> = ({ onPhotoUpload }) => {
-	const [photos, setPhotos] = useRecoilState(photoPreviewState);
+	const [photos, setPhotos] = useState<PhotoData[]>([]);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {

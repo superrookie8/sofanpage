@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSetRecoilState } from "recoil";
-import { selectedLocationState } from "@/states/locationState";
+import { GameLocation } from "@/data/schedule";
 import { locations, GameSchedule } from "@/data/schedule";
 import {
 	format,
@@ -24,10 +23,13 @@ const formatYearMonth = (date: Date): string => {
 
 const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 
-const Calendar: React.FC = () => {
+interface CalendarProps {
+	onLocationSelect: (location: GameLocation) => void;
+}
+
+const Calendar: React.FC<CalendarProps> = ({ onLocationSelect }) => {
 	const [currentMonth, setCurrentMonth] = useState(new Date());
 	const [schedules, setSchedules] = useState<GameSchedule[]>([]);
-	const setSelectedLocation = useSetRecoilState(selectedLocationState);
 	const startDay = startOfMonth(currentMonth);
 	const endDay = endOfMonth(currentMonth);
 	const daysInCurrentMonth = eachDayOfInterval({
@@ -84,7 +86,7 @@ const Calendar: React.FC = () => {
 		if (game) {
 			const locationKey = game.isHome ? "부산 사직실내체육관" : game.opponent;
 			const location = locations[locationKey.trim()];
-			setSelectedLocation(location);
+			onLocationSelect(location);
 		}
 	};
 

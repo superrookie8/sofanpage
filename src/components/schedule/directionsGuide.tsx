@@ -5,12 +5,13 @@ import {
 	GameLocation,
 	RecommendedRoute,
 } from "@/data/schedule";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { selectedLocationState } from "@/states/locationState";
 import { recommended } from "@/data/schedule";
 
-const DirectionsGuide: React.FC = () => {
-	const selectedLocation = useRecoilValue(selectedLocationState);
+interface DirectionsGuideProps {
+	selectedLocation: GameLocation | null;
+}
+
+const DirectionsGuide: React.FC<DirectionsGuideProps> = ({ selectedLocation }) => {
 	const [locaInfo, setLocaInfo] = useState<DirectionInfo | undefined>(
 		undefined
 	);

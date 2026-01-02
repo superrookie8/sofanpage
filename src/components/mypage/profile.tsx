@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 
 interface ProfileData {
+	id: string;
 	name: string;
 	team: string;
+	jerseyNumber: number;
 	position: string;
-	number: string;
 	height: string;
-	nickname: string;
+	nickname: string[];
 	features: string;
+	profileImageUrl?: string | null;
 }
 
 const Profile: React.FC = () => {
@@ -24,12 +26,14 @@ const Profile: React.FC = () => {
 					},
 				});
 
-				const data = await response.json();
-				if (response.ok) {
-					setProfile(data);
-				} else {
-					setError(data.message || "Failed to load profile.");
+				if (!response.ok) {
+					const errorData = await response.json();
+					setError(errorData.message || "Failed to load profile.");
+					return;
 				}
+
+				const data = await response.json();
+				setProfile(data);
 			} catch (error) {
 				console.error("Error fetching profile:", error);
 				setError("An error occurred while fetching the profile.");
@@ -49,12 +53,23 @@ const Profile: React.FC = () => {
 
 	return (
 		<div className="p-4 w-[500px]">
+			{profile.profileImageUrl && (
+				<div className="flex justify-center mb-4">
+					<img
+						src={profile.profileImageUrl}
+						alt={profile.name}
+						className="w-32 h-32 rounded-full object-cover"
+					/>
+				</div>
+			)}
 			<p className="ml-8 mt-4 text-gray-500">Name : {profile.name}</p>
 			<p className="ml-8 mt-4 text-gray-500">Team : {profile.team}</p>
 			<p className="ml-8 mt-4 text-gray-500">Position : {profile.position}</p>
-			<p className="ml-8 mt-4 text-gray-500">Number : {profile.number}</p>
+			<p className="ml-8 mt-4 text-gray-500">Number : {profile.jerseyNumber}</p>
 			<p className="ml-8 mt-4 text-gray-500">Height : {profile.height}</p>
-			<p className="ml-8 mt-4 text-gray-500">Nickname : {profile.nickname}</p>
+			<p className="ml-8 mt-4 text-gray-500">
+				Nickname : {Array.isArray(profile.nickname) ? profile.nickname.join(", ") : profile.nickname}
+			</p>
 			<p className="ml-8 mt-4 text-gray-500">Features : {profile.features}</p>
 		</div>
 	);

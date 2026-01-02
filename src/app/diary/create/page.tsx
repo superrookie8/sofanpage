@@ -11,8 +11,6 @@ import SelectedLocation from "@/components/diary/selectedLocation";
 import WinningToggleMenu from "@/components/diary/winningToggle";
 import SelectedWinningMode from "@/components/diary/selectedWinLose";
 import { useRouter } from "next/navigation";
-import { useRecoilState } from "recoil";
-import { DiaryPhotoPreviewState } from "@/states/diaryPhotoPreview";
 import DiaryTabs from "@/components/diary/diaryTabs";
 import useAuth from "@/hooks/useAuth";
 import SectionToggleMenu from "@/components/diary/sectionToggleMenu";
@@ -21,7 +19,6 @@ import NumberToggleMenu from "@/components/diary/numberToggleMenu";
 import SelectedSection from "@/components/diary/selectedSection";
 import SelectedRow from "@/components/diary/selectedRow";
 import SelectedNumber from "@/components/diary/selectedNumber";
-import { locatonState } from "@/states/locationState";
 import AlertModal from "@/components/shared/alertModal";
 import { DiaryPhotoData } from "@/states/diaryPhotoPreview";
 
@@ -36,7 +33,7 @@ const BasketballDiary: React.FC<Props> = (props) => {
 	const [date, setDate] = useState<string>("");
 	const [weather, setWeather] = useState<string>("");
 	const [together, setTogether] = useState<string>("");
-	const [location, setLocation] = useRecoilState(locatonState);
+	const [location, setLocation] = useState<string>("");
 	const [isWinning, setIsWinning] = useState<string>("");
 	const [message, setMessage] = useState<string>("");
 	const [seatInfo, setSeatInfo] = useState({
@@ -44,7 +41,7 @@ const BasketballDiary: React.FC<Props> = (props) => {
 		row: "",
 		number: "",
 	});
-	const [preview, setPreview] = useRecoilState(DiaryPhotoPreviewState);
+	const [preview, setPreview] = useState<DiaryPhotoData[]>([]);
 
 	const user = useAuth();
 	const router = useRouter(); // 페이지 이동을 위한 Router

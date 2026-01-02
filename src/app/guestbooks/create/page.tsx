@@ -1,9 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { pageState } from "@/states/pageState";
-import { photoPreviewState } from "@/states/photoPreviewState";
 import PhotoUpload from "@/components/shared/photoUpload";
 import useAuth from "@/hooks/useAuth";
 import AlertModal from "@/components/shared/alertModal";
@@ -13,9 +10,7 @@ const GuestBookCreate: React.FC = () => {
 	const router = useRouter();
 	const [write, setWrite] = useState("");
 	const [photo, setPhoto] = useState<string | null>(null);
-	const currentPage = useRecoilValue(pageState);
-	const setPage = useSetRecoilState(pageState);
-	const [photos, setPhotos] = useRecoilState(photoPreviewState);
+	const [photos, setPhotos] = useState<string[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [modalMessage, setModalMessage] = useState("");
@@ -24,15 +19,13 @@ const GuestBookCreate: React.FC = () => {
 		setWrite("");
 		setPhoto(null);
 		setPhotos([]);
-		setPage("default");
 		return () => {
 			// 컴포넌트 언마운트 시에도 초기화
 			setWrite("");
 			setPhoto(null);
 			setPhotos([]);
-			setPage("default");
 		};
-	}, [setPage, setPhotos]);
+	}, [setPhotos]);
 
 	const handlerOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setWrite(e.target.value);

@@ -1,12 +1,28 @@
 import { NextResponse, NextRequest } from "next/server";
 
-const isDevelopment = process.env.NODE_ENV === "development";
-
 export async function GET(req: NextRequest) {
-	const res = await fetch(`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/latest`, {
-		cache: isDevelopment ? "no-store" : "default",
-	});
-	const data = await res.json();
+	try {
+		const res = await fetch(
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/articles/latest`,
+			{
+				cache: "no-store",
+			}
+		);
 
-	return NextResponse.json(data);
+		if (!res.ok) {
+			return NextResponse.json(
+				{ error: "Failed to fetch latest news" },
+				{ status: res.status }
+			);
+		}
+
+		const data = await res.json();
+		return NextResponse.json(data);
+	} catch (error) {
+		console.error("Error fetching latest news:", error);
+		return NextResponse.json(
+			{ error: "Internal server error" },
+			{ status: 500 }
+		);
+	}
 }

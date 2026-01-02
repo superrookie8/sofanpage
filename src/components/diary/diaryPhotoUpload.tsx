@@ -1,11 +1,5 @@
-import React, { useRef, ChangeEvent } from "react";
-import { useRecoilState } from "recoil";
-import {
-	ticketPreviewState,
-	viewPreviewState,
-	additionalPreviewState,
-	DiaryPhotoData,
-} from "@/states/diaryPhotoPreview";
+import React, { useRef, ChangeEvent, useState } from "react";
+import { DiaryPhotoData } from "@/states/diaryPhotoPreview";
 import Image from "next/image";
 
 interface DiaryPhotoUploadProps {
@@ -17,9 +11,9 @@ const DiaryPhotoUpload: React.FC<DiaryPhotoUploadProps> = ({
 	onDiaryPhotoUpload,
 	type, // Destructure type prop
 }) => {
-	const [ticketPhoto, setTicketPhoto] = useRecoilState(ticketPreviewState);
-	const [viewPhoto, setViewPhoto] = useRecoilState(viewPreviewState);
-	const [additionalPhoto, setAdditionalPhoto] = useRecoilState(additionalPreviewState);
+	const [ticketPhoto, setTicketPhoto] = useState<string | null>(null);
+	const [viewPhoto, setViewPhoto] = useState<string | null>(null);
+	const [additionalPhoto, setAdditionalPhoto] = useState<string | null>(null);
 	const ticketInputRef = useRef<HTMLInputElement>(null);
 	const viewInputRef = useRef<HTMLInputElement>(null);
 	const additionalInputRef = useRef<HTMLInputElement>(null);

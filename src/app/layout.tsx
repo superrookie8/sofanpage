@@ -2,7 +2,6 @@
 import type { Metadata } from "next";
 import Script from "next/script"; // Import Script from next
 import "./globals.css";
-import SessionProviderWrapper from "@/components/providers/SessionProviderWrapper";
 import ScriptProvider from "@/utils/scriptProvider";
 import ClientWrapper from "@/components/shared/clientWrapper";
 import Header from "@/components/shared/header";
@@ -48,30 +47,28 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			{/* Google Tag Manager Script */}
-			<meta charSet="UTF-8"></meta>
 			<Script
 				async
 				src="https://www.googletagmanager.com/gtag/js?id=G-FESK7ETCDB"
 			></Script>
 			<Script id="google-analytics" strategy="afterInteractive">
 				{`
-				  window.dataLayer = window.dataLayer || [];
-				  function gtag(){dataLayer.push(arguments);}
-				  gtag('js', new Date());
-				  gtag('config', 'G-FESK7ETCDB');
+				  if (typeof window !== 'undefined') {
+				    window.dataLayer = window.dataLayer || [];
+				    function gtag(){dataLayer.push(arguments);}
+				    gtag('config', 'G-FESK7ETCDB');
+				  }
 				`}
 			</Script>
 			<ScriptProvider />
 			<body>
-				<SessionProviderWrapper>
-					<LoadingProvider>
-						<LoadingSpinner />
-						<RenovationNotice />
-						<Background />
-						<Header />
-						<ClientWrapper>{children}</ClientWrapper>
-					</LoadingProvider>
-				</SessionProviderWrapper>
+				<LoadingProvider>
+					<LoadingSpinner />
+					<RenovationNotice />
+					<Background />
+					<Header />
+					<ClientWrapper>{children}</ClientWrapper>
+				</LoadingProvider>
 			</body>
 		</html>
 	);

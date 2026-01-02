@@ -39,7 +39,7 @@ const MainPage: React.FC = () => {
 				</div>
 			</div>
 
-			<div className="w-full flex justify-center z-10">
+			{/* <div className="w-full flex justify-center z-10">
 				<div className="w-full">
 					<div className="bg-red-600 text-white sm:bg-white sm:text-red-500  sm:border-b-2 sm:border-t-2 sm:bg-opacity-75 border-red-500 h-[50px] w-full flex justify-center items-center">
 						사진
@@ -50,7 +50,7 @@ const MainPage: React.FC = () => {
 						</div>
 					</section>
 				</div>
-			</div>
+			</div> */}
 		</div>
 	);
 };

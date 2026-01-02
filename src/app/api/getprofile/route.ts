@@ -1,26 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const isDevelopment = process.env.NODE_ENV === "development";
-
 export async function GET(req: NextRequest) {
 	try {
 		const backendResponse = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get/profile`,
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/player`,
 			{
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				cache: isDevelopment ? "no-store" : "default",
+				cache: "no-store",
 			}
 		);
 
-		const backendData = await backendResponse.json();
-
 		if (!backendResponse.ok) {
-			throw new Error(backendData.message || "Failed to get profile.");
+			const errorData = await backendResponse.json();
+			throw new Error(errorData.message || "Failed to get profile.");
 		}
 
+		const backendData = await backendResponse.json();
 		return NextResponse.json(backendData, { status: 200 });
 	} catch (error: any) {
 		console.error("Error:", error);

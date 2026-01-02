@@ -3,14 +3,34 @@
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
-import { useSession, signOut } from "next-auth/react";
 
 const Header: React.FC = () => {
 	const pathname = usePathname();
 	const router = useRouter();
-	const { data: session, status } = useSession();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
-	const isLoggedIn = status === "authenticated";
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+		const checkAuth = () => {
+			if (typeof window !== "undefined") {
+				const token = sessionStorage.getItem("token");
+				setIsLoggedIn(!!token);
+			}
+		};
+
+		// 초기 체크
+		checkAuth();
+
+		// storage 이벤트 감지 (다른 탭에서 로그인/로그아웃 시)
+		if (typeof window !== "undefined") {
+			window.addEventListener("storage", checkAuth);
+			return () => {
+				window.removeEventListener("storage", checkAuth);
+			};
+		}
+	}, [pathname]); // pathname이 변경될 때마다 체크
 
 	// 메뉴 참조를 위한 ref 추가
 	const menuRef = useRef<HTMLDivElement>(null);
@@ -54,8 +74,10 @@ const Header: React.FC = () => {
 			: "w-full flex justify-center items-center";
 	};
 
-	const handleLogout = async () => {
-		await signOut({ redirect: false });
+	const handleLogout = () => {
+		sessionStorage.removeItem("token");
+		sessionStorage.removeItem("user");
+		setIsLoggedIn(false);
 		router.push("/home");
 	};
 
@@ -82,9 +104,6 @@ const Header: React.FC = () => {
 						</Link>
 						<Link href="/schedule" className={linkStyle("/schedule")}>
 							경기스케줄
-						</Link>
-						<Link href="/guestbooks/read" className={linkStyle("/guestbooks/")}>
-							방명록
 						</Link>
 
 						{!isLoggedIn && (
@@ -182,15 +201,6 @@ const Header: React.FC = () => {
 							onClick={toggleMenu}
 						>
 							경기스케줄
-						</Link>
-						<Link
-							href="/guestbooks/read"
-							className={`${mobileLinkStyle(
-								"/guestbooks/"
-							)} hover:bg-red-200 active:bg-red-600`}
-							onClick={toggleMenu}
-						>
-							방명록
 						</Link>
 
 						{!isLoggedIn && (

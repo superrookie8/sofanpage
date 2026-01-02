@@ -53,6 +53,14 @@ const nextConfig = {
 				hostname: "cdn.rookie.co.kr",
 				pathname: "/news/thumbnail/**",
 			},
+			{
+				protocol: "https",
+				hostname: "jumpball.co.kr",
+			},
+			{
+				protocol: "https",
+				hostname: "rookie.co.kr",
+			},
 		],
 	},
 };

@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
 
 	try {
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/get/userinfo`,
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/users/me`,
 			{
 				method: "GET",
 				headers: {
@@ -19,6 +19,10 @@ export async function GET(req: NextRequest) {
 				cache: "no-store", // 캐시 방지
 			}
 		);
+
+		if (response.status === 401) {
+			return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+		}
 
 		if (!response.ok) {
 			throw new Error("Failed to fetch user info");

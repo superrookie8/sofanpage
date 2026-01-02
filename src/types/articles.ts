@@ -1,8 +1,12 @@
 export interface Article {
-	_id: string;
+	id: string;
+	source?: string;
 	title: string;
-	link: string;
+	url: string;
 	summary: string;
-	image_url: string;
-	created_at: string;
+	imageUrl: string;
+	publishedAt: string;
+	crawledAt?: string;
+	score?: number;
+	mainTarget?: boolean;
 }

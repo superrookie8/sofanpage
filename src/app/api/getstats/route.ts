@@ -2,26 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
 	try {
-		console.log("Starting GET request to backend");
-
 		const backendResponse = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get/stats`,
+			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/playerstat/all`,
 			{
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
 				},
+				cache: "no-store",
 			}
 		);
 
-		const backendText = await backendResponse.text();
-
 		if (!backendResponse.ok) {
-			throw new Error("Failed to fetch stats from backend");
+			const errorData = await backendResponse.json();
+			throw new Error(errorData.message || "Failed to fetch stats from backend");
 		}
 
-		const backendData = JSON.parse(backendText);
-
+		const backendData = await backendResponse.json();
 		return NextResponse.json(backendData, { status: 200 });
 	} catch (error: any) {
 		console.error("Error during GET request:", error);

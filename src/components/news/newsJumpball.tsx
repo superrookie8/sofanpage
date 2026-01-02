@@ -62,14 +62,14 @@ const JumpballSection: React.FC<JumpballProps> = ({
 			<div className="grid grid-cols-1 gap-4 h-full overflow-y-scroll">
 				{articles.map((article) => (
 					<div
-						key={article._id}
+						key={article.id}
 						className="bg-gray-100 shadow-md rounded-lg p-4 flex flex-col sm:h-auto"
 					>
 						<div className="flex justify-center md:w-1/3 mb-4 md:mb-0 sm:pr-4">
-							{article.image_url ? (
+							{article.imageUrl ? (
 								<div className="relative w-[300px] h-[200px]">
 									<Image
-										src={article.image_url}
+										src={article.imageUrl}
 										alt={article.title || "기사 이미지"}
 										fill
 										sizes="(max-width: 768px) 100vw, 300px"
@@ -88,12 +88,12 @@ const JumpballSection: React.FC<JumpballProps> = ({
 							)}
 						</div>
 						<div className="  sm:text-xs">
-							<p>{formatDate(article.created_at)}</p>
+							<p>{formatDate(article.publishedAt)}</p>
 							<h2>{article.title}</h2>
 							<p>{truncateText(article.summary)}</p>
 							<div className="pt-4">
 								<a
-									href={article.link}
+									href={article.url}
 									className="flex justify-center inline-block px-4 py-2 border border-red-300 text-red-300 rounded"
 								>
 									더보기
