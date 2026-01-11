@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
 	req: NextRequest,
-	{ params }: { params: { stadiumId: string } }
+	{ params }: { params: Promise<{ stadiumId: string }> }
 ) {
 	try {
-		const { stadiumId } = params;
+		const { stadiumId } = await params;
 		const response = await fetch(
 			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/stadiums/${stadiumId}/seats`,
 			{
@@ -28,4 +28,3 @@ export async function GET(
 		return NextResponse.json({ message: error.message }, { status: 500 });
 	}
 }
-
