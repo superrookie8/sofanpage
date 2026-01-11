@@ -3,9 +3,8 @@ import {
 	DirectionInfo,
 	directionguide,
 	GameLocation,
-	RecommendedRoute,
+	recommended,
 } from "../constants";
-import { recommended } from "../constants";
 
 interface DirectionsGuideProps {
 	selectedLocation: GameLocation | null;

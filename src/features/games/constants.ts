@@ -1,6 +1,9 @@
 // src/features/games/constants.ts
 import type { GameLocation, DirectionInfo, RecommendedRoute } from "./types";
 
+// Re-export types for convenience
+export type { GameLocation, DirectionInfo, RecommendedRoute };
+
 export const locations: Record<string, GameLocation> = {
 	"부산 사직실내체육관": {
 		name: "부산 사직실내체육관",

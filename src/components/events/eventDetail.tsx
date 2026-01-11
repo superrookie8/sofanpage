@@ -58,14 +58,14 @@ const EventDetail: React.FC<EventDetailProps> = ({
 				)}
 			</div>
 			<div className="mt-4 flex flex-col items-start">
-				{eventDetails.checkFields.check_1 && (
-					<div className="mt-2">✓ {eventDetails.checkFields.check_1}</div>
+				{eventDetails.checkFields.check1 && (
+					<div className="mt-2">✓ {eventDetails.checkFields.check1}</div>
 				)}
-				{eventDetails.checkFields.check_2 && (
-					<div className="mt-2">✓ {eventDetails.checkFields.check_2}</div>
+				{eventDetails.checkFields.check2 && (
+					<div className="mt-2">✓ {eventDetails.checkFields.check2}</div>
 				)}
-				{eventDetails.checkFields.check_3 && (
-					<div className="mt-2">✓ {eventDetails.checkFields.check_3}</div>
+				{eventDetails.checkFields.check3 && (
+					<div className="mt-2">✓ {eventDetails.checkFields.check3}</div>
 				)}
 			</div>
 		</div>

@@ -14,6 +14,9 @@ const GuestBookCreate: React.FC = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [modalMessage, setModalMessage] = useState("");
+	const [currentPage, setPage] = useState<"default" | "photoAndText">(
+		"default"
+	);
 
 	useEffect(() => {
 		setWrite("");
@@ -45,7 +48,7 @@ const GuestBookCreate: React.FC = () => {
 		setIsLoading(true);
 
 		const formData = new FormData();
-		formData.append("name", user.nickname);
+		formData.append("name", user?.name || user?.email || "익명");
 		formData.append("message", write);
 		formData.append("date", new Date().toISOString());
 		if (currentPage === "photoAndText" && photo) {
