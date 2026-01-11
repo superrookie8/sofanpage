@@ -85,7 +85,12 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 		>
 			<div
 				className="relative bg-white rounded-lg shadow-xl w-[600px] min-w-[600px] max-w-[600px] h-[700px] overflow-y-auto box-border flex-shrink-0"
-				style={{ width: "600px", minWidth: "600px", maxWidth: "600px" }}
+				style={{
+					width: "600px",
+					minWidth: "600px",
+					maxWidth: "600px",
+					height: "700px",
+				}}
 				onClick={(e) => e.stopPropagation()}
 			>
 				{/* 닫기 버튼 */}
