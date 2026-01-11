@@ -1,121 +1,53 @@
 "use client";
-import { useEffect, useState } from "react";
-import EventDetail from "@/components/events/eventDetail";
-import EventPhotos from "@/components/events/eventPhotos";
-import { Event, EventDetails, PhotosResponse } from "@/data/events";
+import { useState } from "react";
+import EventDetail from "@/features/events/components/eventDetail";
+import EventPhotos from "@/features/events/components/eventPhotos";
+import { Event, EventDetails, PhotosResponse } from "@/features/events/types";
 import Image from "next/image";
-import { useLoading } from "@/context/LoadingContext";
+import {
+	useEventListQuery,
+	useEventDetailQuery,
+	useEventPhotosQuery,
+} from "@/features/events/queries";
 
 const Events: React.FC = () => {
-	const [events, setEvents] = useState<Event[]>([]);
 	const [activeEvent, setActiveEvent] = useState<string | null>(null);
-	const [loadingDetails, setLoadingDetails] = useState<boolean>(false);
-	const [loadingPhotos, setLoadingPhotos] = useState<boolean>(false);
-	const [eventDetails, setEventDetails] = useState<
-		Record<string, EventDetails>
-	>({});
-	const [eventPhotos, setEventPhotos] = useState<Record<string, string[]>>({});
 	const [page, setPage] = useState<number>(1);
-	const [totalPages, setTotalPages] = useState<number>(0);
 	const [modalPhoto, setModalPhoto] = useState<string | null>(null);
-	const { setIsLoading } = useLoading();
 
-	useEffect(() => {
-		const fetchEvents = async () => {
-			setIsLoading(true);
-			try {
-				const response = await fetch("/api/geteventlist", {
-					method: "GET",
-					cache: "no-store",
-				});
-				const data = await response.json();
-				if (response.ok) {
-					setEvents(data.events);
-				} else {
-					console.error("Failed to fetch data", data);
-				}
-			} catch (error) {
-				console.error("Error fetching data", error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-		fetchEvents();
-	}, [setIsLoading]);
+	// React Query를 사용하여 이벤트 목록 조회
+	const { data: events = [], isLoading: eventsLoading } = useEventListQuery();
 
-	const fetchEventDetails = async (eventId: string) => {
-		if (!eventDetails[eventId]) {
-			try {
-				setLoadingDetails(true);
-				const response = await fetch(`/api/geteventdetail?id=${eventId}`, {
-					method: "GET",
-					cache: "no-store",
-				});
-				const data = await response.json();
-				if (response.ok) {
-					setEventDetails((prevDetails) => ({
-						...prevDetails,
-						[eventId]: data.event,
-					}));
-				} else {
-					console.error("Failed to fetch event details", data);
-				}
-			} catch (error) {
-				console.error("Error fetching event details", error);
-			} finally {
-				setLoadingDetails(false);
-			}
-		}
-	};
+	// 활성 이벤트의 상세 정보 조회
+	const { data: eventDetails, isLoading: loadingDetails } = useEventDetailQuery(
+		activeEvent || "",
+		!!activeEvent
+	);
 
-	const fetchEventPhotos = async (eventId: string, page: number) => {
-		setLoadingPhotos(true);
-		try {
-			const response = await fetch(
-				`/api/geteventphotos?id=${eventId}&page=${page}`,
-				{
-					method: "GET",
-					cache: "no-store",
-				}
-			);
-			const data: PhotosResponse = await response.json();
-			if (response.ok) {
-				setEventPhotos((prevPhotos) => ({
-					...prevPhotos,
-					[eventId]: [...(prevPhotos[eventId] || []), ...data.photos],
-				}));
-				setTotalPages(data.total_pages);
-			} else {
-				console.error("Failed to fetch event photos", data);
-			}
-		} catch (error) {
-			console.error("Error fetching event photos", error);
-		} finally {
-			setLoadingPhotos(false);
-		}
-	};
+	// 활성 이벤트의 사진 조회
+	const { data: photosData, isLoading: loadingPhotos } = useEventPhotosQuery(
+		activeEvent || "",
+		page,
+		!!activeEvent
+	);
 
-	const loadMorePhotos = async (eventId: string) => {
+	const eventPhotos = photosData?.photos || [];
+	const totalPages = photosData?.total_pages || 0;
+
+	const loadMorePhotos = () => {
 		if (page < totalPages) {
-			await fetchEventPhotos(eventId, page + 1);
 			setPage((prevPage) => prevPage + 1);
 		}
 	};
 
-	const toggleEvent = async (eventId: string) => {
+	const toggleEvent = (eventId: string) => {
 		if (activeEvent === eventId) {
 			setActiveEvent(null);
-			setPage(1); // Reset page when closing event
+			setPage(1);
 			return;
 		}
 		setActiveEvent(eventId);
-		if (!eventDetails[eventId]) {
-			await fetchEventDetails(eventId);
-		}
-		if (!eventPhotos[eventId] || eventPhotos[eventId].length === 0) {
-			await fetchEventPhotos(eventId, 1);
-		}
-		setPage(1); // Reset page for new event
+		setPage(1);
 	};
 
 	const openModal = (photo: string) => {
@@ -138,27 +70,27 @@ const Events: React.FC = () => {
 				<div className="min-h-screen w-full flex flex-col justify-center p-8 relative">
 					<div className="w-full max-w-[1200px] mx-auto">
 						{events.map((event) => (
-							<div key={event._id} className="mb-4">
+							<div key={event.id} className="mb-4">
 								<button
-									onClick={() => toggleEvent(event._id)}
+									onClick={() => toggleEvent(event.id)}
 									className="w-full bg-red-500 text-white font-bold py-2 px-4 rounded mb-2"
 								>
 									{event.title}
 								</button>
-								{activeEvent === event._id && (
+								{activeEvent === event.id && (
 									<div className="bg-white p-4 rounded shadow-md flex flex-col lg:flex-row lg:space-x-4">
 										<EventDetail
-											eventDetails={eventDetails[event._id]}
+											eventDetails={eventDetails}
 											loadingDetails={loadingDetails}
 										/>
 										<EventPhotos
-											eventId={event._id}
-											eventPhotos={eventPhotos[event._id] || []}
+											eventId={event.id}
+											eventPhotos={eventPhotos}
 											loadingPhotos={loadingPhotos}
-											loadMorePhotos={() => loadMorePhotos(event._id)}
+											loadMorePhotos={loadMorePhotos}
 											totalPages={totalPages}
 											page={page}
-											eventTitle={eventDetails[event._id]?.title || ""}
+											eventTitle={eventDetails?.title || ""}
 											openModal={openModal}
 										/>
 									</div>

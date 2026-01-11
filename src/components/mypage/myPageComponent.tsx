@@ -1,19 +1,20 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import ProfileModal from "@/components/shared/profileModal";
+import ProfileModal from "@/shared/ui/profileModal";
 import { GuestBookEntry } from "@/data/guestbook";
 import { format } from "date-fns";
 import Image from "next/image";
-import { fetchUserStats } from "@/api";
-import AlertModal from "@/components/shared/alertModal";
+import { fetchUserStats } from "@/features/diary/api";
+import AlertModal from "@/shared/ui/alertModal";
+import { useSession } from "next-auth/react";
 
 export const fetchUserInfo = async (): Promise<{
 	nickname: string;
 	description?: string;
 	photoUrl?: string;
 }> => {
-	const response = await fetch("/api/getuserinfo", {
+	const response = await fetch("/api/users/me", {
 		headers: {
 			Authorization: `Bearer ${sessionStorage.getItem("token")}`,
 		},
@@ -32,7 +33,7 @@ export const fetchGuestbookEntries = async (filter: {
 	pageSize: number;
 }): Promise<{ entries: GuestBookEntry[]; total_entries: number }> => {
 	const response = await fetch(
-		`/api/getuserguestbook?user=${filter.user}&page=${filter.page}&page_size=${filter.pageSize}`,
+		`/api/guestbooks?user=${filter.user}&page=${filter.page}&page_size=${filter.pageSize}`,
 		{
 			headers: {
 				Authorization: `Bearer ${sessionStorage.getItem("token")}`,
@@ -47,7 +48,7 @@ export const fetchGuestbookEntries = async (filter: {
 };
 
 export const deleteGuestbookEntry = async (entryId: string): Promise<void> => {
-	const response = await fetch(`/api/deleteguestbook?entry_id=${entryId}`, {
+	const response = await fetch(`/api/guestbooks/${entryId}`, {
 		method: "DELETE",
 		headers: {
 			Authorization: `Bearer ${sessionStorage.getItem("token")}`,
@@ -66,6 +67,7 @@ const formatDate = (dateString: string): string => {
 
 const MyPageComp: React.FC = () => {
 	const router = useRouter();
+	const { data: session, status } = useSession();
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
 	const [alertMessage, setAlertMessage] = useState("");
@@ -96,27 +98,13 @@ const MyPageComp: React.FC = () => {
 	const pageSize = 10;
 
 	useEffect(() => {
-		const token = sessionStorage.getItem("token");
-		if (!token) {
+		if (status === "unauthenticated") {
 			router.push("/login");
-		} else {
-			fetchUserInfo()
-				.then((data) => {
-					setProfile({
-						nickname: data.nickname,
-						description: data.description || "",
-						photoUrl: data.photoUrl || "",
-					});
-					return fetchUserStats(data.nickname);
-				})
-				.then((stats) => {
-					setUserStats(stats);
-				})
-				.catch((error) => {
-					console.error("Error fetching user info:", error);
-				});
+		} else if (session) {
+			// 사용자 정보 가져오기
+			fetchUserInfo();
 		}
-	}, [router]);
+	}, [status, session, router]);
 
 	useEffect(() => {
 		if (profile.nickname) {
@@ -170,7 +158,7 @@ const MyPageComp: React.FC = () => {
 		console.log("FormData to be sent:", Array.from(formData.entries()));
 
 		try {
-			const response = await fetch("/api/putuserinfo", {
+			const response = await fetch("/api/users/me", {
 				method: "PUT",
 				headers: {
 					Authorization: `Bearer ${sessionStorage.getItem("token")}`,

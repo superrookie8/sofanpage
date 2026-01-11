@@ -1,7 +1,7 @@
 "use client";
-import Profile from "@/components/mypage/profile";
+import Profile from "@/features/profile/components/profile";
 import Stats from "@/components/home/stats";
-import GetPhotos from "@/components/shared/photos";
+import GetPhotos from "@/shared/ui/photos";
 import { useState } from "react";
 
 import MainImage from "@/components/opening/mainImage";
@@ -39,7 +39,7 @@ const MainPage: React.FC = () => {
 				</div>
 			</div>
 
-			<div className="w-full flex justify-center z-10">
+			{/* <div className="w-full flex justify-center z-10">
 				<div className="w-full">
 					<div className="bg-red-600 text-white sm:bg-white sm:text-red-500  sm:border-b-2 sm:border-t-2 sm:bg-opacity-75 border-red-500 h-[50px] w-full flex justify-center items-center">
 						사진
@@ -50,7 +50,7 @@ const MainPage: React.FC = () => {
 						</div>
 					</section>
 				</div>
-			</div>
+			</div> */}
 		</div>
 	);
 };

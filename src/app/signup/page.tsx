@@ -3,11 +3,10 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRecoilState } from "recoil";
-import { nicknameState } from "@/states/nicknameState";
-import { passwordState } from "@/states/passwordState";
+import { signIn } from "next-auth/react";
+import clientAxiosService from "@/lib/client/http/axiosService";
 import EyeIcon from "@/icons/eyeicon";
-import AlertModal from "@/components/shared/alertModal";
+import AlertModal from "@/shared/ui/alertModal";
 
 interface ValidationState {
 	message: string;
@@ -17,7 +16,12 @@ interface ValidationState {
 const SignUp: React.FC = () => {
 	const router = useRouter();
 	const [message, setMessage] = useState<string>("");
-	const [nicknameChecked, setNicknameChecked] = useState(false);
+	const [email, setEmail] = useState<string>("");
+	const [emailChecked, setEmailChecked] = useState<boolean>(false);
+	const [emailMessage, setEmailMessage] = useState<ValidationState>({
+		message: "",
+		color: "red",
+	});
 	const [nicknameMessage, setNicknameMessage] = useState<ValidationState>({
 		message: "",
 		color: "red",
@@ -25,8 +29,8 @@ const SignUp: React.FC = () => {
 	const [showPassword, setShowPassword] = useState<boolean>(false);
 	const [showPasswordConfirm, setShowPasswordConfirm] =
 		useState<boolean>(false);
-	const [nickname, setNickname] = useRecoilState<string>(nicknameState);
-	const [password, setPassword] = useRecoilState<string>(passwordState);
+	const [nickname, setNickname] = useState<string>("");
+	const [password, setPassword] = useState<string>("");
 	const [passwordConfirm, setPasswordConfirm] = useState<string>("");
 	const [passwordValid, setPasswordValid] = useState<ValidationState>({
 		message: "",
@@ -41,19 +45,31 @@ const SignUp: React.FC = () => {
 	const [formValid, setFormValid] = useState(false);
 	const [showModal, setShowModal] = useState(false);
 	const [modalMessage, setModalMessage] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
 
 	const checkFormValid = useCallback(() => {
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		const nicknameValid =
+			nickname.trim().length >= 2 && nickname.trim().length <= 20;
 		return (
-			nickname.trim() !== "" &&
-			password.trim() !== "" &&
-			password === passwordConfirm &&
-			nicknameChecked
+			emailRegex.test(email) &&
+			emailChecked &&
+			nicknameValid &&
+			password.trim().length >= 8 &&
+			password === passwordConfirm
 		);
-	}, [nickname, password, passwordConfirm, nicknameChecked]);
+	}, [email, emailChecked, nickname, password, passwordConfirm]);
 
 	useEffect(() => {
 		setFormValid(checkFormValid());
-	}, [nickname, password, passwordConfirm, nicknameChecked, checkFormValid]);
+	}, [
+		email,
+		emailChecked,
+		nickname,
+		password,
+		passwordConfirm,
+		checkFormValid,
+	]);
 
 	const togglePasswordVisibility = () => {
 		setShowPassword(!showPassword);
@@ -63,78 +79,98 @@ const SignUp: React.FC = () => {
 		setShowPasswordConfirm(!showPasswordConfirm);
 	};
 
-	const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const { value } = event.target;
-		setNickname(value);
-		if (!value.trim()) {
-			setNicknameMessage({ message: "", color: "" });
-			setFormValid(false);
+	// 이메일 중복 확인 (실시간)
+	const checkEmailExists = async (emailValue: string) => {
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(emailValue)) {
+			setEmailChecked(false);
+			return;
+		}
+
+		try {
+			// Next.js API Route 사용
+			const response = await clientAxiosService.get(
+				`/api/auth/check-email?email=${encodeURIComponent(emailValue)}`
+			);
+
+			const data = response.data;
+
+			if (data.exists) {
+				setEmailMessage({
+					message: "이미 사용 중인 이메일입니다",
+					color: "red",
+				});
+				setEmailChecked(false);
+			} else {
+				setEmailMessage({ message: "사용 가능한 이메일입니다", color: "blue" });
+				setEmailChecked(true);
+			}
+		} catch (error) {
+			setEmailMessage({
+				message: "이메일 확인 중 오류가 발생했습니다",
+				color: "red",
+			});
+			setEmailChecked(false);
 		}
 	};
 
-	const nicknameHandler = () => {
-		// 닉네임 유효성 검사 추가
-		if (!nickname || !nickname.trim()) {
-			setNicknameMessage({
-				message: "닉네임을 입력해주세요",
+	const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const { value } = event.target;
+		setEmail(value);
+		setEmailChecked(false);
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+		if (!value.trim()) {
+			setEmailMessage({ message: "이메일을 입력해주세요", color: "red" });
+		} else if (!emailRegex.test(value)) {
+			setEmailMessage({
+				message: "올바른 이메일 형식이 아닙니다",
 				color: "red",
 			});
-			setNicknameChecked(false);
-			return; // 빈 닉네임일 경우 API 호출하지 않고 종료
+		} else {
+			// 이메일 형식이 맞으면 중복 확인
+			checkEmailExists(value);
 		}
-		const option = {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ nickname }),
-		};
-		fetch("/api/nicknamecheck", option)
-			.then((res) => res.json())
-			.then((data) => {
-				// 서버 응답 메시지를 명확한 상수로 정의
-				const NICKNAME_EXISTS = "이미 존재하는 닉네임입니다";
-				const NICKNAME_AVAILABLE = "가능한 닉네임입니다";
+		setFormValid(checkFormValid());
+	};
 
-				// 응답 메시지 정규화
-				const normalizedMsg = data.msg.trim();
-				const messageColor = normalizedMsg === NICKNAME_EXISTS ? "red" : "blue";
-				setNicknameMessage({ message: normalizedMsg, color: messageColor });
+	const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const { value } = event.target;
+		setNickname(value);
 
-				if (normalizedMsg === NICKNAME_AVAILABLE) {
-					setNicknameChecked(true);
-					setFormValid(checkFormValid());
-				} else {
-					setNicknameChecked(false);
-					setFormValid(false);
-				}
-			})
-			.catch((error) => {
-				setNicknameMessage({ message: "알 수 없는 에러입니다", color: "red" });
-				setNicknameChecked(false);
+		if (!value.trim()) {
+			setNicknameMessage({ message: "닉네임을 입력해주세요", color: "red" });
+		} else if (value.trim().length < 2) {
+			setNicknameMessage({
+				message: "닉네임은 2자 이상이어야 합니다",
+				color: "red",
 			});
+		} else if (value.trim().length > 20) {
+			setNicknameMessage({
+				message: "닉네임은 20자 이하여야 합니다",
+				color: "red",
+			});
+		} else {
+			setNicknameMessage({ message: "", color: "" });
+		}
+		setFormValid(checkFormValid());
 	};
 
 	const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = event.target;
-
 		setPassword(value);
 		setFormValid(checkFormValid());
+
 		if (!value.trim()) {
 			setPasswordValid({ message: "", color: "" });
 			setPasswordConfirmValid({ message: "", color: "" });
+		} else if (value.length < 8) {
+			setPasswordValid({
+				message: "비밀번호는 최소 8자 이상이어야 합니다",
+				color: "red",
+			});
 		} else {
-			const regex =
-				/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$^&*-]).{8,}$/;
-			setPasswordValid(
-				regex.test(value)
-					? { message: "올바른 형태입니다", color: "blue" }
-					: {
-							message:
-								"비밀번호는 8자 이상이며, 대문자, 소문자, 숫자와 특수문자를 포함해야 합니다.",
-							color: "black",
-					  }
-			);
+			setPasswordValid({ message: "올바른 형태입니다", color: "blue" });
 		}
 
 		if (passwordConfirm) {
@@ -152,6 +188,7 @@ const SignUp: React.FC = () => {
 		const { value } = event.target;
 		setPasswordConfirm(value);
 		setFormValid(checkFormValid());
+
 		if (!value.trim()) {
 			setPasswordConfirmValid({ message: "", color: "" });
 		} else {
@@ -163,46 +200,53 @@ const SignUp: React.FC = () => {
 		}
 	};
 
-	const handleNicknameBlur = () => {
-		if (!nickname.trim()) {
-			setModalMessage("닉네임을 입력해 주세요.");
-			setShowModal(true);
-		} else if (!nicknameChecked) {
-			setModalMessage("닉네임 중복확인을 해주시기 바랍니다.");
-			setShowModal(true);
-		}
-	};
-
 	const handleModalClose = () => {
 		setShowModal(false);
 	};
 
-	const signUpHandler = (e: React.FormEvent<HTMLFormElement>) => {
+	const signUpHandler = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		if (!formValid) return;
 
-		const options = {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ nickname, password, passwordConfirm }),
-		};
+		setIsLoading(true);
+		setMessage("");
 
-		fetch("/api/signup", options)
-			.then((res) => res.json())
-			.then((data) => {
-				setMessage(data.message);
-				router.push("/login");
-			})
-			.catch((error) => {
-				alert("회원가입 처리 중 오류가 발생했습니다");
-				setMessage("가입에 실패했습니다");
-				console.error("SignUp Error", error);
+		try {
+			// Next.js API Route 사용
+			const response = await clientAxiosService.post("/api/auth/signup", {
+				email,
+				password,
+				passwordConfirm,
+				nickname,
 			});
+
+			// 회원가입 성공 후 자동 로그인
+			const loginResult = await signIn("credentials", {
+				email,
+				password,
+				redirect: false,
+			});
+
+			if (loginResult?.ok) {
+				router.push("/home");
+			} else {
+				setMessage("회원가입은 완료되었습니다. 로그인 페이지로 이동합니다.");
+				setTimeout(() => {
+					router.push("/login");
+				}, 2000);
+			}
+		} catch (error: any) {
+			console.error("SignUp Error", error);
+			setMessage(
+				error.response?.data?.message || "회원가입 처리 중 오류가 발생했습니다"
+			);
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	return (
-		<div className="w-full h-screen flex flex-col justify-center items-center p-4">
+		<div className="relative w-full h-screen flex flex-col justify-center items-center p-4">
 			<div className="w-full max-w-[500px] h-[80px] bg-red-500 flex justify-center items-center rounded-tl-md rounded-tr-md text-white text-xl font-bold">
 				슈퍼소히
 			</div>
@@ -210,14 +254,46 @@ const SignUp: React.FC = () => {
 				onSubmit={signUpHandler}
 				className="w-full max-w-[500px] bg-red-200 flex flex-col justify-center items-center rounded-bl-md rounded-br-md  p-4"
 			>
-				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
-					<div className="w-full max-w-[400px] flex justify-center items-center mt-5 relative">
+				<div className="w-full h-auto flex flex-col justify-center items-center">
+					<div className="w-full max-w-[400px] flex justify-center items-center mt-5">
 						<input
-							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md"
+							className="pl-3 pr-20 w-full h-[40px] bg-white border border-gray-300 focus:outline-none focus:border-transparent rounded-md"
+							type="email"
+							name="email"
+							value={email}
+							onChange={handleEmailChange}
+							placeholder="이메일"
+							autoComplete="email"
+							style={{
+								fontFamily:
+									'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+								wordBreak: "keep-all",
+								WebkitTextSizeAdjust: "100%",
+								textSizeAdjust: "100%",
+							}}
+						/>
+					</div>
+					<div
+						className="w-full max-w-[400px] mt-2 text-xs"
+						style={{
+							color: emailMessage.color,
+							fontFamily:
+								'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+							wordBreak: "keep-all",
+							WebkitTextSizeAdjust: "100%",
+							textSizeAdjust: "100%",
+						}}
+					>
+						{emailMessage.message}
+					</div>
+				</div>
+				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
+					<div className="w-full max-w-[400px] flex justify-center items-center mt-5">
+						<input
+							className="pl-3 pr-20 w-full h-[40px] bg-white border border-gray-300 focus:outline-none focus:border-transparent rounded-md"
 							name="nickname"
 							value={nickname}
 							onChange={handleNicknameChange}
-							onBlur={handleNicknameBlur}
 							placeholder="닉네임"
 							style={{
 								fontFamily:
@@ -227,13 +303,6 @@ const SignUp: React.FC = () => {
 								textSizeAdjust: "100%",
 							}}
 						/>
-						<button
-							className="absolute right-0 top-0 h-full px-3 bg-red-500 text-white rounded-md font-[GmarketSansMedium]"
-							type="button"
-							onClick={nicknameHandler}
-						>
-							중복확인
-						</button>
 					</div>
 					<div
 						className="w-full max-w-[400px] mt-2 text-xs"
@@ -252,7 +321,7 @@ const SignUp: React.FC = () => {
 				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
 					<div className="relative w-full max-w-[400px] flex justify-center items-center mt-5">
 						<input
-							className="pl-3 pr-20 w-full focus:outline-none focus:border-transparent rounded-md"
+							className="pl-3 pr-20 w-full h-[40px] bg-white border border-gray-300 focus:outline-none focus:border-transparent rounded-md"
 							style={{
 								fontFamily:
 									'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
@@ -262,6 +331,7 @@ const SignUp: React.FC = () => {
 							}}
 							type={showPassword ? "text" : "password"}
 							name="password"
+							value={password}
 							onChange={handlePasswordChange}
 							placeholder="비밀번호"
 						/>
@@ -291,9 +361,10 @@ const SignUp: React.FC = () => {
 				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
 					<div className="relative w-full max-w-[400px] flex justify-center items-center mt-5">
 						<input
-							className="pl-3 pr-10 w-full focus:outline-none focus:border-transparent rounded-md"
+							className="pl-3 pr-10 w-full h-[40px] bg-white border border-gray-300 focus:outline-none focus:border-transparent rounded-md"
 							type={showPasswordConfirm ? "text" : "password"}
 							name="passwordConfirm"
+							value={passwordConfirm}
 							onChange={handlePasswordConfirmChange}
 							placeholder="비밀번호 확인"
 							style={{
@@ -327,14 +398,26 @@ const SignUp: React.FC = () => {
 						{passwordConfirmValid.message}
 					</div>
 				</div>
+				{message && (
+					<div
+						className="w-full max-w-[400px] mt-2 text-red-600 text-xs"
+						style={{
+							fontFamily:
+								'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+						}}
+					>
+						{message}
+					</div>
+				)}
 				<div className="w-full h-[50px] flex justify-center items-center mt-4">
 					<button
+						type="submit"
 						className={`w-full max-w-[250px] h-[40px] flex justify-center items-center rounded-md font-[GmarketSansMedium] ${
 							formValid ? "bg-red-500 text-white" : "bg-gray-300 text-gray-500"
 						}`}
-						disabled={!formValid}
+						disabled={!formValid || isLoading}
 					>
-						가입하기
+						{isLoading ? "처리 중..." : "가입하기"}
 					</button>
 				</div>
 				<div className="text-blue-500 hover:text-blue-700 cursor-pointer mt-4 text-xs font-[GmarketSansMedium]">

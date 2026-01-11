@@ -1,38 +1,34 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { pageState } from "@/states/pageState";
-import { photoPreviewState } from "@/states/photoPreviewState";
-import PhotoUpload from "@/components/shared/photoUpload";
-import useAuth from "@/hooks/useAuth";
-import AlertModal from "@/components/shared/alertModal";
+import PhotoUpload from "@/shared/ui/photoUpload";
+import useAuth from "@/features/auth/hooks/useAuth";
+import AlertModal from "@/shared/ui/alertModal";
 
 const GuestBookCreate: React.FC = () => {
 	const user = useAuth();
 	const router = useRouter();
 	const [write, setWrite] = useState("");
 	const [photo, setPhoto] = useState<string | null>(null);
-	const currentPage = useRecoilValue(pageState);
-	const setPage = useSetRecoilState(pageState);
-	const [photos, setPhotos] = useRecoilState(photoPreviewState);
+	const [photos, setPhotos] = useState<string[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [modalMessage, setModalMessage] = useState("");
+	const [currentPage, setPage] = useState<"default" | "photoAndText">(
+		"default"
+	);
 
 	useEffect(() => {
 		setWrite("");
 		setPhoto(null);
 		setPhotos([]);
-		setPage("default");
 		return () => {
 			// 컴포넌트 언마운트 시에도 초기화
 			setWrite("");
 			setPhoto(null);
 			setPhotos([]);
-			setPage("default");
 		};
-	}, [setPage, setPhotos]);
+	}, [setPhotos]);
 
 	const handlerOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setWrite(e.target.value);
@@ -52,7 +48,7 @@ const GuestBookCreate: React.FC = () => {
 		setIsLoading(true);
 
 		const formData = new FormData();
-		formData.append("name", user.nickname);
+		formData.append("name", user?.name || user?.email || "익명");
 		formData.append("message", write);
 		formData.append("date", new Date().toISOString());
 		if (currentPage === "photoAndText" && photo) {
@@ -63,7 +59,7 @@ const GuestBookCreate: React.FC = () => {
 		}
 
 		try {
-			const response = await fetch("/api/postguestbook", {
+			const response = await fetch("/api/guestbooks", {
 				method: "POST",
 				body: formData,
 			});

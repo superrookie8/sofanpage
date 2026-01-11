@@ -1,32 +1,26 @@
 "use client";
-import { DiaryEntry } from "@/data/diary";
+import { DiaryEntry } from "@/features/diary/types";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { where, weather, together, result } from "@/data/constants";
-import { fetchUserStats } from "@/api";
+import { where, weather, together, result } from "@/shared/constants";
+import { fetchUserStats } from "@/features/diary/api";
 import UserProfileModal from "@/components/mypage/userProfileModal";
-import AlertModal from "@/components/shared/alertModal";
+import AlertModal from "@/shared/ui/alertModal";
 import Slider from "react-slick";
 import ReactDOM from "react-dom";
+import clientAxiosService from "@/lib/client/http/axiosService";
+import { deleteDiary } from "@/features/diary/api";
 
 // Modal.setAppElement("#__next");
 
-// 사용자 정보를 가져오는 함수 (토큰 기반)
+// 사용자 정보를 가져오는 함수 (Next-Auth 기반)
 export const fetchUserInfo = async (): Promise<{
 	nickname: string;
 	description?: string;
 	photoUrl?: string;
 }> => {
-	const response = await fetch("/api/getuserinfo", {
-		headers: {
-			Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-		},
-	});
-	if (!response.ok) {
-		throw new Error("Failed to fetch user info");
-	}
-	const data = await response.json();
-	return data;
+	const response = await clientAxiosService.get("/api/users/me");
+	return response.data;
 };
 
 // 개인 일지를 가져오는 함수
@@ -35,27 +29,16 @@ export const fetchPersonalDiaries = async (filter: {
 	page: number;
 	pageSize: number;
 }): Promise<DiaryEntry[]> => {
-	const token = sessionStorage.getItem("token");
-
 	try {
-		const response = await fetch(
-			`/api/getuserdiaries?user=${filter.nickname}&page=${filter.page}&page_size=${filter.pageSize}`,
-			{
-				method: "GET",
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			}
-		);
-
-		if (!response.ok) {
-			throw new Error("Failed to fetch diary entries");
-		}
-
-		const data = await response.json();
+		// 내 일지 목록 조회는 /api/diary 사용 (백엔드에서 자동으로 본인 일지만 반환)
+		const response = await clientAxiosService.get(`/api/diary`);
+		const data = response.data;
 
 		if (Array.isArray(data)) {
-			return data;
+			// 닉네임 필터링 (필요한 경우)
+			return data.filter(
+				(diary: DiaryEntry) => diary.nickname === filter.nickname
+			);
 		} else {
 			return [];
 		}
@@ -70,21 +53,8 @@ export const fetchAllDiaries = async (
 	pageSize: number
 ): Promise<DiaryEntry[]> => {
 	try {
-		const response = await fetch(
-			`/api/getdiaries?page=${page}&page_size=${pageSize}`,
-			{
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-				},
-			}
-		);
-
-		if (!response.ok) {
-			throw new Error("Failed to fetch all diary entries");
-		}
-
-		const data = await response.json();
+		const response = await clientAxiosService.get(`/api/diary`);
+		const data = response.data;
 
 		if (Array.isArray(data)) {
 			return data;
@@ -96,18 +66,7 @@ export const fetchAllDiaries = async (
 	}
 };
 
-export const deleteDiaryEntry = async (entryId: string): Promise<void> => {
-	const response = await fetch(`/api/deletediary?entry_id=${entryId}`, {
-		method: "DELETE",
-		headers: {
-			Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-		},
-	});
-	if (!response.ok) {
-		const errorData = await response.json();
-		throw new Error(errorData.message);
-	}
-};
+// deleteDiary는 features/diary/api에서 import하여 사용
 
 const DiaryTabs: React.FC = () => {
 	const [activeTab, setActiveTab] = useState<"A" | "B">("A");
@@ -140,28 +99,12 @@ const DiaryTabs: React.FC = () => {
 	const [clickPosition, setClickPosition] = useState(0);
 
 	const handleProfileClick = async (nickname: string) => {
-		const token = sessionStorage.getItem("token");
-
-		if (!token) {
-			console.error("No token found");
-			return;
-		}
-
 		try {
-			const profileResponse = await fetch(
-				`/api/getuserinfo?nickname=${nickname}`,
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				}
+			const profileResponse = await clientAxiosService.get(
+				`/api/profile?nickname=${nickname}`
 			);
 
-			if (!profileResponse.ok) {
-				throw new Error("Failed to fetch profile info");
-			}
-
-			const profileData = await profileResponse.json();
+			const profileData = profileResponse.data;
 			const statsData = await fetchUserStats(nickname);
 
 			setSelectedProfile({
@@ -232,19 +175,29 @@ const DiaryTabs: React.FC = () => {
 	const confirmDelete = async () => {
 		if (diaryToDelete) {
 			try {
-				await deleteDiaryEntry(diaryToDelete);
+				await deleteDiary(diaryToDelete);
 				setPersonalDiaries(
-					personalDiaries.filter((diary) => diary._id !== diaryToDelete)
+					personalDiaries.filter(
+						(diary) => (diary.id || diary._id) !== diaryToDelete
+					)
 				);
 				setAllDiaries(
-					allDiaries.filter((diary) => diary._id !== diaryToDelete)
+					allDiaries.filter(
+						(diary) => (diary.id || diary._id) !== diaryToDelete
+					)
 				);
 				if (activeTab === "A") {
 					setDiaries(
-						personalDiaries.filter((diary) => diary._id !== diaryToDelete)
+						personalDiaries.filter(
+							(diary) => (diary.id || diary._id) !== diaryToDelete
+						)
 					);
 				} else if (activeTab === "B") {
-					setDiaries(allDiaries.filter((diary) => diary._id !== diaryToDelete));
+					setDiaries(
+						allDiaries.filter(
+							(diary) => (diary.id || diary._id) !== diaryToDelete
+						)
+					);
 				}
 				setAlertMessage("일지가 성공적으로 삭제되었습니다.");
 				setIsDeleteConfirm(false);
@@ -275,11 +228,15 @@ const DiaryTabs: React.FC = () => {
 	}
 
 	const handleImageClick = (diary: DiaryEntry, event: React.MouseEvent) => {
-		const images = [
-			diary.diary_photos?.ticket_photo,
-			diary.diary_photos?.view_photo,
-			diary.diary_photos?.additional_photo,
-		].filter((image): image is string => Boolean(image));
+		// 백엔드 새 형식 (photoUrls) 또는 기존 형식 (diary_photos) 지원
+		const images =
+			diary.photoUrls && diary.photoUrls.length > 0
+				? diary.photoUrls
+				: [
+						diary.diary_photos?.ticket_photo,
+						diary.diary_photos?.view_photo,
+						diary.diary_photos?.additional_photo,
+				  ].filter((image): image is string => Boolean(image));
 		setCurrentImages(images);
 		setIsImageModalOpen(true);
 	};
@@ -328,7 +285,11 @@ const DiaryTabs: React.FC = () => {
 									>
 										<div className="flex items-center justify-center w-full h-full">
 											<Image
-												src={`data:image/jpeg;base64,${image}`}
+												src={
+													image.startsWith("http")
+														? image
+														: `data:image/jpeg;base64,${image}`
+												}
 												alt={`diary photo ${index + 1}`}
 												width={1000}
 												height={1000}
@@ -400,100 +361,140 @@ const DiaryTabs: React.FC = () => {
 			<div className="h-auto lg:h-[500px] xl:h-[500px] lg:overflow-y-auto xl:overflow-y-auto  2xl:overflow-y-auto">
 				<div className="mt-4">
 					{activeTab === "A" && Array.isArray(diaries) && diaries.length > 0 ? (
-						diaries.map((diary) => (
-							<div
-								key={diary._id}
-								className="w-full text-xs mb-4 p-4 border-2 border-red-500 rounded-lg bg-white"
-							>
-								<div className="grid grid-cols-3 gap-4 p-2 w-full">
-									<div className="flex justify-between items-center sm:flex-col sm:justify-center sm:items-start">
-										<span className="flex justify-end w-1/3 min-w-[70px] sm:w-full sm:justify-start">
-											관람일자:
-										</span>
-										<span className="text-right flex justify-center w-2/3">
-											{new Date(diary.date).toLocaleDateString()}
-										</span>
-									</div>
-									<div className="flex w-full items-center sm:flex-col sm:justify-center sm:items-start">
-										<span className="flex justify-end w-1/3">날씨:</span>
-										<span className="text-right flex justify-center w-2/3 sm:w-full">
-											{weather[diary.weather as keyof typeof weather]}
-										</span>
-									</div>
-									<div className="flex justify-between items-center sm:flex-col sm:justify-center sm:items-start">
-										<span>장소:</span>
-										<span className="text-right flex justify-center w-2/3 sm:w-full">
-											{where[diary.location as keyof typeof where] ||
-												"알 수 없는 장소"}
-										</span>
-									</div>
-									<div className="flex justify-between items-center sm:flex-col sm:justify-center sm:items-start">
-										<span className="flex justify-end w-1/3 min-w-[70px]">
-											함께 본 사람:
-										</span>
-										<span className="text-right flex justify-center w-2/3 sm:w-full">
-											{together[diary.together as keyof typeof together]}
-										</span>
-									</div>
-									<div className="flex justify-between items-center sm:flex-col sm:justify-center sm:items-start">
-										<span className="flex justify-end w-1/3">결과:</span>
-										<span className="text-right flex justify-center w-2/3 sm:w-full">
-											{result[diary.win_status as keyof typeof result]}
-										</span>
-									</div>
-									<div className="flex justify-between items-center sm:flex-col sm:justify-center sm:items-start">
-										<span>좌석:</span>
-										<span className="text-right flex justify-center w-2/3 sm:w-full">
-											{`${diary.seat_info.section}/${diary.seat_info.row}/${diary.seat_info.number}`}
-										</span>
-									</div>
-								</div>
-								<div className="flex flex-row justify-between items-center">
-									<div className="mt-2 w-full bg-red-200 flex flex-row items-center p-2 rounded-md relative">
-										<div className="w-[100px] h-[70px] bg-gray-300 flex items-center justify-center rounded-lg">
-											<Image
-												src={`data:image/jpeg;base64,${diary.diary_photos?.ticket_photo}`}
-												alt="diary ticket photo"
-												width={70}
-												height={50}
-												style={{
-													objectFit: "cover",
-													width: "auto",
-													height: "70px",
-												}}
-												className="object-cover"
-												onClick={(event) => handleImageClick(diary, event)}
-											/>
+						diaries.map((diary) => {
+							const diaryId = diary.id || diary._id || "";
+							const diaryDate = diary.date || diary.createdAt || "";
+							const diaryWeather = diary.weather || "";
+							const diaryLocation =
+								diary.location ||
+								(diary.watchType === "DIRECT" ? "DIRECT" : "HOUSE");
+							const diaryTogether = diary.together || "";
+							const diaryWinStatus = diary.win_status || diary.gameWinner || "";
+							const seatSection = diary.seat_info?.section || "";
+							const seatRow = diary.seatRow || diary.seat_info?.row || "";
+							const seatNumber =
+								diary.seatNumber || diary.seat_info?.number || "";
+							const diaryContent = diary.content || diary.diary_message || "";
+
+							// 백엔드 API 응답: photoUrls는 이미 서명된 URL 배열
+							const photoSrc =
+								diary.photoUrls && diary.photoUrls.length > 0
+									? diary.photoUrls[0]
+									: "";
+
+							return (
+								<div
+									key={diaryId}
+									className="w-full text-xs mb-4 p-4 border-2 border-red-500 rounded-lg bg-white"
+								>
+									<div className="grid grid-cols-3 gap-4 p-2 w-full">
+										<div className="flex justify-between items-center sm:flex-col sm:justify-center sm:items-start">
+											<span className="flex justify-end w-1/3 min-w-[70px] sm:w-full sm:justify-start">
+												관람일자:
+											</span>
+											<span className="text-right flex justify-center w-2/3">
+												{diaryDate
+													? new Date(diaryDate).toLocaleDateString()
+													: "-"}
+											</span>
 										</div>
-										<div className="flex flex-1 justify-between items-center">
-											<div className="pl-4 pr-4 flex-1 sm:h-[70px] sm:overflow-y-auto">
-												{diary.diary_message}
-											</div>
-											<button
-												onClick={() => handleDeleteEntry(diary._id)}
-												className="bg-gray-400 rounded-lg w-10 h-10 hover:bg-red-500 flex justify-center items-center transition-colors duration-200 shrink-0"
-												title="삭제"
-											>
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													className="w-5 h-5 text-white"
-													viewBox="0 0 24 24"
-													fill="none"
-													stroke="currentColor"
-													strokeWidth="2"
-													strokeLinecap="round"
-													strokeLinejoin="round"
+										<div className="flex w-full items-center sm:flex-col sm:justify-center sm:items-start">
+											<span className="flex justify-end w-1/3">날씨:</span>
+											<span className="text-right flex justify-center w-2/3 sm:w-full">
+												{diaryWeather
+													? weather[diaryWeather as keyof typeof weather]
+													: "-"}
+											</span>
+										</div>
+										<div className="flex justify-between items-center sm:flex-col sm:justify-center sm:items-start">
+											<span>장소:</span>
+											<span className="text-right flex justify-center w-2/3 sm:w-full">
+												{diaryLocation
+													? where[diaryLocation as keyof typeof where] ||
+													  diaryLocation
+													: "-"}
+											</span>
+										</div>
+										<div className="flex justify-between items-center sm:flex-col sm:justify-center sm:items-start">
+											<span className="flex justify-end w-1/3 min-w-[70px]">
+												함께 본 사람:
+											</span>
+											<span className="text-right flex justify-center w-2/3 sm:w-full">
+												{diaryTogether
+													? together[diaryTogether as keyof typeof together] ||
+													  diaryTogether
+													: "-"}
+											</span>
+										</div>
+										<div className="flex justify-between items-center sm:flex-col sm:justify-center sm:items-start">
+											<span className="flex justify-end w-1/3">결과:</span>
+											<span className="text-right flex justify-center w-2/3 sm:w-full">
+												{diaryWinStatus
+													? result[diaryWinStatus as keyof typeof result] ||
+													  diaryWinStatus
+													: "-"}
+											</span>
+										</div>
+										<div className="flex justify-between items-center sm:flex-col sm:justify-center sm:items-start">
+											<span>좌석:</span>
+											<span className="text-right flex justify-center w-2/3 sm:w-full">
+												{seatSection && seatRow && seatNumber
+													? `${seatSection}/${seatRow}/${seatNumber}`
+													: seatRow && seatNumber
+													? `${seatRow}/${seatNumber}`
+													: "-"}
+											</span>
+										</div>
+									</div>
+									<div className="flex flex-row justify-between items-center">
+										<div className="mt-2 w-full bg-red-200 flex flex-row items-center p-2 rounded-md relative">
+											{photoSrc && (
+												<div className="w-[100px] h-[70px] bg-gray-300 flex items-center justify-center rounded-lg">
+													<Image
+														src={photoSrc}
+														alt="diary ticket photo"
+														width={70}
+														height={50}
+														style={{
+															objectFit: "cover",
+															width: "auto",
+															height: "70px",
+														}}
+														className="object-cover cursor-pointer"
+														onClick={(event) => handleImageClick(diary, event)}
+													/>
+												</div>
+											)}
+											<div className="flex flex-1 justify-between items-center">
+												<div className="pl-4 pr-4 flex-1 sm:h-[70px] sm:overflow-y-auto">
+													{diaryContent}
+												</div>
+												<button
+													onClick={() => handleDeleteEntry(diaryId)}
+													className="bg-gray-400 rounded-lg w-10 h-10 hover:bg-red-500 flex justify-center items-center transition-colors duration-200 shrink-0"
+													title="삭제"
 												>
-													<path d="M3 6h18" />
-													<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-													<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-												</svg>
-											</button>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														className="w-5 h-5 text-white"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="2"
+														strokeLinecap="round"
+														strokeLinejoin="round"
+													>
+														<path d="M3 6h18" />
+														<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+														<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+													</svg>
+												</button>
+											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-						))
+							);
+						})
 					) : activeTab === "A" ? (
 						<div>일지가 없습니다</div>
 					) : null}
@@ -501,45 +502,79 @@ const DiaryTabs: React.FC = () => {
 					{activeTab === "B" && (
 						<div className="w-full sm:flex-col sm:flex sm:justify-center sm:items-center grid grid-cols-3 sm:grid-cols-1 md:grid-row-3 gap-4">
 							{diaries && diaries.length > 0 ? (
-								diaries.map((diary) => (
-									<div
-										key={diary._id}
-										className="flex flex-col justify-center items-center w-[200px] h-[300px] bg-gray-200 rounded-lg shadow-md"
-									>
-										<div className="w-full h-3/5 bg-white rounded-t-lg flex justify-center items-center">
-											<Image
-												src={`data:image/jpeg;base64,${diary.diary_photos?.ticket_photo}`}
-												alt="diary entry"
-												width={100}
-												height={100}
-												style={{ objectFit: "cover", cursor: "pointer" }}
-												className="object-cover rounded-t-lg"
-												onClick={(event) => handleImageClick(diary, event)}
-											/>
-										</div>
-										<div className="flex flex-col w-full h-2/5 p-2 text-sm justify-center pl-8">
-											<div>
-												<span>아이디: </span>
-												<span
-													onClick={() => handleProfileClick(diary.name)}
-													className="cursor-pointer text-blue-500 hover:underline"
-												>
-													{diary.name}
+								diaries.map((diary) => {
+									const diaryId = diary.id || diary._id || "";
+									const diaryDate = diary.date || diary.createdAt || "";
+									const diaryWeather = diary.weather || "";
+									const seatSection = diary.seat_info?.section || "";
+									const seatRow = diary.seatRow || diary.seat_info?.row || "";
+									const seatNumber =
+										diary.seatNumber || diary.seat_info?.number || "";
+									const diaryName = diary.name || diary.nickname || "";
+									const firstPhoto =
+										diary.photoUrls && diary.photoUrls.length > 0
+											? diary.photoUrls[0]
+											: diary.diary_photos?.ticket_photo;
+									const photoSrc = firstPhoto
+										? firstPhoto.startsWith("http")
+											? firstPhoto
+											: `data:image/jpeg;base64,${firstPhoto}`
+										: "";
+
+									return (
+										<div
+											key={diaryId}
+											className="flex flex-col justify-center items-center w-[200px] h-[300px] bg-gray-200 rounded-lg shadow-md"
+										>
+											{photoSrc && (
+												<div className="w-full h-3/5 bg-white rounded-t-lg flex justify-center items-center">
+													<Image
+														src={photoSrc}
+														alt="diary entry"
+														width={100}
+														height={100}
+														style={{ objectFit: "cover", cursor: "pointer" }}
+														className="object-cover rounded-t-lg"
+														onClick={(event) => handleImageClick(diary, event)}
+													/>
+												</div>
+											)}
+											<div className="flex flex-col w-full h-2/5 p-2 text-sm justify-center pl-8">
+												{diaryName && (
+													<div>
+														<span>아이디: </span>
+														<span
+															onClick={() => handleProfileClick(diaryName)}
+															className="cursor-pointer text-blue-500 hover:underline"
+														>
+															{diaryName}
+														</span>
+													</div>
+												)}
+												<span>
+													관람일자:{" "}
+													{diaryDate
+														? new Date(diaryDate).toLocaleDateString()
+														: "-"}
+												</span>
+												<span>
+													날씨:{" "}
+													{diaryWeather
+														? weather[diaryWeather as keyof typeof weather]
+														: "-"}
+												</span>
+												<span>
+													좌석:{" "}
+													{seatSection && seatRow && seatNumber
+														? `${seatSection}/${seatRow}/${seatNumber}`
+														: seatRow && seatNumber
+														? `${seatRow}/${seatNumber}`
+														: "-"}
 												</span>
 											</div>
-											<span>
-												관람일자: {new Date(diary.date).toLocaleDateString()}
-											</span>
-											<span>
-												날씨: {weather[diary.weather as keyof typeof weather]}
-											</span>
-											<span>
-												좌석:
-												{`${diary.seat_info.section}/${diary.seat_info.row}/${diary.seat_info.number}`}
-											</span>
 										</div>
-									</div>
-								))
+									);
+								})
 							) : (
 								<div>일지를 불러오는 중입니다...</div>
 							)}

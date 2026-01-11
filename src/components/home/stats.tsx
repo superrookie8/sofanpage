@@ -2,6 +2,44 @@
 
 import React, { useState, useEffect } from "react";
 
+// 백엔드 PlayerStat 응답 형식
+interface PlayerStat {
+	id: string;
+	playerId: string;
+	season: string;
+	team: string;
+	gamesPlayed: number;
+	minutesPerGame: string;
+	twoPointPercent: number;
+	threePointPercent: number;
+	freeThrowPercent: number;
+	offensiveRebounds: number;
+	defensiveRebounds: number;
+	totalRebounds: number;
+	ppg: number;
+	apg: number;
+	spg: number;
+	bpg: number;
+	turnovers: number;
+	fouls: number;
+	totalMinutes: string;
+	twoPointMade: number;
+	twoPointAttempted: number;
+	threePointMade: number;
+	threePointAttempted: number;
+	freeThrowMade: number;
+	freeThrowAttempted: number;
+	totalOffensiveRebounds: number;
+	totalDefensiveRebounds: number;
+	totalTotalRebounds: number;
+	totalAssists: number;
+	totalSteals: number;
+	totalBlocks: number;
+	totalTurnovers: number;
+	totalFouls: number;
+	totalPoints: number;
+}
+
 interface AverageStats {
 	G: number;
 	MPG: string;
@@ -50,7 +88,7 @@ const Stats: React.FC = () => {
 	useEffect(() => {
 		const fetchStats = async () => {
 			try {
-				const response = await fetch("/api/getstats", {
+				const response = await fetch("/api/stats", {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
@@ -63,9 +101,48 @@ const Stats: React.FC = () => {
 					throw new Error(errorData.message || "Failed to load stats.");
 				}
 
-				const data: StatsData[] = await response.json();
-				console.log("Fetched data:", data); // 데이터 확인을 위한 로그
-				setStats(data);
+				const backendData: PlayerStat[] = await response.json();
+				console.log("Fetched data:", backendData);
+
+				// 백엔드 응답을 StatsData 형식으로 변환
+				const convertedData: StatsData[] = backendData.map((stat) => ({
+					season: stat.season,
+					average: {
+						G: stat.gamesPlayed,
+						MPG: stat.minutesPerGame,
+						"2P%": stat.twoPointPercent,
+						"3P%": stat.threePointPercent,
+						FT: stat.freeThrowPercent,
+						OFF: stat.offensiveRebounds,
+						DEF: stat.defensiveRebounds,
+						TOT: stat.totalRebounds,
+						APG: stat.apg,
+						SPG: stat.spg,
+						BPG: stat.bpg,
+						TO: stat.turnovers,
+						PF: stat.fouls,
+						PPG: stat.ppg,
+					},
+					total: {
+						MIN: stat.totalMinutes,
+						"FGM-A": `${stat.twoPointMade + stat.threePointMade}-${
+							stat.twoPointAttempted + stat.threePointAttempted
+						}`,
+						"3PM-A": `${stat.threePointMade}-${stat.threePointAttempted}`,
+						"FTM-A": `${stat.freeThrowMade}-${stat.freeThrowAttempted}`,
+						OFF: stat.totalOffensiveRebounds,
+						DEF: stat.totalDefensiveRebounds,
+						TOT: stat.totalTotalRebounds,
+						AST: stat.totalAssists,
+						STL: stat.totalSteals,
+						BLK: stat.totalBlocks,
+						TO: stat.totalTurnovers,
+						PF: stat.totalFouls,
+						PTS: stat.totalPoints,
+					},
+				}));
+
+				setStats(convertedData);
 			} catch (error: any) {
 				console.error("Error fetching stats:", error);
 				setError("An error occurred while fetching the stats.");
@@ -89,13 +166,13 @@ const Stats: React.FC = () => {
 		<table className="min-w-full ">
 			<thead>
 				<tr>
-					<th className="py-2 px-4 border-b-2 border-red-200 bg-red-600 text-left text-[10px] lg:text-xs font-semibold text-white uppercase tracking-wider">
+					<th className="py-2 px-4 border-b-2 border-red-200 bg-red-600 text-center text-[10px] lg:text-xs font-semibold text-white uppercase tracking-wider">
 						Season
 					</th>
 					{keys.map((key) => (
 						<th
 							key={String(key)}
-							className="py-2 px-4 border-b-2 border-red-200 bg-red-600 text-left text-[10px] lg:text-xs font-semibold text-white uppercase tracking-wider"
+							className="py-2 px-4 border-b-2 border-red-200 bg-red-600 text-center text-[10px] lg:text-xs font-semibold text-white uppercase tracking-wider"
 						>
 							{String(key).replace(/^(Average|Total)/, "")}
 						</th>
@@ -105,13 +182,13 @@ const Stats: React.FC = () => {
 			<tbody>
 				{data.map((stat) => (
 					<tr key={stat.season}>
-						<td className="py-1 px-1  border-b border-red-200 text-gray-500 text-[10px] lg:text-sm">
+						<td className="py-1 px-1 border-b border-red-200 text-gray-500 text-[10px] lg:text-sm text-center">
 							{stat.season}
 						</td>
 						{keys.map((key) => (
 							<td
 								key={String(key)}
-								className="py-1 px-1 border-b border-red-200 text-gray-500 text-[10px] lg:text-sm"
+								className="py-1 px-1 border-b border-red-200 text-gray-500 text-[10px] lg:text-sm text-center"
 							>
 								{(stat[type] as any)[key]}
 							</td>

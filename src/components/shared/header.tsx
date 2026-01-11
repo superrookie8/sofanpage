@@ -3,23 +3,22 @@
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
-import { useRecoilState } from "recoil";
-import { loginState } from "@/states/loginState"; // Import the login state
+import { useSession, signOut } from "next-auth/react";
 
 const Header: React.FC = () => {
 	const pathname = usePathname();
 	const router = useRouter();
+	const { data: session } = useSession();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
-	const [isLoggedIn, setIsLoggedIn] = useRecoilState(loginState); // Use the login state
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
 	// 메뉴 참조를 위한 ref 추가
 	const menuRef = useRef<HTMLDivElement>(null);
 	const buttonRef = useRef<HTMLButtonElement>(null);
-
-	useEffect(() => {
-		const token = sessionStorage.getItem("token");
-		setIsLoggedIn(!!token);
-	}, [setIsLoggedIn]);
 
 	// 외부 클릭 감지를 위한 useEffect 추가
 	useEffect(() => {
@@ -59,18 +58,18 @@ const Header: React.FC = () => {
 			: "w-full flex justify-center items-center";
 	};
 
-	const handleLogout = () => {
-		sessionStorage.removeItem("token");
-		setIsLoggedIn(false);
-		router.push("/home");
+	const handleLogout = async () => {
+		await signOut({ redirect: true, callbackUrl: "/home" });
 	};
 
 	const toggleMenu = () => {
 		setIsMenuOpen(!isMenuOpen);
 	};
 
+	// 로그인 상태는 session으로 확인
+	const isLoggedIn = !!session;
+
 	return (
-		// <header className="w-full bg-white text-red-500 p-4 z-50 relative">
 		<header className="w-full text-white bg-red-500 sm:bg-white p-4 z-50 relative">
 			<div className="w-[100%] static ml-auto ">
 				<nav className="container mx-auto flex  items-center justify-end">
@@ -89,9 +88,6 @@ const Header: React.FC = () => {
 						</Link>
 						<Link href="/schedule" className={linkStyle("/schedule")}>
 							경기스케줄
-						</Link>
-						<Link href="/guestbooks/read" className={linkStyle("/guestbooks/")}>
-							방명록
 						</Link>
 
 						{!isLoggedIn && (
@@ -140,7 +136,6 @@ const Header: React.FC = () => {
 				</nav>
 			</div>
 			{isMenuOpen && (
-				// <div className="flex text-red-500 ml-[25%] mt-1 rounded bg-white absolute left-0 w-[60%] md:hidden lg:hidden  shadow-lg z-40">
 				<div
 					ref={menuRef}
 					className="absolute w-full text-red-500 right-0 mt-1 rounded bg-white  lg:hidden shadow-lg z-40"
@@ -190,15 +185,6 @@ const Header: React.FC = () => {
 							onClick={toggleMenu}
 						>
 							경기스케줄
-						</Link>
-						<Link
-							href="/guestbooks/read"
-							className={`${mobileLinkStyle(
-								"/guestbooks/"
-							)} hover:bg-red-200 active:bg-red-600`}
-							onClick={toggleMenu}
-						>
-							방명록
 						</Link>
 
 						{!isLoggedIn && (

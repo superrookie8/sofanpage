@@ -1,30 +1,22 @@
 "use client";
 
-import useAuth from "@/hooks/useAuth";
+import useAuth from "@/features/auth/hooks/useAuth";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { GuestBookEntry } from "@/data/guestbook";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useRecoilValue } from "recoil";
-import { loginState } from "@/states/loginState";
 import { useLoading } from "@/context/LoadingContext";
-import LoadingSpinner from "@/components/shared/loadingSpinner";
+import LoadingSpinner from "@/shared/ui/loadingSpinner";
+import { useSession } from "next-auth/react";
+import clientAxiosService from "@/lib/client/http/axiosService";
 
 const fetchGuestbookEntries = async (): Promise<{
 	photo_entries: GuestBookEntry[];
 	no_photo_entries: GuestBookEntry[];
 }> => {
-	const response = await fetch(`/api/getguestbooks`, {
-		headers: {
-			Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-		},
-	});
-	if (!response.ok) {
-		throw new Error("Network response was not ok");
-	}
-	const data = await response.json();
-	return data;
+	const response = await clientAxiosService.get(`/api/guestbooks`);
+	return response.data;
 };
 
 const formatDate = (dateString: string): string => {
@@ -42,8 +34,9 @@ const GuestBookList: React.FC = () => {
 	const [noPhotoPage, setNoPhotoPage] = useState(1);
 	const pageSize = 10;
 	const router = useRouter();
-	const isLoggedIn = useRecoilValue(loginState);
+	const { data: session } = useSession();
 	const { setIsLoading } = useLoading();
+	const isLoggedIn = !!session;
 
 	useEffect(() => {
 		setIsLoading(true);

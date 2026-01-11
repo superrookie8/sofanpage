@@ -1,11 +1,12 @@
-// recoilRootProvider.tsx
 "use client";
 
 import { RecoilRoot } from "recoil";
+import { ReactNode } from "react";
+
 export default function RecoilRootProvider({
 	children,
 }: {
-	children: React.ReactNode;
+	children: ReactNode;
 }) {
 	return <RecoilRoot>{children}</RecoilRoot>;
 }

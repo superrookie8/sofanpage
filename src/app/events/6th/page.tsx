@@ -1,14 +1,14 @@
 "use client";
 import { useState } from "react";
 import styled from "styled-components";
-import Header from "@/components/events/6thcomp/Header";
+import Header from "@/features/events/components/6thcomp/Header";
 import Image from "next/image";
-import Youtube from "@/components/events/6thcomp/Youtube";
-import YoutubeTwo from "@/components/events/6thcomp/YoutubeTwo";
-import YoutubeTitle from "@/components/events/6thcomp/YoutubeTitle";
-import YoutubeZero from "@/components/events/6thcomp/YoutubeZero";
-import Event from "@/components/events/6thcomp/Event";
-import LinkPage from "@/components/events/6thcomp/Link";
+import Youtube from "@/features/events/components/6thcomp/Youtube";
+import YoutubeTwo from "@/features/events/components/6thcomp/YoutubeTwo";
+import YoutubeTitle from "@/features/events/components/6thcomp/YoutubeTitle";
+import YoutubeZero from "@/features/events/components/6thcomp/YoutubeZero";
+import Event from "@/features/events/components/6thcomp/Event";
+import LinkPage from "@/features/events/components/6thcomp/Link";
 
 export default function Home() {
 	const [isOldVideoOpen, setIsOldVideoOpen] = useState(false);

@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
-import { useRecoilValue } from "recoil";
-import { selectedLocationState } from "@/states/locationState";
+import { GameLocation } from "@/data/schedule";
 
 declare global {
 	interface Window {
@@ -8,8 +7,11 @@ declare global {
 	}
 }
 
-const Map = () => {
-	const selectedLocation = useRecoilValue(selectedLocationState);
+interface MapProps {
+	selectedLocation: GameLocation | null;
+}
+
+const Map: React.FC<MapProps> = ({ selectedLocation }) => {
 
 	useEffect(() => {
 		const loadScript = () => {

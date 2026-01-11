@@ -20,7 +20,7 @@
     "plugins": [
       {
         "name": "next"
-      } 
+      }
     ],
     "paths": {
       "@/*": [
@@ -33,9 +33,12 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/components/arcade/brickbreakergame.js"
+    "src/components/arcade/brickbreakergame.js",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
-  ],
+    "node_modules",
+    "src/states/**/*",
+    "src/utils/recoilRootProvider.tsx"
+  ]
 }

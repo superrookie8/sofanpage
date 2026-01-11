@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Main from "@/components/events/5thcomp/Main";
+import Main from "@/features/events/components/5thcomp/Main";
 
 function App() {
 	return (

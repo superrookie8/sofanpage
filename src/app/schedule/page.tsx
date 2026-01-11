@@ -1,39 +1,57 @@
-// src/components/Schedule.tsx
+// src/app/schedule/page.tsx
 "use client";
 import { useEffect } from "react";
-import Calendar from "@/components/schedule/calender";
-import { locations } from "@/data/schedule";
-import Map from "@/components/schedule/kakaoMap";
-import { useSetRecoilState } from "recoil";
-import { selectedLocationState } from "@/states/locationState";
-import DirectionsGuide from "@/components/schedule/directionsGuide";
+import Calendar from "@/features/games/components/calender";
+import { locations } from "@/features/games/constants";
+import Map from "@/features/games/components/kakaoMap";
+import { useState } from "react";
+import { GameLocation } from "@/features/games/types";
+import DirectionsGuide from "@/features/games/components/directionsGuide";
+import GameInfoModal from "@/features/games/components/gameInfoModal";
 
 const Schedule: React.FC = () => {
-	const setSelectedLocation = useSetRecoilState(selectedLocationState);
+	const [selectedLocation, setSelectedLocation] = useState<GameLocation>(
+		locations["부산 사직실내체육관"]
+	);
+
+	const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(
+		null
+	);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	useEffect(() => {
 		const location = locations["부산 사직실내체육관"];
 		setSelectedLocation(location);
-	}, [setSelectedLocation]);
+	}, []);
+
+	const handleGameClick = (scheduleId: string) => {
+		setSelectedScheduleId(scheduleId);
+		setIsModalOpen(true);
+	};
+
+	const handleCloseModal = () => {
+		setIsModalOpen(false);
+		setSelectedScheduleId(null);
+	};
 
 	return (
-		<div className="flex overflow-x-hidden justify-center items-center min-h-screen w-full">
-			<div className="flex flex-col justify-center p-4 w-full max-w-screen-lg">
-				<div className="flex flex-col  lg:flex-row  md:space-x-4 lg:space-x-4">
-					<div className="bg-white w-full  lg:w-1/2 mb-4  lg:mb-0 rounded-lg shadow-lg">
-						<Calendar />
-					</div>
-
-					<div className="bg-white relative w-full  lg:w-1/2  md:h-auto lg:h-auto p-4 rounded-lg shadow-lg">
-						<div className="lg:h-[400px] md: h-[400px] sm: h-[200px]">
-							<Map />
-						</div>
-						<div className="mt-4 p-4 h-[250px] sm:h-auto border border-red-500 rounded">
-							<DirectionsGuide />
-						</div>
+		<div className="relative flex justify-center items-start min-h-screen w-full">
+			<div className="flex flex-row justify-center items-start p-4 mt-4 w-full h-screen max-w-screen-lg">
+				<div className="flex flex-col">
+					<div className="bg-gray-100 bg-opacity-80 w-full">
+						<Calendar
+							onLocationSelect={setSelectedLocation}
+							onGameClick={handleGameClick}
+						/>
 					</div>
 				</div>
 			</div>
+
+			<GameInfoModal
+				scheduleId={selectedScheduleId}
+				isOpen={isModalOpen}
+				onClose={handleCloseModal}
+			/>
 		</div>
 	);
 };

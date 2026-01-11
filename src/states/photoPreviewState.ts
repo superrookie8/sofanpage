@@ -1,5 +1,3 @@
-import { atom } from "recoil";
-
 export interface PhotoData {
 	id: string;
 	preview: string;
@@ -8,7 +6,8 @@ export interface PhotoData {
 	uploadTime: string;
 }
 
-export const photoPreviewState = atom<PhotoData[]>({
-	key: "photoPreviewState",
-	default: [], // 기본값을 빈 배열로 설정
-});
+// Recoil atom은 더 이상 사용하지 않음
+// export const photoPreviewState = atom<PhotoData[]>({
+// 	key: "photoPreviewState",
+// 	default: [],
+// });
