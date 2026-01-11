@@ -37,10 +37,23 @@ const DiaryRead: React.FC<Props> = (props) => {
 	}
 	return (
 		<>
-			<div className="w-full h-[500px]">
-				<div className="w-full p-8 h-[500px] bg-black bg-opacity-75 grid justify-center gap-8 items-center overflow-y-auto">
-					{diaries && diaries.length > 0 ? (
-						<div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full">
+			<div className="w-full min-h-screen">
+				<div className="w-full p-8 bg-black bg-opacity-75">
+					{/* 헤더 및 작성하기 버튼 */}
+					<div className="flex justify-between items-center mb-6">
+						<h1 className="text-2xl font-bold text-white">직관일지</h1>
+						<button
+							onClick={() => router.push("/diary/create")}
+							className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+						>
+							작성하기
+						</button>
+					</div>
+
+					{/* 일지 목록 */}
+					<div className="grid justify-center gap-8 items-start overflow-y-auto">
+						{diaries && diaries.length > 0 ? (
+							<div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full">
 							{diaries.map((diary) => {
 								const diaryId = diary.id || diary._id || "";
 								const diaryDate = diary.date || diary.createdAt || "";
@@ -60,7 +73,8 @@ const DiaryRead: React.FC<Props> = (props) => {
 								return (
 									<div
 										key={diaryId}
-										className="w-[200px] h-[270px] bg-white rounded"
+										onClick={() => router.push(`/diary/${diaryId}`)}
+										className="w-[200px] h-[270px] bg-white rounded cursor-pointer hover:shadow-lg transition-shadow"
 									>
 										{photoSrc && (
 											<div className="w-full h-3/5 flex justify-center pt-4">
@@ -102,12 +116,25 @@ const DiaryRead: React.FC<Props> = (props) => {
 								);
 							})}
 						</div>
-					) : (
-						<p>일지가 없습니다.</p>
-					)}
-					{isLoading && <LoadingSpinner />}
-					{error && <div>일지를 불러오는 중 오류가 발생했습니다.</div>}
-				</div>
+							) : (
+								<div className="text-center text-white py-12">
+									<p className="text-lg mb-4">일지가 없습니다.</p>
+									<button
+										onClick={() => router.push("/diary/create")}
+										className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+									>
+										첫 일지 작성하기
+									</button>
+								</div>
+							)}
+							{isLoading && <LoadingSpinner />}
+							{error && (
+								<div className="text-white">
+									일지를 불러오는 중 오류가 발생했습니다.
+								</div>
+							)}
+						</div>
+					</div>
 				<AlertModal
 					isOpen={modalOpen}
 					onClose={closeModal}

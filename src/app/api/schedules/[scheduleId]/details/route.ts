@@ -23,7 +23,7 @@ export async function GET(
 		const token = session?.accessToken;
 
 		const backendUrl = `${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/schedules/${scheduleId}/details`;
-		
+
 		const headers: HeadersInit = {
 			"Content-Type": "application/json",
 		};
@@ -47,7 +47,12 @@ export async function GET(
 			} catch {
 				errorMessage = `Backend returned ${backendResponse.status}: ${backendResponse.statusText}`;
 			}
-			console.error("Backend error:", errorMessage, "Status:", backendResponse.status);
+			console.error(
+				"Backend error:",
+				errorMessage,
+				"Status:",
+				backendResponse.status
+			);
 			return NextResponse.json(
 				{ message: errorMessage },
 				{ status: backendResponse.status }
@@ -55,7 +60,15 @@ export async function GET(
 		}
 
 		const backendData = await backendResponse.json();
-		return NextResponse.json(backendData, { status: 200 });
+
+		// 캐싱 헤더 추가 (10분간 캐시)
+		const response = NextResponse.json(backendData, { status: 200 });
+		response.headers.set(
+			"Cache-Control",
+			"public, s-maxage=600, stale-while-revalidate=300"
+		);
+
+		return response;
 	} catch (error: any) {
 		console.error("Error fetching schedule details:", error);
 		return NextResponse.json(

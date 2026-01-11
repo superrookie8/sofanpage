@@ -109,9 +109,9 @@ const Header: React.FC = () => {
 								<Link href="/diary/create" className={linkStyle("/diary")}>
 									직관일지
 								</Link>
-								<Link href="/mypage" className={linkStyle("/mypage")}>
+								{/* <Link href="/mypage" className={linkStyle("/mypage")}>
 									마이페이지
-								</Link>
+								</Link> */}
 
 								<button
 									onClick={handleLogout}

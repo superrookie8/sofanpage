@@ -11,7 +11,6 @@ import Header from "@/shared/ui/header";
 import Background from "@/components/opening/background";
 import { LoadingProvider } from "@/context/LoadingContext";
 import LoadingSpinner from "@/shared/ui/loadingSpinner";
-import RenovationNotice from "@/shared/ui/renovationNotice";
 
 export const metadata: Metadata = {
 	title: {
@@ -40,6 +39,11 @@ export const metadata: Metadata = {
 		"슈퍼소희",
 		"supersohee",
 	],
+	icons: {
+		icon: "/favicon.ico",
+		shortcut: "/favicon.ico",
+		apple: "/favicon.ico",
+	},
 };
 
 export default async function RootLayout({
@@ -90,7 +94,6 @@ export default async function RootLayout({
 				<Providers session={session}>
 					<LoadingProvider>
 						<LoadingSpinner />
-						<RenovationNotice />
 						<Background />
 						<Header />
 						<ClientWrapper>{children}</ClientWrapper>
