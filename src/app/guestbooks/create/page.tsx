@@ -1,9 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import PhotoUpload from "@/components/shared/photoUpload";
-import useAuth from "@/hooks/useAuth";
-import AlertModal from "@/components/shared/alertModal";
+import PhotoUpload from "@/shared/ui/photoUpload";
+import useAuth from "@/features/auth/hooks/useAuth";
+import AlertModal from "@/shared/ui/alertModal";
 
 const GuestBookCreate: React.FC = () => {
 	const user = useAuth();
@@ -56,7 +56,7 @@ const GuestBookCreate: React.FC = () => {
 		}
 
 		try {
-			const response = await fetch("/api/postguestbook", {
+			const response = await fetch("/api/guestbooks", {
 				method: "POST",
 				body: formData,
 			});

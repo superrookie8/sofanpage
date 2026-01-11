@@ -1,158 +1,112 @@
 "use client";
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { DiaryEntry } from "@/data/diary";
-import { where, weather, together, result } from "@/data/constants";
+import { DiaryEntry } from "@/features/diary/types";
+import { where, weather, together, result } from "@/shared/constants";
 import Image from "next/image";
 import { useLoading } from "@/context/LoadingContext";
-import LoadingSpinner from "@/components/shared/loadingSpinner";
-import AlertModal from "@/components/shared/alertModal";
+import LoadingSpinner from "@/shared/ui/loadingSpinner";
+import AlertModal from "@/shared/ui/alertModal";
+import { useDiaryListQuery } from "@/features/diary/queries";
 
 interface Props {}
 
-const fetchAllDiariesPage = async (
-	page: number,
-	pageSize: number
-): Promise<DiaryEntry[]> => {
-	try {
-		const response = await fetch(
-			`/api/getdiaries?page=${page}&page_size=${pageSize}`,
-			{
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-				},
-			}
-		);
-		if (!response.ok) {
-			throw new Error("Failed to fetch all diary entries");
-		}
-		const data = await response.json();
-
-		if (Array.isArray(data)) {
-			return data;
-		} else {
-			console.error("Expected array but got:", data);
-			return [];
-		}
-	} catch (error) {
-		console.error("Error fetching all diaries:", error);
-		return [];
-	}
-};
-
 const DiaryRead: React.FC<Props> = (props) => {
-	const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
-	const [page, setPage] = useState(1);
-	const [pageSize] = useState(10);
-	const [user, setUser] = useState<string | null>(null);
 	const { setIsLoading } = useLoading();
-	const [loading, setLoading] = useState<boolean>(true);
-	const [hasMore, setHasMore] = useState<boolean>(true);
 	const router = useRouter();
 	const [modalOpen, setModalOpen] = useState(false);
 	const [modalMessage, setModalMessage] = useState("");
+
+	// React Query를 사용하여 일지 목록 조회
+	const { data: diaries = [], isLoading, error } = useDiaryListQuery();
+
+	// 인증 체크는 middleware에서 처리됨
+
+	// 로딩 상태 동기화
+	useEffect(() => {
+		setIsLoading(isLoading);
+	}, [isLoading, setIsLoading]);
 
 	const closeModal = () => {
 		setModalOpen(false);
 	};
 
-	const loadMoreDiaries = useCallback(async () => {
-		if (loading || !hasMore) return;
-
-		setLoading(true);
-		setIsLoading(true);
-
-		const newDiaries = await fetchAllDiariesPage(page, pageSize);
-
-		if (newDiaries.length > 0) {
-			setDiaries((prevDiaries) => [...prevDiaries, ...newDiaries]);
-			setPage((prevPage) => prevPage + 1);
-		} else {
-			setHasMore(false);
-		}
-
-		setLoading(false);
-		setIsLoading(false);
-	}, [page, pageSize, loading, hasMore, setIsLoading]);
-
-	useEffect(() => {
-		loadMoreDiaries();
-	}, [loadMoreDiaries]);
-
-	useEffect(() => {
-		const handleScroll = () => {
-			if (
-				window.innerHeight + document.documentElement.scrollTop >=
-				document.documentElement.offsetHeight - 100
-			) {
-				loadMoreDiaries();
-			}
-		};
-
-		window.addEventListener("scroll", handleScroll);
-		return () => window.removeEventListener("scroll", handleScroll);
-	}, [loadMoreDiaries]);
-
-	// 로그인 페이지로 이동하는 함수
-	const goToLogin = () => {
-		router.push("/login");
-	};
-
+	// 로딩 중일 때
+	if (isLoading) {
+		return <LoadingSpinner />;
+	}
 	return (
 		<>
-			<div className="w-full h-[150px] flex flex-col gap-4 justify-center items-center bg-black bg-opacity-75">
-				<span className="text-white mr-4">
-					작성하려면, 로그인이 필요합니다!
-				</span>
-				<button
-					onClick={goToLogin}
-					className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 focus:outline-none"
-				>
-					로그인 바로가기
-				</button>
-			</div>
 			<div className="w-full h-[500px]">
 				<div className="w-full p-8 h-[500px] bg-black bg-opacity-75 grid justify-center gap-8 items-center overflow-y-auto">
 					{diaries && diaries.length > 0 ? (
 						<div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full">
-							{diaries.map((diary) => (
-								<div
-									key={diary._id}
-									className="w-[200px] h-[270px] bg-white rounded"
-								>
-									<div className="w-full h-3/5 flex justify-center pt-4">
-										<Image
-											src={`data:image/jpeg;base64,${diary.diary_photos.ticket_photo}`}
-											alt="diary entry"
-											width={150}
-											height={100}
-											style={{ objectFit: "fill" }}
-											className="object-cover rounded border shadow-lg"
-										/>
-									</div>
+							{diaries.map((diary) => {
+								const diaryId = diary.id || diary._id || "";
+								const diaryDate = diary.date || diary.createdAt || "";
+								const diaryWeather = diary.weather || "";
+								const seatSection = diary.seat_info?.section || "";
+								const seatRow = diary.seatRow || diary.seat_info?.row || "";
+								const seatNumber =
+									diary.seatNumber || diary.seat_info?.number || "";
+								const diaryName = diary.name || diary.nickname || "";
 
-									<div className="flex flex-col w-full h-2/5 text-sm pt-4 pl-4 pb-4">
-										<span>아이디: {diary.name}</span>
-										<span>
-											관람일자: {new Date(diary.date).toLocaleDateString()}
-										</span>
-										<span>
-											날씨: {weather[diary.weather as keyof typeof weather]}
-										</span>
-										<span>
-											좌석:
-											{`${diary.seat_info.section}/${diary.seat_info.row}/${diary.seat_info.number}`}
-										</span>
+								// 백엔드 API 응답: photoUrls는 이미 서명된 URL 배열
+								const photoSrc =
+									diary.photoUrls && diary.photoUrls.length > 0
+										? diary.photoUrls[0]
+										: "";
+
+								return (
+									<div
+										key={diaryId}
+										className="w-[200px] h-[270px] bg-white rounded"
+									>
+										{photoSrc && (
+											<div className="w-full h-3/5 flex justify-center pt-4">
+												<Image
+													src={photoSrc}
+													alt="diary entry"
+													width={150}
+													height={100}
+													style={{ objectFit: "fill" }}
+													className="object-cover rounded border shadow-lg"
+												/>
+											</div>
+										)}
+
+										<div className="flex flex-col w-full h-2/5 text-sm pt-4 pl-4 pb-4">
+											{diaryName && <span>아이디: {diaryName}</span>}
+											<span>
+												관람일자:{" "}
+												{diaryDate
+													? new Date(diaryDate).toLocaleDateString()
+													: "-"}
+											</span>
+											<span>
+												날씨:{" "}
+												{diaryWeather
+													? weather[diaryWeather as keyof typeof weather]
+													: "-"}
+											</span>
+											<span>
+												좌석:{" "}
+												{seatSection && seatRow && seatNumber
+													? `${seatSection}/${seatRow}/${seatNumber}`
+													: seatRow && seatNumber
+													? `${seatRow}/${seatNumber}`
+													: "-"}
+											</span>
+										</div>
 									</div>
-								</div>
-							))}
+								);
+							})}
 						</div>
 					) : (
 						<p>일지가 없습니다.</p>
 					)}
-					{loading && <LoadingSpinner />}
-					{!hasMore && <div>더이상 없어요..</div>}
+					{isLoading && <LoadingSpinner />}
+					{error && <div>일지를 불러오는 중 오류가 발생했습니다.</div>}
 				</div>
 				<AlertModal
 					isOpen={modalOpen}

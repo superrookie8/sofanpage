@@ -1,5 +1,5 @@
 "use client";
-import useAuth from "@/hooks/useAuth";
+import useAuth from "@/features/auth/hooks/useAuth";
 import React from "react";
 
 interface Props {}

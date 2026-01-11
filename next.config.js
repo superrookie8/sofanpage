@@ -61,6 +61,11 @@ const nextConfig = {
 				protocol: "https",
 				hostname: "rookie.co.kr",
 			},
+			{
+				protocol: "https",
+				hostname:
+					"supersohee-images-all.92d40bb4fa2c6db4a006f8b35dcb1d11.r2.cloudflarestorage.com",
+			},
 		],
 	},
 };

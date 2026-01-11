@@ -1,6 +1,6 @@
 // components/eventDetail.tsx
 import Link from "next/link";
-import { EventDetails } from "@/data/events";
+import { EventDetails } from "@/features/events/types";
 
 interface EventDetailProps {
 	eventDetails: EventDetails;

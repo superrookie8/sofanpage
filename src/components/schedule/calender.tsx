@@ -40,7 +40,7 @@ const Calendar: React.FC<CalendarProps> = ({ onLocationSelect }) => {
 	useEffect(() => {
 		const fetchSchedules = async () => {
 			try {
-				const response = await fetch("/api/getschedule");
+				const response = await fetch("/api/games/schedule");
 				const data = await response.json();
 				if (Array.isArray(data)) {
 					setSchedules(data);

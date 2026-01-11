@@ -1,0 +1,232 @@
+"use client";
+import React, { useMemo } from "react";
+import { ScheduleDetailsResponse, GameLocation } from "../types";
+import { useRouter } from "next/navigation";
+import Map from "./kakaoMap";
+import { format, parseISO } from "date-fns";
+import { useScheduleDetailsQuery } from "../queries";
+import { locations } from "../constants";
+
+interface GameInfoModalProps {
+	scheduleId: string | null;
+	isOpen: boolean;
+	onClose: () => void;
+}
+
+const GameInfoModal: React.FC<GameInfoModalProps> = ({
+	scheduleId,
+	isOpen,
+	onClose,
+}) => {
+	const router = useRouter();
+	const {
+		data: scheduleDetails,
+		isLoading,
+		error,
+	} = useScheduleDetailsQuery(scheduleId, isOpen);
+
+	const stadiumLocation = useMemo(() => {
+		if (!scheduleDetails) return null;
+
+		// 백엔드에서 좌표가 있으면 사용
+		if (
+			scheduleDetails.stadium?.latitude &&
+			scheduleDetails.stadium?.longitude
+		) {
+			return {
+				name: scheduleDetails.stadium.name,
+				latitude: scheduleDetails.stadium.latitude,
+				longitude: scheduleDetails.stadium.longitude,
+			} as GameLocation;
+		}
+
+		// 백엔드에서 좌표가 없으면 location 기반으로 로컬 상수에서 찾기
+		const isHome = scheduleDetails.location === "Home";
+		const locationKey = isHome ? "부산 사직실내체육관" : scheduleDetails.title;
+
+		const location = locations[locationKey];
+		if (!location) {
+			return null;
+		}
+
+		return location;
+	}, [scheduleDetails]);
+
+	if (!isOpen) return null;
+
+	const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
+		if (e.target === e.currentTarget) {
+			onClose();
+		}
+	};
+
+	const handleCreateDiary = () => {
+		// 로그인 체크는 middleware에서 처리됨
+		if (scheduleDetails?.gameId) {
+			router.push(`/diary/game/${scheduleDetails.gameId}`);
+		} else {
+			router.push("/diary/create");
+		}
+	};
+
+	const formatDateTime = (dateTime: string) => {
+		try {
+			const date = parseISO(dateTime);
+			return format(date, "yyyy년 MM월 dd일 HH:mm");
+		} catch {
+			return dateTime;
+		}
+	};
+
+	return (
+		<div
+			className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+			onClick={handleOutsideClick}
+		>
+			<div
+				className="relative bg-white rounded-lg shadow-xl w-[600px] min-w-[600px] max-w-[600px] h-[700px] overflow-y-auto box-border flex-shrink-0"
+				style={{ width: "600px", minWidth: "600px", maxWidth: "600px" }}
+				onClick={(e) => e.stopPropagation()}
+			>
+				{/* 닫기 버튼 */}
+				<button
+					className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold z-10"
+					onClick={onClose}
+				>
+					&times;
+				</button>
+
+				{/* 모달 내용 */}
+				<div className="p-6 box-border overflow-hidden">
+					{isLoading ? (
+						<div className="flex items-center justify-center h-full min-h-[500px]">
+							<div className="text-lg">로딩 중...</div>
+						</div>
+					) : error ? (
+						<div className="flex flex-col items-center justify-center h-full min-h-[500px]">
+							<div className="text-red-500 mb-4">
+								{error instanceof Error
+									? error.message
+									: "스케줄 상세 정보를 불러올 수 없습니다."}
+							</div>
+						</div>
+					) : scheduleDetails ? (
+						<>
+							{/* 일정 정보 */}
+							<div className="mb-6">
+								<h2 className="text-2xl font-bold mb-4">
+									vs {scheduleDetails.title} (
+									{scheduleDetails.location === "Home" ? "BNK 홈 경기" : "원정"}
+									)
+								</h2>
+								{scheduleDetails.description && (
+									<p className="text-gray-600 mb-4">
+										{scheduleDetails.description}
+									</p>
+								)}
+								<div className="space-y-2">
+									<p>
+										<span className="font-semibold">경기 시작:</span>{" "}
+										{formatDateTime(scheduleDetails.startDateTime)}
+									</p>
+								</div>
+							</div>
+
+							{/* 경기장 정보 */}
+							{scheduleDetails.stadium && (
+								<>
+									{/* 지도 */}
+									{stadiumLocation && (
+										<div className="mb-6">
+											<h2 className="text-xl font-bold mb-4">🗺️ 경기장 위치</h2>
+											<div className="w-full h-[300px] rounded-lg overflow-hidden border border-gray-300">
+												<Map
+													selectedLocation={stadiumLocation}
+													mapId="game-info-modal-map"
+												/>
+											</div>
+										</div>
+									)}
+
+									{/* 경기장 상세 정보 */}
+									<div className="mb-6">
+										<h2 className="text-xl font-bold mb-4">경기장 정보</h2>
+										<div className="space-y-3">
+											<p>
+												<span className="font-semibold">경기장:</span>{" "}
+												{scheduleDetails.stadium.name}
+											</p>
+											<p>
+												<span className="font-semibold">주소:</span>{" "}
+												{scheduleDetails.stadium.address}
+											</p>
+											<p>
+												<span className="font-semibold">수용인원:</span>{" "}
+												{scheduleDetails.stadium.capacity.toLocaleString()}석
+											</p>
+										</div>
+									</div>
+
+									{/* 교통정보 */}
+									<div className="mb-6">
+										<h2 className="text-xl font-bold mb-4">🚇 교통정보</h2>
+										<div className="space-y-3">
+											{scheduleDetails.stadium.subwayInfo &&
+												scheduleDetails.stadium.subwayInfo.length > 0 && (
+													<div>
+														<p className="font-semibold mb-1">지하철:</p>
+														<ul className="text-sm bg-gray-100 p-2 rounded list-disc list-inside">
+															{scheduleDetails.stadium.subwayInfo.map(
+																(info, index) => (
+																	<li key={index}>{info}</li>
+																)
+															)}
+														</ul>
+													</div>
+												)}
+											{scheduleDetails.stadium.busInfo &&
+												scheduleDetails.stadium.busInfo.length > 0 && (
+													<div>
+														<p className="font-semibold mb-1">버스:</p>
+														<ul className="text-sm bg-gray-100 p-2 rounded list-disc list-inside">
+															{scheduleDetails.stadium.busInfo.map(
+																(info, index) => (
+																	<li key={index}>{info}</li>
+																)
+															)}
+														</ul>
+													</div>
+												)}
+											{scheduleDetails.stadium.intercityRoute && (
+												<div>
+													<p className="font-semibold mb-1">시외교통:</p>
+													<p className="text-sm whitespace-pre-line bg-gray-100 p-2 rounded">
+														{scheduleDetails.stadium.intercityRoute}
+													</p>
+												</div>
+											)}
+										</div>
+									</div>
+								</>
+							)}
+
+							{/* 직관일지 버튼 (gameId가 있으면 보러가기, 없으면 작성하기) */}
+							<div className="mt-6">
+								<button
+									onClick={handleCreateDiary}
+									className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
+								>
+									{scheduleDetails.gameId
+										? "직관일지 보러가기"
+										: "직관일지 작성하기"}
+								</button>
+							</div>
+						</>
+					) : null}
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export default GameInfoModal;

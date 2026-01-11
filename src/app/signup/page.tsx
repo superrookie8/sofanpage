@@ -3,8 +3,10 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import clientAxiosService from "@/lib/client/http/axiosService";
 import EyeIcon from "@/icons/eyeicon";
-import AlertModal from "@/components/shared/alertModal";
+import AlertModal from "@/shared/ui/alertModal";
 
 interface ValidationState {
 	message: string;
@@ -86,12 +88,12 @@ const SignUp: React.FC = () => {
 		}
 
 		try {
-			const response = await fetch(
-				`${
-					process.env.NEXT_PUBLIC_BACKAPI_URL
-				}/api/users/check-email?email=${encodeURIComponent(emailValue)}`
+			// Next.js API Route 사용
+			const response = await clientAxiosService.get(
+				`/api/auth/check-email?email=${encodeURIComponent(emailValue)}`
 			);
-			const data = await response.json();
+
+			const data = response.data;
 
 			if (data.exists) {
 				setEmailMessage({
@@ -210,42 +212,22 @@ const SignUp: React.FC = () => {
 		setMessage("");
 
 		try {
-			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/users/signup`,
-				{
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						email,
-						password,
-						passwordConfirm,
-						nickname,
-					}),
-				}
-			);
+			// Next.js API Route 사용
+			const response = await clientAxiosService.post("/api/auth/signup", {
+				email,
+				password,
+				passwordConfirm,
+				nickname,
+			});
 
-			if (!response.ok) {
-				const errorText = await response.text();
-				setMessage(errorText || "회원가입에 실패했습니다");
-				setIsLoading(false);
-				return;
-			}
+			// 회원가입 성공 후 자동 로그인
+			const loginResult = await signIn("credentials", {
+				email,
+				password,
+				redirect: false,
+			});
 
-			const data = await response.json();
-
-			// 회원가입 성공 - 토큰 저장
-			if (data.token) {
-				sessionStorage.setItem("token", data.token);
-				sessionStorage.setItem(
-					"user",
-					JSON.stringify({
-						userId: data.userId,
-						email: data.email,
-						nickname: data.nickname,
-					})
-				);
+			if (loginResult?.ok) {
 				router.push("/home");
 			} else {
 				setMessage("회원가입은 완료되었습니다. 로그인 페이지로 이동합니다.");
@@ -253,9 +235,11 @@ const SignUp: React.FC = () => {
 					router.push("/login");
 				}, 2000);
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error("SignUp Error", error);
-			setMessage("회원가입 처리 중 오류가 발생했습니다");
+			setMessage(
+				error.response?.data?.message || "회원가입 처리 중 오류가 발생했습니다"
+			);
 		} finally {
 			setIsLoading(false);
 		}

@@ -2,49 +2,87 @@
 import DiaryPhotoUpload from "@/components/diary/diaryPhotoUpload";
 import React, { FormEvent, useEffect, useState } from "react";
 import { format } from "date-fns";
-import WeatherToggleMenu from "@/components/diary/weatherMenu";
-import SelectedWeather from "@/components/diary/selectedWeather";
-import SelectedTogether from "@/components/diary/selectedWith";
-import TogetherToggleMenu from "@/components/diary/togetherToggle";
-import LocationToggleMenu from "@/components/diary/locationToggle";
-import SelectedLocation from "@/components/diary/selectedLocation";
 import WinningToggleMenu from "@/components/diary/winningToggle";
 import SelectedWinningMode from "@/components/diary/selectedWinLose";
 import { useRouter } from "next/navigation";
 import DiaryTabs from "@/components/diary/diaryTabs";
-import useAuth from "@/hooks/useAuth";
-import SectionToggleMenu from "@/components/diary/sectionToggleMenu";
-import RowToggleMenu from "@/components/diary/rowToggleMenu";
-import NumberToggleMenu from "@/components/diary/numberToggleMenu";
-import SelectedSection from "@/components/diary/selectedSection";
-import SelectedRow from "@/components/diary/selectedRow";
-import SelectedNumber from "@/components/diary/selectedNumber";
-import AlertModal from "@/components/shared/alertModal";
+import useAuth from "@/features/auth/hooks/useAuth";
+import AlertModal from "@/shared/ui/alertModal";
 import { DiaryPhotoData } from "@/states/diaryPhotoPreview";
+import { useSession } from "next-auth/react";
+import { useCreateDiaryMutation } from "@/features/diary/mutations";
+import type { CreateDiaryRequest } from "@/features/diary/types";
+
+interface Stadium {
+	id: string;
+	name: string;
+	address: string;
+	capacity: number;
+	latitude: number;
+	longitude: number;
+	imageUrl?: string;
+	subwayInfo?: string[];
+	busInfo?: string[];
+	intercityRoute?: string;
+}
+
+// 계층 구조 인터페이스
+interface RowInfo {
+	row: string; // "A열", "3열", "1열" 등
+	numbers: string[]; // ["1번", "2번", ...]
+}
+
+interface BlockInfo {
+	blockName: string;
+	rows: RowInfo[];
+}
+
+interface ZoneInfo {
+	zoneName: string;
+	seatType: string;
+	floor: string | null;
+	blocks: BlockInfo[] | null; // 블럭이 있으면 blocks, 없으면 null
+	rows: RowInfo[] | null; // 블럭이 없으면 rows
+}
+
+interface SeatHierarchyResponse {
+	zones: ZoneInfo[];
+}
 
 // Define DiaryPhotoData if it's not already defined
 
 interface Props {}
 
 const BasketballDiary: React.FC<Props> = (props) => {
-	const [ticketphoto, setTicketPhoto] = useState<string | null>(null);
-	const [viewphoto, setViewPhoto] = useState<string | null>(null);
-	const [additionalphoto, setAdditionalPhoto] = useState<string | null>(null);
+	const { data: session } = useSession();
+	const [ticketphoto, setTicketPhoto] = useState<string[]>([]); // R2 키 배열
+	const [viewphoto, setViewPhoto] = useState<string[]>([]); // R2 키 배열
+	const [additionalphoto, setAdditionalPhoto] = useState<string[]>([]); // R2 키 배열
 	const [date, setDate] = useState<string>("");
-	const [weather, setWeather] = useState<string>("");
 	const [together, setTogether] = useState<string>("");
-	const [location, setLocation] = useState<string>("");
+	const [watchType, setWatchType] = useState<"DIRECT" | "HOUSE">("DIRECT");
 	const [isWinning, setIsWinning] = useState<string>("");
 	const [message, setMessage] = useState<string>("");
-	const [seatInfo, setSeatInfo] = useState({
-		section: "",
-		row: "",
-		number: "",
-	});
+	const [selectedStadium, setSelectedStadium] = useState<string>("");
+	const [stadiums, setStadiums] = useState<Stadium[]>([]);
+	const [stadiumsLoading, setStadiumsLoading] = useState<boolean>(true);
+	const [hierarchy, setHierarchy] = useState<SeatHierarchyResponse | null>(
+		null
+	);
+	const [hierarchyLoading, setHierarchyLoading] = useState<boolean>(false);
+
+	// 좌석 선택 상태
+	const [selectedZone, setSelectedZone] = useState<string>("");
+	const [selectedBlock, setSelectedBlock] = useState<string>("");
+	const [selectedRow, setSelectedRow] = useState<string>("");
+	const [selectedNumber, setSelectedNumber] = useState<string>("");
+	const [seatId, setSeatId] = useState<string>("");
+
 	const [preview, setPreview] = useState<DiaryPhotoData[]>([]);
 
 	const user = useAuth();
 	const router = useRouter(); // 페이지 이동을 위한 Router
+	const createDiaryMutation = useCreateDiaryMutation();
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [modalMessage, setModalMessage] = useState<string>("");
@@ -62,24 +100,195 @@ const BasketballDiary: React.FC<Props> = (props) => {
 	};
 
 	const handleDiaryPhotoChange = (
-		photoUrl: string,
+		r2Key: string,
 		type: "ticket" | "view" | "additional"
 	) => {
+		// 각 타입별로 1장만 저장 (기존 이미지 교체 또는 제거)
 		if (type === "ticket") {
-			setTicketPhoto(photoUrl);
+			setTicketPhoto(r2Key ? [r2Key] : []);
 		} else if (type === "view") {
-			setViewPhoto(photoUrl);
+			setViewPhoto(r2Key ? [r2Key] : []);
 		} else if (type === "additional") {
-			setAdditionalPhoto(photoUrl);
+			setAdditionalPhoto(r2Key ? [r2Key] : []);
 		}
-		setPreview((prev) => [...prev, { url: photoUrl } as DiaryPhotoData]);
-		console.log(`${type} photo updated:`, photoUrl);
+		if (r2Key) {
+			console.log(`${type} photo uploaded (R2 key):`, r2Key);
+		} else {
+			console.log(`${type} photo removed`);
+		}
 	};
 
 	useEffect(() => {
 		const today = new Date();
 		setDate(format(today, "yyyy-MM-dd"));
 	}, []);
+
+	// 경기장 목록 가져오기
+	useEffect(() => {
+		const fetchStadiums = async () => {
+			setStadiumsLoading(true);
+			try {
+				const response = await fetch("/api/stadiums");
+				if (response.ok) {
+					const data = await response.json();
+					console.log("경기장 목록:", data);
+					setStadiums(Array.isArray(data) ? data : []);
+				} else {
+					const errorData = await response.json();
+					console.error("경기장 목록 가져오기 실패:", errorData);
+					setStadiums([]);
+				}
+			} catch (error) {
+				console.error("경기장 목록 가져오기 실패:", error);
+				setStadiums([]);
+			} finally {
+				setStadiumsLoading(false);
+			}
+		};
+		fetchStadiums();
+	}, []);
+
+	// 경기장 선택 시 좌석 계층 구조 가져오기
+	useEffect(() => {
+		const fetchHierarchy = async () => {
+			if (!selectedStadium) {
+				setHierarchy(null);
+				resetSeatSelection();
+				setHierarchyLoading(false);
+				return;
+			}
+			setHierarchyLoading(true);
+			try {
+				// 경기장 ID 사용
+				const response = await fetch(
+					`/api/stadiums/${selectedStadium}/seats/hierarchy`
+				);
+				if (response.ok) {
+					const data = await response.json();
+					console.log("좌석 계층 구조:", data);
+					setHierarchy(data);
+				} else {
+					const errorData = await response.json();
+					console.error("좌석 계층 구조 가져오기 실패:", errorData);
+					setHierarchy(null);
+				}
+			} catch (error) {
+				console.error("좌석 계층 구조 가져오기 실패:", error);
+				setHierarchy(null);
+			} finally {
+				setHierarchyLoading(false);
+			}
+		};
+		fetchHierarchy();
+	}, [selectedStadium]);
+
+	// 좌석 선택 초기화 함수
+	const resetSeatSelection = () => {
+		setSelectedZone("");
+		setSelectedBlock("");
+		setSelectedRow("");
+		setSelectedNumber("");
+		setSeatId("");
+	};
+
+	// 선택한 구역 정보 가져오기
+	const getSelectedZoneInfo = (): ZoneInfo | null => {
+		if (!hierarchy || !selectedZone) return null;
+		return (
+			hierarchy.zones.find((zone) => zone.zoneName === selectedZone) || null
+		);
+	};
+
+	// 선택한 블럭 정보 가져오기
+	const getSelectedBlockInfo = (): BlockInfo | null => {
+		const zoneInfo = getSelectedZoneInfo();
+		if (!zoneInfo || !zoneInfo.blocks || !selectedBlock) return null;
+		return (
+			zoneInfo.blocks.find((block) => block.blockName === selectedBlock) || null
+		);
+	};
+
+	// 선택한 열 정보 가져오기
+	const getSelectedRowInfo = (): RowInfo | null => {
+		const zoneInfo = getSelectedZoneInfo();
+		if (!zoneInfo) return null;
+
+		// 블럭이 있는 경우
+		if (zoneInfo.blocks) {
+			const blockInfo = getSelectedBlockInfo();
+			if (!blockInfo || !selectedRow) return null;
+			return blockInfo.rows.find((row) => row.row === selectedRow) || null;
+		}
+		// 블럭이 없는 경우
+		if (zoneInfo.rows && selectedRow) {
+			return zoneInfo.rows.find((row) => row.row === selectedRow) || null;
+		}
+		return null;
+	};
+
+	// 모든 선택이 완료되면 최종 좌석 ID 조회 (직관일 때만)
+	useEffect(() => {
+		// 집관일 때는 좌석 선택 불필요
+		if (watchType === "HOUSE") {
+			setSeatId("");
+			return;
+		}
+
+		const fetchSeatId = async () => {
+			if (
+				!selectedStadium ||
+				!selectedZone ||
+				!selectedRow ||
+				!selectedNumber
+			) {
+				setSeatId("");
+				return;
+			}
+
+			try {
+				const queryParams = new URLSearchParams({
+					zoneName: selectedZone,
+					row: selectedRow,
+					number: selectedNumber,
+				});
+				if (selectedBlock) {
+					queryParams.append("blockName", selectedBlock);
+				}
+
+				// 경기장 ID 사용
+				const response = await fetch(
+					`/api/stadiums/${selectedStadium}/seat?${queryParams.toString()}`
+				);
+				if (response.ok) {
+					const data = await response.json();
+					console.log("좌석 ID 응답:", data);
+					// API 라우트에서 문자열로 반환하므로 그대로 사용
+					const id = typeof data === "string" ? data : String(data);
+					setSeatId(id);
+				} else {
+					if (response.status === 404) {
+						console.error("좌석을 찾을 수 없습니다");
+						setSeatId("");
+						return;
+					}
+					const errorData = await response.json();
+					console.error("좌석 ID 조회 실패:", errorData);
+					setSeatId("");
+				}
+			} catch (error) {
+				console.error("좌석 ID 조회 실패:", error);
+				setSeatId("");
+			}
+		};
+		fetchSeatId();
+	}, [
+		watchType,
+		selectedStadium,
+		selectedZone,
+		selectedBlock,
+		selectedRow,
+		selectedNumber,
+	]);
 
 	const handleDateChange = (event: FormEvent<HTMLInputElement>) => {
 		const selectedDate = new Date(event.currentTarget.value);
@@ -90,127 +299,90 @@ const BasketballDiary: React.FC<Props> = (props) => {
 		setMessage(event.currentTarget.value);
 	};
 
-	const updateSeatInfo = (key: string, value: string) => {
-		setSeatInfo((prevState) => ({
-			...prevState,
-			[key]: value,
-		}));
-	};
-
 	// POST 데이터 전송 함수
 	const postData = async (): Promise<void> => {
-		if (!user) {
+		if (!session?.user) {
 			handleOpenModal("로그인 해주세요.");
 			return;
 		}
 
-		console.log("Current ticket photo:", ticketphoto);
-		console.log("Current view photo:", viewphoto);
-
-		if (!ticketphoto || !viewphoto) {
-			handleOpenModal("티켓 사진과 경기장 사진을 업로드해주세요.");
-			return;
-		}
+		console.log("Current ticket photos:", ticketphoto);
+		console.log("Current view photos:", viewphoto);
 
 		setIsLoading(true); // Start loading
 
-		// FormData 객체 생성
-		const formData = new FormData();
-		formData.append("name", user.nickname);
-		formData.append("date", date); // 관람일자
-		formData.append("weather", weather); // 날씨
-		formData.append("location", location); // 장소
-		formData.append("together", together); // 함께 본 사람
-		formData.append("win_status", isWinning); // 승패 상태
-
-		// 좌석 정보 추가
-		formData.append("section", seatInfo.section);
-		formData.append("row", seatInfo.row);
-		formData.append("number", seatInfo.number);
-
-		// 티켓 사진 추가
-		const ticketResponse = await fetch(ticketphoto);
-		const ticketBlob = await ticketResponse.blob();
-		const ticketFile = new File(
-			[ticketBlob],
-			`ticket_${new Date().toISOString()}.jpg`,
-			{ type: ticketBlob.type }
-		);
-		formData.append("ticket_photo", ticketFile);
-
-		// 경기장 사진 추가
-		const viewResponse = await fetch(viewphoto);
-		const viewBlob = await viewResponse.blob();
-		const viewFile = new File(
-			[viewBlob],
-			`view_${new Date().toISOString()}.jpg`,
-			{ type: viewBlob.type }
-		);
-		formData.append("view_photo", viewFile);
-
-		// 추가 사진이 있는 경우
-		if (additionalphoto) {
-			const additionalResponse = await fetch(additionalphoto);
-			const additionalBlob = await additionalResponse.blob();
-			const additionalFile = new File(
-				[additionalBlob],
-				`additional_${new Date().toISOString()}.jpg`,
-				{ type: additionalBlob.type }
-			);
-			formData.append("additional_photo", additionalFile);
-		}
-
-		formData.append("message", message);
-
 		try {
-			// 백엔드로 데이터 전송
-			const response = await fetch("/api/postdiary", {
-				method: "POST",
-				body: formData,
-			});
+			// 이미 업로드된 R2 키들을 합침
+			const photoUrls = [...ticketphoto, ...viewphoto, ...additionalphoto];
 
-			// 응답 처리
-			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.message || "Failed to post diary entry.");
+			// 2. 백엔드 API 형식에 맞게 데이터 변환
+			// win_status를 gameWinner로 변환
+			const gameWinner =
+				isWinning === "WIN" || isWinning === "승"
+					? "HOME"
+					: isWinning === "LOSE" || isWinning === "패"
+					? "AWAY"
+					: undefined;
+
+			// 백엔드 요청 Body 생성
+			const diaryData: CreateDiaryRequest = {
+				gameId: "", // TODO: 게임 선택 UI 추가 필요
+				watchType: watchType,
+				content: message,
+				photoUrls: photoUrls,
+			};
+
+			// 직관일 때만 seatId 포함
+			if (watchType === "DIRECT" && seatId) {
+				diaryData.seatId = seatId;
 			}
 
-			const responseData = await response.json();
+			// 선택적 필드 추가
+			if (gameWinner) {
+				diaryData.gameWinner = gameWinner;
+			}
+			// companion은 user-id 배열이므로 나중에 추가 필요
+			// 선수 스탯들도 나중에 추가 필요
+
+			// 3. React Query Mutation 사용
+			await createDiaryMutation.mutateAsync(diaryData);
+
 			handleOpenModal("일지가 성공적으로 추가되었습니다");
 
 			// 성공 후 상태 초기화
-			setTicketPhoto(null);
-			setViewPhoto(null);
-			setAdditionalPhoto(null);
-			setDate("default");
-			setWeather("");
+			setTicketPhoto([]);
+			setViewPhoto([]);
+			setAdditionalPhoto([]);
+			const today = new Date();
+			setDate(format(today, "yyyy-MM-dd"));
 			setTogether("");
-			setLocation("");
+			setWatchType("DIRECT");
 			setIsWinning("");
 			setMessage("");
-			setSeatInfo({ section: "", row: "", number: "" });
+			setSelectedStadium("");
+			resetSeatSelection();
 			setPreview([]);
 		} catch (error) {
 			console.error("일지 등록중 오류 발생:", error);
-			handleOpenModal("일지를 등록하는 동안 오류가 발생했습니다.");
+			handleOpenModal(
+				error instanceof Error
+					? error.message
+					: "일지를 등록하는 동안 오류가 발생했습니다."
+			);
 		} finally {
 			setIsLoading(false); // Stop loading
 		}
 	};
 
 	return (
-		<div className="pl-4 pr-4 gap-4 flex flex-col md:flex-col lg:flex-col xl:flex-row 2xl:flex-row justify-center items-center w-full rounded">
+		<div className="relative pl-4 pr-4 gap-4 flex flex-col md:flex-col lg:flex-col xl:flex-row 2xl:flex-row justify-center items-center w-full rounded">
 			<div className="w-1/2 sm:w-full md:w-full lg:w-full h-[700px] sm:pt-8 sm:h-[1700px] sm:justify-between bg-gray-200 bg-opacity-75 rounded flex flex-col justify-center items-center">
 				<div className="w-full h-50 gap-4 flex flex-col">
 					{" "}
 					{/* gap-2를 gap-4로 변경 */}
 					<div className="flex flex-col md:flex-row lg:flex-row xl:flex-row 2xl:flex-row w-full gap-4">
-						{" "}
-						{/* sm:flex-row 제거, gap 추가 */}
 						<div className="w-full md:w-1/3 lg:w-1/3 xl:w-1/3 2xl:w-1/3 h-15 p-4 sm:p-0 flex flex-col">
-							{" "}
-							{/* sm:w-1/3 제거 */}
-							<label htmlFor="datePicker" className="flex w-full sm:bg-red-500">
+							<label htmlFor="datePicker" className="flex w-full">
 								관람일자
 							</label>
 							<input
@@ -222,60 +394,74 @@ const BasketballDiary: React.FC<Props> = (props) => {
 							/>
 						</div>
 						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-50">
-							{" "}
-							{/* sm:w-1/3 제거 */}
-							<label className="flex w-full  sm:bg-red-500 sm:ml-0 ml-8 mt-2 ">
-								날씨
-							</label>
-							<div className="w-full flex flex-row justify-center items-center mr-4">
-								<div className="w-1/3 flex justify-center items-center relative z-30">
-									<WeatherToggleMenu onSelect={setWeather} />
+							<label className="flex w-full ml-8 mt-2">경기장</label>
+							{stadiumsLoading ? (
+								<div className="w-full p-2 text-gray-500 text-sm">
+									경기장 목록 로딩 중...
 								</div>
-								<div className="w-2/3 min-w-[70px] flex justify-center">
-									<SelectedWeather weather={weather} />
-								</div>
-							</div>
+							) : (
+								<select
+									value={selectedStadium}
+									onChange={(e) => {
+										console.log("경기장 선택:", e.target.value);
+										setSelectedStadium(e.target.value);
+										resetSeatSelection();
+									}}
+									className="w-full p-2 border rounded bg-white cursor-pointer relative z-50"
+									style={{
+										WebkitAppearance: "menulist",
+										MozAppearance: "menulist",
+										appearance: "menulist",
+									}}
+								>
+									<option value="">경기장 선택</option>
+									{stadiums.length > 0 ? (
+										stadiums.map((stadium) => (
+											<option key={stadium.id} value={stadium.id}>
+												{stadium.name}
+											</option>
+										))
+									) : (
+										<option value="" disabled>
+											경기장 목록이 없습니다
+										</option>
+									)}
+								</select>
+							)}
 						</div>
-						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-40">
-							{" "}
-							{/* sm:w-1/3 제거 */}
-							<label className="flex w-full  sm:bg-red-500 sm:ml-0 ml-8 mt-2">
-								장소
-							</label>
-							<div className="w-full flex flex-row justify-between items-center">
-								<div className="w-1/3 flex justify-center items-center">
-									<LocationToggleMenu onSelect={setLocation} />
-								</div>
-								<div className="w-2/3 flex justify-center items-center">
-									<SelectedLocation location={location} />
-								</div>
-							</div>
+						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-50">
+							<label className="flex w-full ml-8 mt-2">관람 방식</label>
+							<select
+								value={watchType}
+								onChange={(e) =>
+									setWatchType(e.target.value as "DIRECT" | "HOUSE")
+								}
+								className="w-full p-2 border rounded bg-white cursor-pointer relative z-50"
+								style={{
+									WebkitAppearance: "menulist",
+									MozAppearance: "menulist",
+									appearance: "menulist",
+								}}
+							>
+								<option value="DIRECT">직관</option>
+								<option value="HOUSE">집관</option>
+							</select>
 						</div>
 					</div>
-					<div className="flex flex-col md:flex-row lg:flex-row xl:flex-row 2xl:flex-row gap-4 ">
-						{" "}
-						{/* sm:flex-row 제거, gap 추가 */}
-						<div className="w-full md:w-1/3 h-15 border-l-2 flex flex-col justify-between items-center relative z-30">
-							{" "}
-							{/* sm:w-1/3 제거 */}
-							<label className="flex w-full  sm:bg-red-500 sm:ml-0 ml-8 mt-2">
-								함께 본 사람
-							</label>
-							<div className="w-full flex flex-row justify-between items-center gap-2">
-								<div className="w-1/3 flex justify-center items-center">
-									<TogetherToggleMenu onSelect={setTogether} />
-								</div>
-								<div className="w-2/3 flex justify-center items-center">
-									<SelectedTogether together={together} />
-								</div>
-							</div>
+					<div className="flex flex-col md:flex-row lg:flex-row xl:flex-row 2xl:flex-row gap-4">
+						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-50">
+							<label className="flex w-full ml-8 mt-2">함께 본 사람</label>
+							<input
+								type="text"
+								value={together}
+								onChange={(e) => setTogether(e.target.value)}
+								placeholder="함께 본 사람을 입력하세요"
+								className="w-full p-2 border rounded bg-white relative z-50"
+								style={{ pointerEvents: "auto" }}
+							/>
 						</div>
 						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-20">
-							{" "}
-							{/* sm:w-1/3 제거 */}
-							<label className="flex w-full  sm:bg-red-500 sm:ml-0 ml-8 mt-2">
-								승패선택
-							</label>
+							<label className="flex w-full ml-8 mt-2">승패선택</label>
 							<div className="w-full flex flex-row justify-center items-center gap-2">
 								<div className="w-1/3 flex justify-center items-center">
 									<WinningToggleMenu onSelect={setIsWinning} />
@@ -285,41 +471,173 @@ const BasketballDiary: React.FC<Props> = (props) => {
 								</div>
 							</div>
 						</div>
-						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-10">
-							{" "}
-							{/* sm:w-1/3 제거 */}
-							<div className="w-full  sm:bg-red-500 flex flex-row justify-between items-center">
-								<label className="ml-4 mt-2">좌석</label>
-								<div className="w-1/3 mr-4 flex justify-center items-center">
-									<SectionToggleMenu
-										location={location}
-										onSelect={(value) => updateSeatInfo("section", value)}
-									/>
-									<RowToggleMenu
-										onSelect={(value) => updateSeatInfo("row", value)}
-									/>
-									<NumberToggleMenu
-										onSelect={(value) => updateSeatInfo("number", value)}
-									/>
+						<div className="w-full md:w-1/3 h-15 flex flex-col justify-between items-center relative z-50">
+							<label className="flex w-full ml-4 mt-2">좌석</label>
+							{watchType === "HOUSE" ? (
+								<div className="w-full p-2 text-gray-500 text-sm">
+									집관은 좌석 선택이 필요 없습니다
 								</div>
-							</div>
-							<div className="w-full flex flex-row justify-center items-center gap-2">
-								<div className="pl-4 pr-4 pb-2 w-full flex justify-between items-center">
-									<SelectedSection
-										location={location}
-										section={seatInfo.section}
-									/>
-									<SelectedRow row={seatInfo.row} />
-									<SelectedNumber number={seatInfo.number} />
+							) : !selectedStadium ? (
+								<div className="w-full p-2 text-gray-500 text-sm">
+									경기장을 먼저 선택해주세요
 								</div>
-							</div>
+							) : hierarchyLoading ? (
+								<div className="w-full p-2 text-gray-500 text-sm">
+									좌석 정보 로딩 중...
+								</div>
+							) : !hierarchy || hierarchy.zones.length === 0 ? (
+								<div className="w-full p-2 text-gray-500 text-sm">
+									좌석 정보가 없습니다
+								</div>
+							) : (
+								<div className="w-full flex flex-col gap-2">
+									{/* 구역 선택 */}
+									<select
+										value={selectedZone}
+										onChange={(e) => {
+											setSelectedZone(e.target.value);
+											setSelectedBlock("");
+											setSelectedRow("");
+											setSelectedNumber("");
+										}}
+										className="w-full p-2 border rounded bg-white cursor-pointer relative z-50 text-sm"
+										style={{
+											WebkitAppearance: "menulist",
+											MozAppearance: "menulist",
+											appearance: "menulist",
+										}}
+									>
+										<option value="">구역 선택</option>
+										{hierarchy.zones.map((zone) => (
+											<option key={zone.zoneName} value={zone.zoneName}>
+												{zone.zoneName}
+											</option>
+										))}
+									</select>
+
+									{/* 블럭 선택 (블럭이 있는 경우) */}
+									{getSelectedZoneInfo()?.blocks &&
+										getSelectedZoneInfo()!.blocks!.length > 0 && (
+											<select
+												value={selectedBlock}
+												onChange={(e) => {
+													setSelectedBlock(e.target.value);
+													setSelectedRow("");
+													setSelectedNumber("");
+												}}
+												className="w-full p-2 border rounded bg-white cursor-pointer relative z-50 text-sm"
+												style={{
+													WebkitAppearance: "menulist",
+													MozAppearance: "menulist",
+													appearance: "menulist",
+												}}
+											>
+												<option value="">블럭 선택</option>
+												{getSelectedZoneInfo()!.blocks!.map((block) => (
+													<option key={block.blockName} value={block.blockName}>
+														{block.blockName}
+													</option>
+												))}
+											</select>
+										)}
+
+									{/* 열 선택 */}
+									{(() => {
+										const zoneInfo = getSelectedZoneInfo();
+										if (!selectedZone || !zoneInfo) return null;
+
+										// 블럭이 있는 경우: 블럭 선택이 완료되어야 열 선택 표시
+										if (zoneInfo.blocks && zoneInfo.blocks.length > 0) {
+											if (!selectedBlock) return null;
+											const blockInfo = getSelectedBlockInfo();
+											if (
+												!blockInfo ||
+												!blockInfo.rows ||
+												blockInfo.rows.length === 0
+											)
+												return null;
+											return (
+												<select
+													value={selectedRow}
+													onChange={(e) => {
+														setSelectedRow(e.target.value);
+														setSelectedNumber("");
+													}}
+													className="w-full p-2 border rounded bg-white cursor-pointer relative z-50 text-sm"
+													style={{
+														WebkitAppearance: "menulist",
+														MozAppearance: "menulist",
+														appearance: "menulist",
+													}}
+												>
+													<option value="">열 선택</option>
+													{blockInfo.rows.map((row) => (
+														<option key={row.row} value={row.row}>
+															{row.row}
+														</option>
+													))}
+												</select>
+											);
+										}
+
+										// 블럭이 없는 경우: 구역 선택만으로 열 선택 표시
+										if (zoneInfo.rows && zoneInfo.rows.length > 0) {
+											return (
+												<select
+													value={selectedRow}
+													onChange={(e) => {
+														setSelectedRow(e.target.value);
+														setSelectedNumber("");
+													}}
+													className="w-full p-2 border rounded bg-white cursor-pointer relative z-50 text-sm"
+													style={{
+														WebkitAppearance: "menulist",
+														MozAppearance: "menulist",
+														appearance: "menulist",
+													}}
+												>
+													<option value="">열 선택</option>
+													{zoneInfo.rows.map((row) => (
+														<option key={row.row} value={row.row}>
+															{row.row}
+														</option>
+													))}
+												</select>
+											);
+										}
+
+										return null;
+									})()}
+
+									{/* 번호 선택 */}
+									{selectedRow && getSelectedRowInfo() && (
+										<select
+											value={selectedNumber}
+											onChange={(e) => setSelectedNumber(e.target.value)}
+											className="w-full p-2 border rounded bg-white cursor-pointer relative z-50 text-sm"
+											style={{
+												WebkitAppearance: "menulist",
+												MozAppearance: "menulist",
+												appearance: "menulist",
+											}}
+										>
+											<option value="">번호 선택</option>
+											{getSelectedRowInfo()!.numbers.map((number) => (
+												<option key={number} value={number}>
+													{number}
+												</option>
+											))}
+										</select>
+									)}
+								</div>
+							)}
 						</div>
 					</div>
 				</div>
 
 				<div className="w-full mb-2 rounded flex flex-col justify-center sm:justify-between items-center gap-4 p-4 sm:h-[800px]">
 					<div className="w-full p-2 rounded flex justify-center">
-						<p>티켓 사진과 경기장 사진은 필수 입니다!</p>
+						<p>사진 업로드 (선택사항)</p>
 					</div>
 					<div className="w-full flex flex-row justify-center items-center gap-4 sm:h-[700px] sm:flex-col md:flex-row lg:flex-row xl:flex-row">
 						<div className="w-[200px] h-[200px] rounded-lg flex flex-row justify-center items-center cursor-pointer mb-4 sm:mb-0">
@@ -357,31 +675,24 @@ const BasketballDiary: React.FC<Props> = (props) => {
 						className={`rounded-lg w-[100px] h-[40px] flex justify-center items-center transition-colors duration-200
         ${
 					isLoading ||
-					!ticketphoto ||
-					!viewphoto ||
 					!message ||
 					!date ||
-					!weather ||
-					!location ||
-					!together ||
-					!isWinning
+					!isWinning ||
+					(watchType === "DIRECT" && (!selectedStadium || !seatId))
 						? "bg-gray-400 cursor-not-allowed" // 비활성화 상태
 						: "bg-red-500 hover:bg-black text-white" // 활성화 상태
 				}`}
 						onClick={postData}
 						disabled={
 							isLoading ||
-							!ticketphoto ||
-							!viewphoto ||
+							createDiaryMutation.isPending ||
 							!message ||
 							!date ||
-							!weather ||
-							!location ||
-							!together ||
-							!isWinning
+							!isWinning ||
+							(watchType === "DIRECT" && (!selectedStadium || !seatId))
 						}
 					>
-						{isLoading ? (
+						{isLoading || createDiaryMutation.isPending ? (
 							<svg
 								className="animate-spin h-5 w-5 text-white"
 								xmlns="http://www.w3.org/2000/svg"

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
 import EyeIcon from "@/icons/eyeicon";
 
 interface ValidationState {
@@ -34,6 +35,7 @@ const Spinner = () => (
 
 const Login: React.FC = () => {
 	const router = useRouter();
+	const { data: session } = useSession();
 	const [message, setMessage] = useState("");
 	const [emailMessage, setEmailMessage] = useState<ValidationState>({
 		message: "",
@@ -51,11 +53,10 @@ const Login: React.FC = () => {
 
 	// 로그인 상태 체크 및 리다이렉트
 	useEffect(() => {
-		const token = sessionStorage.getItem("token");
-		if (token) {
+		if (session) {
 			router.push("/home");
 		}
-	}, [router]);
+	}, [session, router]);
 
 	const checkFormValid = useCallback(() => {
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -108,35 +109,16 @@ const Login: React.FC = () => {
 		setMessage("");
 
 		try {
-			const response = await fetch(
-				`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/users/login`,
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ email, password }),
-				}
-			);
+			const result = await signIn("credentials", {
+				email,
+				password,
+				redirect: false,
+			});
 
-			if (!response.ok) {
-				const errorText = await response.text();
-				setMessage(errorText || "이메일 또는 비밀번호가 올바르지 않습니다.");
-				return;
-			}
-
-			const data = await response.json();
-			if (data.token) {
-				sessionStorage.setItem("token", data.token);
-				sessionStorage.setItem(
-					"user",
-					JSON.stringify({
-						userId: data.userId,
-						email: data.email,
-						nickname: data.nickname,
-					})
-				);
+			if (result?.error) {
+				setMessage("이메일 또는 비밀번호가 올바르지 않습니다.");
+			} else if (result?.ok) {
 				router.push("/home");
-			} else {
-				setMessage("로그인에 실패했습니다.");
 			}
 		} catch (error) {
 			console.error("Login error:", error);
@@ -147,7 +129,7 @@ const Login: React.FC = () => {
 	};
 
 	const handleGoogleLogin = () => {
-		window.location.href = `${process.env.NEXT_PUBLIC_BACKAPI_URL}/oauth2/authorization/google`;
+		signIn("google", { callbackUrl: "/home" });
 	};
 
 	return (

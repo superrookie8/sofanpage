@@ -1,5 +1,6 @@
 import { atom } from "recoil";
-import { GameLocation, locations } from "@/data/schedule";
+import { GameLocation } from "@/features/games/types";
+import { locations } from "@/features/games/constants";
 
 export const selectedLocationState = atom<GameLocation | null>({
 	key: "selectedLocationState",

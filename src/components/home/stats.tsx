@@ -88,7 +88,7 @@ const Stats: React.FC = () => {
 	useEffect(() => {
 		const fetchStats = async () => {
 			try {
-				const response = await fetch("/api/getstats", {
+				const response = await fetch("/api/stats", {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
@@ -125,7 +125,9 @@ const Stats: React.FC = () => {
 					},
 					total: {
 						MIN: stat.totalMinutes,
-						"FGM-A": `${stat.twoPointMade + stat.threePointMade}-${stat.twoPointAttempted + stat.threePointAttempted}`,
+						"FGM-A": `${stat.twoPointMade + stat.threePointMade}-${
+							stat.twoPointAttempted + stat.threePointAttempted
+						}`,
 						"3PM-A": `${stat.threePointMade}-${stat.threePointAttempted}`,
 						"FTM-A": `${stat.freeThrowMade}-${stat.freeThrowAttempted}`,
 						OFF: stat.totalOffensiveRebounds,

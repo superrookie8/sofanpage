@@ -1,7 +1,7 @@
 import React from "react";
 import { Article } from "@/types/articles";
 import Image from "next/image";
-import useFormatDate from "@/hooks/useFormatDate";
+import useFormatDate from "@/shared/hooks/useFormatDate";
 
 interface MainNewsProps {
 	article: Article;
@@ -9,11 +9,11 @@ interface MainNewsProps {
 
 const MainNews: React.FC<MainNewsProps> = ({ article }) => {
 	const formatDate = useFormatDate();
-	
+
 	if (!article) {
 		return null;
 	}
-	
+
 	return (
 		<div
 			className="flex-col items-center p-4 sm:text-xs"

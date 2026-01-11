@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Article } from "@/types/articles";
 import Image from "next/image";
-import useFormatDate from "@/hooks/useFormatDate";
-import useTruncateText from "@/hooks/useTruncateText";
+import useFormatDate from "@/shared/hooks/useFormatDate";
+import useTruncateText from "@/shared/hooks/useTruncateText";
 
 interface RookieProps {
 	articles: Article[];

@@ -2,13 +2,16 @@
 import type { Metadata } from "next";
 import Script from "next/script"; // Import Script from next
 import "./globals.css";
+import Providers from "@/components/providers/sessionProvider";
+import { authOptions } from "@/config/auth";
+import { getServerSession } from "next-auth";
 import ScriptProvider from "@/utils/scriptProvider";
-import ClientWrapper from "@/components/shared/clientWrapper";
-import Header from "@/components/shared/header";
+import ClientWrapper from "@/shared/ui/clientWrapper";
+import Header from "@/shared/ui/header";
 import Background from "@/components/opening/background";
 import { LoadingProvider } from "@/context/LoadingContext";
-import LoadingSpinner from "@/components/shared/loadingSpinner";
-import RenovationNotice from "@/components/shared/renovationNotice";
+import LoadingSpinner from "@/shared/ui/loadingSpinner";
+import RenovationNotice from "@/shared/ui/renovationNotice";
 
 export const metadata: Metadata = {
 	title: {
@@ -39,11 +42,33 @@ export const metadata: Metadata = {
 	],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
+	// 세션 에러 처리 추가 - JWT 복호화 실패 시에도 앱이 계속 작동하도록
+	let session = null;
+
+	// NEXTAUTH_SECRET이 없으면 세션을 가져오지 않음
+	if (!process.env.NEXTAUTH_SECRET && process.env.NODE_ENV === "production") {
+		console.warn("NEXTAUTH_SECRET is not set. Session will not be available.");
+	} else {
+		try {
+			session = await getServerSession(authOptions);
+		} catch (error: any) {
+			// JWT 복호화 실패 시 세션을 null로 처리
+			// Next-Auth가 내부적으로 에러를 로깅하지만, 앱은 계속 작동하도록 함
+			if (error?.message?.includes("decryption")) {
+				// 손상된 쿠키로 인한 에러는 조용히 처리
+				session = null;
+			} else {
+				console.error("Session error:", error);
+				session = null;
+			}
+		}
+	}
+
 	return (
 		<html lang="en">
 			{/* Google Tag Manager Script */}
@@ -62,13 +87,15 @@ export default function RootLayout({
 			</Script>
 			<ScriptProvider />
 			<body>
-				<LoadingProvider>
-					<LoadingSpinner />
-					<RenovationNotice />
-					<Background />
-					<Header />
-					<ClientWrapper>{children}</ClientWrapper>
-				</LoadingProvider>
+				<Providers session={session}>
+					<LoadingProvider>
+						<LoadingSpinner />
+						<RenovationNotice />
+						<Background />
+						<Header />
+						<ClientWrapper>{children}</ClientWrapper>
+					</LoadingProvider>
+				</Providers>
 			</body>
 		</html>
 	);

@@ -1,6 +1,6 @@
 "use client";
 import MyPageComp from "@/components/mypage/myPageComponent";
-import useAuth from "@/hooks/useAuth";
+import useAuth from "@/features/auth/hooks/useAuth";
 
 export default function Mypage() {
 	useAuth();
