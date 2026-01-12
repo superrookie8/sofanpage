@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { GameLocation, ScheduleResponse } from "../types";

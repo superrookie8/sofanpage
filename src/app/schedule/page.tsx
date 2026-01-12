@@ -1,6 +1,6 @@
 // src/app/schedule/page.tsx
 "use client";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import Calendar from "@/features/games/components/calender";
 import { locations } from "@/features/games/constants";
 import Map from "@/features/games/components/kakaoMap";
@@ -39,10 +39,18 @@ const Schedule: React.FC = () => {
 			<div className="flex flex-row justify-center items-start p-4 mt-4 w-full h-screen max-w-screen-lg">
 				<div className="flex flex-col">
 					<div className="bg-gray-100 bg-opacity-80 w-full">
-						<Calendar
-							onLocationSelect={setSelectedLocation}
-							onGameClick={handleGameClick}
-						/>
+						<Suspense
+							fallback={
+								<div className="w-full h-[600px] flex items-center justify-center">
+									로딩 중...
+								</div>
+							}
+						>
+							<Calendar
+								onLocationSelect={setSelectedLocation}
+								onGameClick={handleGameClick}
+							/>
+						</Suspense>
 					</div>
 				</div>
 			</div>
