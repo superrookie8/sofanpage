@@ -57,12 +57,20 @@ const Calendar: React.FC<CalendarProps> = ({
 
 	const [currentMonth, setCurrentMonth] = useState(initialMonth);
 	const isUpdatingFromURL = useRef(false);
+	const lastUpdatedMonth = useRef<string | null>(null);
 
 	// URL과 동기화 (URL이 변경되면 달력도 업데이트)
 	useEffect(() => {
-		isUpdatingFromURL.current = true;
-		setCurrentMonth(initialMonth);
-		isUpdatingFromURL.current = false;
+		const monthKey = `${initialMonth.getFullYear()}-${initialMonth.getMonth()}`;
+		if (lastUpdatedMonth.current !== monthKey) {
+			isUpdatingFromURL.current = true;
+			setCurrentMonth(initialMonth);
+			lastUpdatedMonth.current = monthKey;
+			// 다음 렌더 사이클에서 false로 설정
+			setTimeout(() => {
+				isUpdatingFromURL.current = false;
+			}, 0);
+		}
 	}, [initialMonth]);
 
 	// currentMonth가 변경될 때 URL 업데이트 (URL에서 온 변경은 제외)
@@ -81,7 +89,7 @@ const Calendar: React.FC<CalendarProps> = ({
 			const params = new URLSearchParams(searchParams.toString());
 			params.set("year", year.toString());
 			params.set("month", month.toString());
-			router.push(`/schedule?${params.toString()}`, { scroll: false });
+			router.replace(`/schedule?${params.toString()}`, { scroll: false });
 		}
 	}, [currentMonth, yearParam, monthParam, searchParams, router]);
 
