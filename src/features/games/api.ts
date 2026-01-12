@@ -43,10 +43,9 @@ export const fetchScheduleDetails = async (
 
 // 날짜 범위로 스케줄 조회 (캘린더용)
 export const fetchSchedulesByDateRange = async (
-	start: string,
-	end: string
+	start: string
 ): Promise<ScheduleResponse[]> => {
-	const response = await fetch(`/api/schedules?start=${start}&end=${end}`, {
+	const response = await fetch(`/api/schedules?start=${start}`, {
 		method: "GET",
 		cache: "no-store",
 	});

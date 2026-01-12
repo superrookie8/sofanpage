@@ -22,8 +22,8 @@ export const useSchedulesByDateRangeQuery = (
 	enabled: boolean = true
 ) => {
 	return useQuery({
-		queryKey: queryKeys.games.schedulesByDateRange(start, end),
-		queryFn: () => fetchSchedulesByDateRange(start, end),
+		queryKey: queryKeys.games.schedulesByDateRange(start),
+		queryFn: () => fetchSchedulesByDateRange(start),
 		enabled: enabled && !!start && !!end,
 		staleTime: 1000 * 60 * 5, // 5분간 캐시
 		gcTime: 1000 * 60 * 30, // 30분간 유지

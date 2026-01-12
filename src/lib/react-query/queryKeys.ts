@@ -25,8 +25,8 @@ export const queryKeys = {
 		details: () => [...queryKeys.games.all, "detail"] as const,
 		detail: (id: string) => [...queryKeys.games.details(), id] as const,
 		schedule: () => [...queryKeys.games.all, "schedule"] as const,
-		schedulesByDateRange: (start: string, end: string) =>
-			[...queryKeys.games.all, "schedules", start, end] as const,
+		schedulesByDateRange: (start: string) =>
+			[...queryKeys.games.all, "schedules", start] as const,
 	},
 
 	// News 관련
