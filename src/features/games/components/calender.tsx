@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { GameLocation, ScheduleResponse } from "../types";
 import { locations } from "../constants";
 import {
@@ -35,12 +35,29 @@ const Calendar: React.FC<CalendarProps> = ({
 }) => {
 	const [currentMonth, setCurrentMonth] = useState(new Date());
 	const [schedules, setSchedules] = useState<ScheduleResponse[]>([]);
-	const startDay = startOfMonth(currentMonth);
-	const endDay = endOfMonth(currentMonth);
-	const daysInCurrentMonth = eachDayOfInterval({
-		start: startDay,
-		end: endDay,
-	});
+	
+	// useMemo로 불필요한 재계산 방지
+	const { startDay, endDay, daysInCurrentMonth, emptyDays } = useMemo(() => {
+		const start = startOfMonth(currentMonth);
+		const end = endOfMonth(currentMonth);
+		return {
+			startDay: start,
+			endDay: end,
+			daysInCurrentMonth: eachDayOfInterval({
+				start: start,
+				end: end,
+			}),
+			emptyDays: Array(getDay(start)).fill(null),
+		};
+	}, [currentMonth]);
+
+	// schedules 상태 변경 감지용 디버깅
+	useEffect(() => {
+		console.log("[캘린더] schedules 상태 변경:", {
+			count: schedules.length,
+			scheduleIds: schedules.map((s) => s.id),
+		});
+	}, [schedules]);
 
 	useEffect(() => {
 		const fetchSchedules = async () => {
@@ -86,15 +103,14 @@ const Calendar: React.FC<CalendarProps> = ({
 
 				const data = await response.json();
 
-				// 응답 데이터 검증 및 로깅
-				if (process.env.NODE_ENV === "development") {
-					console.log("API 응답 데이터:", {
-						isArray: Array.isArray(data),
-						dataType: typeof data,
-						dataLength: Array.isArray(data) ? data.length : "N/A",
-						rawData: data,
-					});
-				}
+				// 응답 데이터 검증 및 로깅 (배포 환경에서도 최소한의 로그)
+				console.log("[캘린더] API 응답 데이터:", {
+					isArray: Array.isArray(data),
+					dataType: typeof data,
+					dataLength: Array.isArray(data) ? data.length : "N/A",
+					startISO,
+					endISO,
+				});
 
 				if (Array.isArray(data)) {
 					// type이 "game"인 스케줄만 필터링
@@ -102,32 +118,30 @@ const Calendar: React.FC<CalendarProps> = ({
 						(schedule: ScheduleResponse) => schedule.type === "game"
 					);
 
-					if (process.env.NODE_ENV === "development") {
-						console.log("필터링된 게임 스케줄:", {
-							total: data.length,
-							games: gameSchedules.length,
-							schedules: gameSchedules,
-						});
-					} else {
-						// 배포 환경에서도 최소한의 성공 로그 (문제 진단용)
-						if (gameSchedules.length === 0 && data.length > 0) {
-							console.warn("일정 데이터는 있지만 게임 스케줄이 없습니다:", {
-								total: data.length,
-								types: data.map((s: ScheduleResponse) => s.type),
-							});
-						}
-					}
+					console.log("[캘린더] 필터링된 게임 스케줄:", {
+						total: data.length,
+						games: gameSchedules.length,
+						scheduleIds: gameSchedules.map((s) => s.id),
+					});
 
+					// 상태 업데이트 전 로그
+					console.log("[캘린더] 상태 업데이트 전 schedules 개수:", schedules.length);
+					
 					setSchedules(gameSchedules);
+					
+					// 상태 업데이트는 비동기이므로, 다음 렌더에서 확인
+					setTimeout(() => {
+						console.log("[캘린더] 상태 업데이트 완료, 예상 개수:", gameSchedules.length);
+					}, 0);
 				} else {
-					console.error("응답이 배열이 아닙니다:", {
+					console.error("[캘린더] 응답이 배열이 아닙니다:", {
 						dataType: typeof data,
 						data: data,
 					});
 					setSchedules([]);
 				}
 			} catch (error) {
-				console.error("일정 가져오기 실패:", error);
+				console.error("[캘린더] 일정 가져오기 실패:", error);
 				setSchedules([]);
 			}
 		};
@@ -157,8 +171,6 @@ const Calendar: React.FC<CalendarProps> = ({
 		});
 	};
 
-	const emptyDays = Array(getDay(startDay)).fill(null);
-
 	const handleDateClick = (schedule: ScheduleResponse) => {
 		const isHome = schedule.location === "Home";
 
@@ -181,12 +193,31 @@ const Calendar: React.FC<CalendarProps> = ({
 	const renderGameSchedule = (date: Date) => {
 		const formattedDate = format(date, "yyyy-MM-dd");
 		const todaySchedules = schedules.filter((schedule) => {
-			const scheduleDate = format(
-				parseISO(schedule.startDateTime),
-				"yyyy-MM-dd"
-			);
-			return scheduleDate === formattedDate;
+			try {
+				const scheduleDate = format(
+					parseISO(schedule.startDateTime),
+					"yyyy-MM-dd"
+				);
+				return scheduleDate === formattedDate;
+			} catch (error) {
+				console.error("[캘린더] 날짜 파싱 오류:", {
+					startDateTime: schedule.startDateTime,
+					error,
+				});
+				return false;
+			}
 		});
+
+		if (todaySchedules.length > 0) {
+			console.log(`[캘린더] ${formattedDate} 일정 렌더링:`, {
+				count: todaySchedules.length,
+				schedules: todaySchedules.map((s) => ({
+					id: s.id,
+					title: s.title,
+					time: s.startDateTime,
+				})),
+			});
+		}
 
 		return todaySchedules.map((schedule, index) => {
 			// 시간 추출 (HH:mm 형식)
