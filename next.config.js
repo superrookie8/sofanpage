@@ -68,6 +68,17 @@ const nextConfig = {
 			},
 		],
 	},
+	webpack: (config, { isServer, dev }) => {
+		// 프로덕션 빌드에서 locatorjs 관련 모듈 제외
+		if (!dev && !isServer) {
+			config.resolve.alias = {
+				...config.resolve.alias,
+				"@locator/runtime": false,
+				"@locator/babel-jsx": false,
+			};
+		}
+		return config;
+	},
 };
 
 module.exports = nextConfig;
