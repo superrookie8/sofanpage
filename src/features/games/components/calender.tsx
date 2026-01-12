@@ -24,46 +24,6 @@ const formatYearMonth = (date: Date): string => {
 
 const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 
-// 한국 시간대(KST) 기준으로 Date를 ISO 문자열로 변환하는 헬퍼 함수
-const formatKSTToISO = (date: Date): string => {
-	// 한국 시간대(Asia/Seoul) 기준으로 날짜 정보를 가져옴
-	const kstDateStr = date.toLocaleString("en-US", {
-		timeZone: "Asia/Seoul",
-		year: "numeric",
-		month: "2-digit",
-		day: "2-digit",
-		hour: "2-digit",
-		minute: "2-digit",
-		second: "2-digit",
-		hour12: false,
-	});
-
-	// "MM/DD/YYYY, HH:mm:ss" 형식을 "YYYY-MM-DDTHH:mm:ss+09:00" 형식으로 변환
-	const [datePart, timePart] = kstDateStr.split(", ");
-	const [month, day, year] = datePart.split("/");
-	return `${year}-${month}-${day}T${timePart}.000+09:00`;
-};
-
-// 타임존 정보가 없는 ISO 문자열을 한국 시간대(KST)로 정규화하는 헬퍼 함수
-// 백엔드에서 타임존 없이 보내는 경우, 프론트엔드에서 명시적으로 KST로 변환
-const normalizeToKST = (isoString: string): string => {
-	// 타임존 정보가 있는지 확인 (Z 또는 +09:00 같은 형식)
-	if (isoString.includes("Z") || isoString.match(/[+-]\d{2}:\d{2}$/)) {
-		// 타임존 정보가 있으면 그대로 반환
-		return isoString;
-	}
-
-	// 타임존 정보가 없으면 한국 시간대(KST, UTC+9)로 명시적으로 변환
-	// 예: "2025-11-16T14:00:00" → "2025-11-16T14:00:00+09:00"
-	return `${isoString}+09:00`;
-};
-
-// 정규화된 ISO 문자열을 Date 객체로 파싱
-const parseKSTDate = (isoString: string): Date => {
-	const normalized = normalizeToKST(isoString);
-	return parseISO(normalized);
-};
-
 interface CalendarProps {
 	onLocationSelect: (location: GameLocation) => void;
 	onGameClick?: (scheduleId: string) => void;
@@ -127,11 +87,9 @@ const Calendar: React.FC<CalendarProps> = ({
 					999
 				);
 
-				// 한국 시간대(KST) 기준으로 ISO 문자열 생성
-				// toISOString() 대신 KST 오프셋을 명시적으로 포함하여 타임존 문제 해결
-				// 예: 2026-02-01 00:00:00 KST → 2026-02-01T00:00:00.000+09:00 (이전: 2026-01-31T15:00:00.000Z)
-				const startISO = formatKSTToISO(start);
-				const endISO = formatKSTToISO(end);
+				// ISO 형식으로 변환
+				const startISO = format(start, "yyyy-MM-dd'T'HH:mm:ss");
+				const endISO = format(end, "yyyy-MM-dd'T'HH:mm:ss");
 
 				const response = await fetch(
 					`/api/schedules?start=${startISO}&end=${endISO}`
@@ -151,55 +109,20 @@ const Calendar: React.FC<CalendarProps> = ({
 
 				const data = await response.json();
 
-				// 응답 데이터 검증 및 로깅 (배포 환경에서도 최소한의 로그)
+				// 응답 데이터 검증 및 로깅
 				console.log("[캘린더] API 응답 데이터:", {
 					isArray: Array.isArray(data),
 					dataType: typeof data,
 					dataLength: Array.isArray(data) ? data.length : "N/A",
-					startISO,
-					endISO,
-					localStart: start.toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }),
-					localEnd: end.toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }),
 				});
 
 				if (Array.isArray(data)) {
-					// type이 "game"인 스케줄만 필터링하고, 날짜를 KST로 정규화
-					const gameSchedules = data
-						.filter((schedule: ScheduleResponse) => schedule.type === "game")
-						.map((schedule: ScheduleResponse) => ({
-							...schedule,
-							// 프론트엔드에서 명시적으로 KST로 정규화
-							startDateTime: normalizeToKST(schedule.startDateTime),
-							endDateTime: normalizeToKST(schedule.endDateTime),
-						}));
-
-					console.log("[캘린더] 필터링 및 정규화된 게임 스케줄:", {
-						total: data.length,
-						games: gameSchedules.length,
-						scheduleIds: gameSchedules.map((s) => s.id),
-						sampleDates: gameSchedules.slice(0, 3).map((s) => ({
-							id: s.id,
-							original: data.find((d: ScheduleResponse) => d.id === s.id)
-								?.startDateTime,
-							normalized: s.startDateTime,
-						})),
-					});
-
-					// 상태 업데이트 전 로그
-					console.log(
-						"[캘린더] 상태 업데이트 전 schedules 개수:",
-						schedules.length
+					// type이 "game"인 스케줄만 필터링
+					const gameSchedules = data.filter(
+						(schedule: ScheduleResponse) => schedule.type === "game"
 					);
 
 					setSchedules(gameSchedules);
-
-					// 상태 업데이트는 비동기이므로, 다음 렌더에서 확인
-					setTimeout(() => {
-						console.log(
-							"[캘린더] 상태 업데이트 완료, 예상 개수:",
-							gameSchedules.length
-						);
-					}, 0);
 				} else {
 					console.error("[캘린더] 응답이 배열이 아닙니다:", {
 						dataType: typeof data,
@@ -262,30 +185,10 @@ const Calendar: React.FC<CalendarProps> = ({
 		const formattedDate = format(date, "yyyy-MM-dd");
 		const todaySchedules = schedules.filter((schedule) => {
 			try {
-				// 한국 시간대(KST)로 명시적으로 파싱
-				const scheduleDateObj = parseKSTDate(schedule.startDateTime);
-				// 한국 시간대 기준으로 날짜 포맷하여 비교
+				// 백엔드에서 받은 데이터를 그대로 파싱
+				const scheduleDateObj = parseISO(schedule.startDateTime);
 				const scheduleDate = format(scheduleDateObj, "yyyy-MM-dd");
-				const matches = scheduleDate === formattedDate;
-
-				// 디버깅: 날짜 매칭 실패 시 로그 출력
-				if (
-					!matches &&
-					scheduleDateObj.getTime() >= date.getTime() - 86400000 &&
-					scheduleDateObj.getTime() <= date.getTime() + 86400000
-				) {
-					console.log("[캘린더] 날짜 매칭 실패 (근접한 날짜):", {
-						calendarDate: formattedDate,
-						scheduleDate,
-						scheduleISO: schedule.startDateTime,
-						scheduleParsed: scheduleDateObj.toISOString(),
-						scheduleKST: scheduleDateObj.toLocaleString("ko-KR", {
-							timeZone: "Asia/Seoul",
-						}),
-					});
-				}
-
-				return matches;
+				return scheduleDate === formattedDate;
 			} catch (error) {
 				console.error("[캘린더] 날짜 파싱 오류:", {
 					startDateTime: schedule.startDateTime,
@@ -307,8 +210,8 @@ const Calendar: React.FC<CalendarProps> = ({
 		}
 
 		return todaySchedules.map((schedule, index) => {
-			// 시간 추출 (HH:mm 형식) - 한국 시간대 기준
-			const time = format(parseKSTDate(schedule.startDateTime), "HH:mm");
+			// 시간 추출 (HH:mm 형식) - 백엔드 데이터를 그대로 파싱
+			const time = format(parseISO(schedule.startDateTime), "HH:mm");
 			const isHome = schedule.location === "Home";
 
 			return (
