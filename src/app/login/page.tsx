@@ -158,6 +158,8 @@ const Login: React.FC = () => {
 								wordBreak: "keep-all",
 								WebkitTextSizeAdjust: "100%",
 								textSizeAdjust: "100%",
+								fontSize: "16px",
+								touchAction: "manipulation",
 							}}
 						></input>
 						<div
@@ -192,6 +194,8 @@ const Login: React.FC = () => {
 								wordBreak: "keep-all",
 								WebkitTextSizeAdjust: "100%",
 								textSizeAdjust: "100%",
+								fontSize: "16px",
+								touchAction: "manipulation",
 							}}
 						/>
 						<button
