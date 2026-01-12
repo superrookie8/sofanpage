@@ -66,11 +66,16 @@ const Calendar: React.FC<CalendarProps> = ({
 				const monthStart = startOfMonth(currentMonth);
 				const monthEnd = endOfMonth(currentMonth);
 
-				// 현재 월의 시작일과 종료일 계산
+				// 한국 시간대(KST, UTC+9) 기준으로 날짜 범위 계산
+				// 로컬 시간대로 날짜를 생성
 				const start = new Date(
 					monthStart.getFullYear(),
 					monthStart.getMonth(),
-					1
+					1,
+					0,
+					0,
+					0,
+					0
 				);
 				const end = new Date(
 					monthEnd.getFullYear(),
@@ -78,10 +83,12 @@ const Calendar: React.FC<CalendarProps> = ({
 					0,
 					23,
 					59,
-					59
+					59,
+					999
 				);
 
-				// ISO 8601 형식으로 변환
+				// ISO 8601 형식으로 변환 (toISOString()은 자동으로 UTC로 변환)
+				// 예: 2026-02-01 00:00:00 KST → 2026-01-31 15:00:00.000Z
 				const startISO = start.toISOString();
 				const endISO = end.toISOString();
 
@@ -110,6 +117,8 @@ const Calendar: React.FC<CalendarProps> = ({
 					dataLength: Array.isArray(data) ? data.length : "N/A",
 					startISO,
 					endISO,
+					localStart: start.toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }),
+					localEnd: end.toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }),
 				});
 
 				if (Array.isArray(data)) {
@@ -191,14 +200,27 @@ const Calendar: React.FC<CalendarProps> = ({
 	};
 
 	const renderGameSchedule = (date: Date) => {
+		// 로컬 시간대 기준으로 날짜 포맷 (yyyy-MM-dd)
 		const formattedDate = format(date, "yyyy-MM-dd");
 		const todaySchedules = schedules.filter((schedule) => {
 			try {
-				const scheduleDate = format(
-					parseISO(schedule.startDateTime),
-					"yyyy-MM-dd"
-				);
-				return scheduleDate === formattedDate;
+				// ISO 문자열을 파싱 (타임존 정보 포함)
+				const scheduleDateObj = parseISO(schedule.startDateTime);
+				// 로컬 시간대 기준으로 날짜 포맷하여 비교
+				const scheduleDate = format(scheduleDateObj, "yyyy-MM-dd");
+				const matches = scheduleDate === formattedDate;
+				
+				// 디버깅: 날짜 매칭 실패 시 로그 출력
+				if (!matches && scheduleDateObj.getTime() >= date.getTime() - 86400000 && scheduleDateObj.getTime() <= date.getTime() + 86400000) {
+					console.log("[캘린더] 날짜 매칭 실패 (근접한 날짜):", {
+						calendarDate: formattedDate,
+						scheduleDate,
+						scheduleISO: schedule.startDateTime,
+						scheduleLocal: scheduleDateObj.toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }),
+					});
+				}
+				
+				return matches;
 			} catch (error) {
 				console.error("[캘린더] 날짜 파싱 오류:", {
 					startDateTime: schedule.startDateTime,
