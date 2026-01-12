@@ -7,6 +7,25 @@ import { format, parseISO } from "date-fns";
 import { useScheduleDetailsQuery } from "../queries";
 import { locations } from "../constants";
 
+// 타임존 정보가 없는 ISO 문자열을 한국 시간대(KST)로 정규화하는 헬퍼 함수
+const normalizeToKST = (isoString: string): string => {
+	// 타임존 정보가 있는지 확인 (Z 또는 +09:00 같은 형식)
+	if (isoString.includes("Z") || isoString.match(/[+-]\d{2}:\d{2}$/)) {
+		// 타임존 정보가 있으면 그대로 반환
+		return isoString;
+	}
+
+	// 타임존 정보가 없으면 한국 시간대(KST, UTC+9)로 명시적으로 변환
+	// 예: "2025-11-16T14:00:00" → "2025-11-16T14:00:00+09:00"
+	return `${isoString}+09:00`;
+};
+
+// 정규화된 ISO 문자열을 Date 객체로 파싱
+const parseKSTDate = (isoString: string): Date => {
+	const normalized = normalizeToKST(isoString);
+	return parseISO(normalized);
+};
+
 interface GameInfoModalProps {
 	scheduleId: string | null;
 	isOpen: boolean;
@@ -20,10 +39,22 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 }) => {
 	const router = useRouter();
 	const {
-		data: scheduleDetails,
+		data: scheduleDetailsRaw,
 		isLoading,
 		error,
 	} = useScheduleDetailsQuery(scheduleId, isOpen);
+
+	// 프론트엔드에서 받은 데이터를 KST로 정규화
+	const scheduleDetails = useMemo(() => {
+		if (!scheduleDetailsRaw) return null;
+
+		return {
+			...scheduleDetailsRaw,
+			// 날짜를 KST로 명시적으로 정규화
+			startDateTime: normalizeToKST(scheduleDetailsRaw.startDateTime),
+			endDateTime: normalizeToKST(scheduleDetailsRaw.endDateTime),
+		};
+	}, [scheduleDetailsRaw]);
 
 	const stadiumLocation = useMemo(() => {
 		if (!scheduleDetails) return null;
@@ -71,7 +102,8 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 
 	const formatDateTime = (dateTime: string) => {
 		try {
-			const date = parseISO(dateTime);
+			// 한국 시간대(KST)로 명시적으로 파싱
+			const date = parseKSTDate(dateTime);
 			return format(date, "yyyy년 MM월 dd일 HH:mm");
 		} catch {
 			return dateTime;
