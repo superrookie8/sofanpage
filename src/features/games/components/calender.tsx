@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { GameLocation, ScheduleResponse } from "../types";
 import { locations } from "../constants";
 import {
@@ -9,6 +9,7 @@ import {
 	getDay,
 	parseISO,
 } from "date-fns";
+import { useSchedulesByDateRangeQuery } from "../queries";
 
 // 월 이름을 한글로 반환하는 함수
 const getKoreanMonth = (date: Date): string => {
@@ -34,110 +35,54 @@ const Calendar: React.FC<CalendarProps> = ({
 	onGameClick,
 }) => {
 	const [currentMonth, setCurrentMonth] = useState(new Date());
-	const [schedules, setSchedules] = useState<ScheduleResponse[]>([]);
 
-	// useMemo로 불필요한 재계산 방지
-	const { startDay, endDay, daysInCurrentMonth, emptyDays } = useMemo(() => {
+	// useMemo로 날짜 범위 계산
+	const { daysInCurrentMonth, emptyDays, startISO, endISO } = useMemo(() => {
 		const start = startOfMonth(currentMonth);
 		const end = endOfMonth(currentMonth);
+
+		const startDate = new Date(
+			start.getFullYear(),
+			start.getMonth(),
+			1,
+			0,
+			0,
+			0,
+			0
+		);
+		const endDate = new Date(
+			end.getFullYear(),
+			end.getMonth() + 1,
+			0,
+			23,
+			59,
+			59,
+			999
+		);
+
 		return {
-			startDay: start,
-			endDay: end,
 			daysInCurrentMonth: eachDayOfInterval({
 				start: start,
 				end: end,
 			}),
 			emptyDays: Array(getDay(start)).fill(null),
+			startISO: format(startDate, "yyyy-MM-dd'T'HH:mm:ss"),
+			endISO: format(endDate, "yyyy-MM-dd'T'HH:mm:ss"),
 		};
 	}, [currentMonth]);
 
-	// schedules 상태 변경 감지용 디버깅
-	useEffect(() => {
-		console.log("[캘린더] schedules 상태 변경:", {
-			count: schedules.length,
-			scheduleIds: schedules.map((s) => s.id),
-		});
-	}, [schedules]);
+	// React Query로 데이터 가져오기
+	const { data: allSchedules = [] } = useSchedulesByDateRangeQuery(
+		startISO,
+		endISO
+	);
 
-	useEffect(() => {
-		const fetchSchedules = async () => {
-			try {
-				// currentMonth를 기반으로 월의 시작일과 종료일 계산
-				const monthStart = startOfMonth(currentMonth);
-				const monthEnd = endOfMonth(currentMonth);
-
-				// 한국 시간대(KST, UTC+9) 기준으로 날짜 범위 계산
-				// 로컬 시간대로 날짜를 생성
-				const start = new Date(
-					monthStart.getFullYear(),
-					monthStart.getMonth(),
-					1,
-					0,
-					0,
-					0,
-					0
-				);
-				const end = new Date(
-					monthEnd.getFullYear(),
-					monthEnd.getMonth() + 1,
-					0,
-					23,
-					59,
-					59,
-					999
-				);
-
-				// ISO 형식으로 변환
-				const startISO = format(start, "yyyy-MM-dd'T'HH:mm:ss");
-				const endISO = format(end, "yyyy-MM-dd'T'HH:mm:ss");
-
-				const response = await fetch(
-					`/api/schedules?start=${startISO}&end=${endISO}`
-				);
-
-				// HTTP 응답 상태 확인
-				if (!response.ok) {
-					const errorData = await response.json().catch(() => ({}));
-					console.error("API 응답 오류:", {
-						status: response.status,
-						statusText: response.statusText,
-						error: errorData,
-					});
-					setSchedules([]);
-					return;
-				}
-
-				const data = await response.json();
-
-				// 응답 데이터 검증 및 로깅
-				console.log("[캘린더] API 응답 데이터:", {
-					isArray: Array.isArray(data),
-					dataType: typeof data,
-					dataLength: Array.isArray(data) ? data.length : "N/A",
-				});
-
-				if (Array.isArray(data)) {
-					// type이 "game"인 스케줄만 필터링
-					const gameSchedules = data.filter(
-						(schedule: ScheduleResponse) => schedule.type === "game"
-					);
-
-					setSchedules(gameSchedules);
-				} else {
-					console.error("[캘린더] 응답이 배열이 아닙니다:", {
-						dataType: typeof data,
-						data: data,
-					});
-					setSchedules([]);
-				}
-			} catch (error) {
-				console.error("[캘린더] 일정 가져오기 실패:", error);
-				setSchedules([]);
-			}
-		};
-
-		fetchSchedules();
-	}, [currentMonth]);
+	// type이 "game"인 스케줄만 필터링
+	const schedules = useMemo(() => {
+		return allSchedules.filter(
+			(schedule: ScheduleResponse) => schedule.type === "game"
+		);
+	}, [allSchedules]);
 
 	const weekDayHeader = weekDays.map((day) => (
 		<div key={day} className="text-center font-bold text-xs md:text-sm">

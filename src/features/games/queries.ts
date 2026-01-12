@@ -1,13 +1,32 @@
 // src/features/games/queries.ts
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/react-query/queryKeys";
-import { fetchGameSchedule, fetchScheduleDetails } from "./api";
+import {
+	fetchGameSchedule,
+	fetchScheduleDetails,
+	fetchSchedulesByDateRange,
+} from "./api";
 
 // 경기 일정 조회 Query
 export const useGameScheduleQuery = () => {
 	return useQuery({
 		queryKey: queryKeys.games.schedule(),
 		queryFn: fetchGameSchedule,
+	});
+};
+
+// 날짜 범위로 스케줄 조회 Query (캘린더용)
+export const useSchedulesByDateRangeQuery = (
+	start: string,
+	end: string,
+	enabled: boolean = true
+) => {
+	return useQuery({
+		queryKey: queryKeys.games.schedulesByDateRange(start, end),
+		queryFn: () => fetchSchedulesByDateRange(start, end),
+		enabled: enabled && !!start && !!end,
+		staleTime: 1000 * 60 * 5, // 5분간 캐시
+		gcTime: 1000 * 60 * 30, // 30분간 유지
 	});
 };
 
