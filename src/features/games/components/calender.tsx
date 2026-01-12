@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { GameLocation, ScheduleResponse } from "../types";
 import { locations } from "../constants";
 import {
@@ -34,7 +35,53 @@ const Calendar: React.FC<CalendarProps> = ({
 	onLocationSelect,
 	onGameClick,
 }) => {
-	const [currentMonth, setCurrentMonth] = useState(new Date());
+	const searchParams = useSearchParams();
+	const router = useRouter();
+
+	// URL에서 year, month 읽기 (없으면 현재 날짜 사용)
+	const yearParam = searchParams.get("year");
+	const monthParam = searchParams.get("month");
+
+	const initialMonth = useMemo(() => {
+		if (yearParam && monthParam) {
+			const year = parseInt(yearParam);
+			const month = parseInt(monthParam) - 1; // 0-based (1월 = 0)
+			if (!isNaN(year) && !isNaN(month) && month >= 0 && month <= 11) {
+				return new Date(year, month, 1);
+			}
+		}
+		return new Date(); // URL에 없으면 현재 날짜
+	}, [yearParam, monthParam]);
+
+	const [currentMonth, setCurrentMonth] = useState(initialMonth);
+	const isUpdatingFromURL = useRef(false);
+
+	// URL과 동기화 (URL이 변경되면 달력도 업데이트)
+	useEffect(() => {
+		isUpdatingFromURL.current = true;
+		setCurrentMonth(initialMonth);
+		isUpdatingFromURL.current = false;
+	}, [initialMonth]);
+
+	// currentMonth가 변경될 때 URL 업데이트 (URL에서 온 변경은 제외)
+	useEffect(() => {
+		if (isUpdatingFromURL.current) {
+			return; // URL에서 온 변경이면 URL 업데이트 안 함
+		}
+
+		const year = currentMonth.getFullYear();
+		const month = currentMonth.getMonth() + 1; // 1-based (1월 = 1)
+		const currentYear = yearParam ? parseInt(yearParam) : null;
+		const currentMonthParam = monthParam ? parseInt(monthParam) : null;
+
+		// URL과 다를 때만 업데이트
+		if (currentYear !== year || currentMonthParam !== month) {
+			const params = new URLSearchParams(searchParams.toString());
+			params.set("year", year.toString());
+			params.set("month", month.toString());
+			router.push(`/schedule?${params.toString()}`, { scroll: false });
+		}
+	}, [currentMonth, yearParam, monthParam, searchParams, router]);
 
 	// useMemo로 날짜 범위 계산
 	const { daysInCurrentMonth, emptyDays, startISO, endISO } = useMemo(() => {
@@ -92,17 +139,13 @@ const Calendar: React.FC<CalendarProps> = ({
 
 	const prevMonth = () => {
 		setCurrentMonth((prevState) => {
-			const year = prevState.getFullYear();
-			const month = prevState.getMonth();
-			return new Date(year, month - 1, 1);
+			return new Date(prevState.getFullYear(), prevState.getMonth() - 1, 1);
 		});
 	};
 
 	const nextMonth = () => {
 		setCurrentMonth((prevState) => {
-			const year = prevState.getFullYear();
-			const month = prevState.getMonth();
-			return new Date(year, month + 1, 1);
+			return new Date(prevState.getFullYear(), prevState.getMonth() + 1, 1);
 		});
 	};
 
