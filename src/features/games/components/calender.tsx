@@ -71,16 +71,64 @@ const Calendar: React.FC<CalendarProps> = ({
 				const response = await fetch(
 					`/api/schedules?start=${startISO}&end=${endISO}`
 				);
+
+				// HTTP 응답 상태 확인
+				if (!response.ok) {
+					const errorData = await response.json().catch(() => ({}));
+					console.error("API 응답 오류:", {
+						status: response.status,
+						statusText: response.statusText,
+						error: errorData,
+					});
+					setSchedules([]);
+					return;
+				}
+
 				const data = await response.json();
+
+				// 응답 데이터 검증 및 로깅
+				if (process.env.NODE_ENV === "development") {
+					console.log("API 응답 데이터:", {
+						isArray: Array.isArray(data),
+						dataType: typeof data,
+						dataLength: Array.isArray(data) ? data.length : "N/A",
+						rawData: data,
+					});
+				}
+
 				if (Array.isArray(data)) {
 					// type이 "game"인 스케줄만 필터링
 					const gameSchedules = data.filter(
 						(schedule: ScheduleResponse) => schedule.type === "game"
 					);
+
+					if (process.env.NODE_ENV === "development") {
+						console.log("필터링된 게임 스케줄:", {
+							total: data.length,
+							games: gameSchedules.length,
+							schedules: gameSchedules,
+						});
+					} else {
+						// 배포 환경에서도 최소한의 성공 로그 (문제 진단용)
+						if (gameSchedules.length === 0 && data.length > 0) {
+							console.warn("일정 데이터는 있지만 게임 스케줄이 없습니다:", {
+								total: data.length,
+								types: data.map((s: ScheduleResponse) => s.type),
+							});
+						}
+					}
+
 					setSchedules(gameSchedules);
+				} else {
+					console.error("응답이 배열이 아닙니다:", {
+						dataType: typeof data,
+						data: data,
+					});
+					setSchedules([]);
 				}
 			} catch (error) {
-				// 에러 처리 (콘솔 로그 제거)
+				console.error("일정 가져오기 실패:", error);
+				setSchedules([]);
 			}
 		};
 
