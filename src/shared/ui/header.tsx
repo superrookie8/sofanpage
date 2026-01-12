@@ -192,7 +192,7 @@ const Header: React.FC = () => {
 								<Link
 									href="/diary/read"
 									className={`${mobileLinkStyle(
-										"/mypage"
+										"/diary"
 									)} hover:bg-red-200 active:bg-red-600`}
 									onClick={toggleMenu}
 								>
@@ -223,7 +223,7 @@ const Header: React.FC = () => {
 								<Link
 									href="/diary/create"
 									className={`${mobileLinkStyle(
-										"/mypage"
+										"/diary"
 									)} hover:bg-red-200 active:bg-red-600`}
 									onClick={toggleMenu}
 								>

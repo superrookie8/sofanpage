@@ -38,6 +38,7 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 	onClose,
 }) => {
 	const router = useRouter();
+
 	const {
 		data: scheduleDetailsRaw,
 		isLoading,
@@ -112,36 +113,37 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 
 	return (
 		<div
-			className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+			className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 md:p-4 z-50"
 			onClick={handleOutsideClick}
 		>
 			<div
-				className="relative bg-white rounded-lg shadow-xl w-[600px] min-w-[600px] max-w-[600px] h-[700px] overflow-y-auto box-border flex-shrink-0"
+				className="relative bg-white rounded-lg shadow-xl overflow-y-auto box-border"
 				style={{
-					width: "600px",
-					minWidth: "600px",
-					maxWidth: "600px",
-					height: "700px",
+					width: "500px",
+					height: "650px",
+					maxWidth: "95vw",
+					maxHeight: "90vh",
 				}}
 				onClick={(e) => e.stopPropagation()}
 			>
 				{/* 닫기 버튼 */}
 				<button
-					className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold z-10"
+					className="absolute top-2 right-2 md:top-4 md:right-4 text-gray-500 hover:text-gray-700 text-3xl md:text-2xl font-bold z-10 w-10 h-10 md:w-auto md:h-auto flex items-center justify-center"
 					onClick={onClose}
+					aria-label="닫기"
 				>
 					&times;
 				</button>
 
 				{/* 모달 내용 */}
-				<div className="p-6 box-border overflow-hidden">
+				<div className="p-4 md:p-6 box-border overflow-hidden">
 					{isLoading ? (
-						<div className="flex items-center justify-center h-full min-h-[500px]">
-							<div className="text-lg">로딩 중...</div>
+						<div className="flex items-center justify-center h-full min-h-[300px] md:min-h-[500px]">
+							<div className="text-base md:text-lg">로딩 중...</div>
 						</div>
 					) : error ? (
-						<div className="flex flex-col items-center justify-center h-full min-h-[500px]">
-							<div className="text-red-500 mb-4">
+						<div className="flex flex-col items-center justify-center h-full min-h-[300px] md:min-h-[500px]">
+							<div className="text-red-500 mb-4 text-sm md:text-base px-4 text-center">
 								{error instanceof Error
 									? error.message
 									: "스케줄 상세 정보를 불러올 수 없습니다."}
@@ -150,19 +152,19 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 					) : scheduleDetails ? (
 						<>
 							{/* 일정 정보 */}
-							<div className="mb-6">
-								<h2 className="text-2xl font-bold mb-4">
+							<div className="mb-4 md:mb-6">
+								<h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 pr-8">
 									vs {scheduleDetails.title} (
 									{scheduleDetails.location === "Home" ? "BNK 홈 경기" : "원정"}
 									)
 								</h2>
 								{scheduleDetails.description && (
-									<p className="text-gray-600 mb-4">
+									<p className="text-gray-600 mb-3 md:mb-4 text-sm md:text-base">
 										{scheduleDetails.description}
 									</p>
 								)}
 								<div className="space-y-2">
-									<p>
+									<p className="text-sm md:text-base">
 										<span className="font-semibold">경기 시작:</span>{" "}
 										{formatDateTime(scheduleDetails.startDateTime)}
 									</p>
@@ -174,9 +176,11 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 								<>
 									{/* 지도 */}
 									{stadiumLocation && (
-										<div className="mb-6">
-											<h2 className="text-xl font-bold mb-4">🗺️ 경기장 위치</h2>
-											<div className="w-full h-[300px] rounded-lg overflow-hidden border border-gray-300">
+										<div className="mb-4 md:mb-6">
+											<h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4">
+												🗺️ 경기장 위치
+											</h2>
+											<div className="w-full h-[200px] md:h-[300px] rounded-lg overflow-hidden border border-gray-300">
 												<Map
 													selectedLocation={stadiumLocation}
 													mapId="game-info-modal-map"
@@ -186,18 +190,20 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 									)}
 
 									{/* 경기장 상세 정보 */}
-									<div className="mb-6">
-										<h2 className="text-xl font-bold mb-4">경기장 정보</h2>
-										<div className="space-y-3">
-											<p>
+									<div className="mb-4 md:mb-6">
+										<h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4">
+											경기장 정보
+										</h2>
+										<div className="space-y-2 md:space-y-3">
+											<p className="text-sm md:text-base">
 												<span className="font-semibold">경기장:</span>{" "}
 												{scheduleDetails.stadium.name}
 											</p>
-											<p>
+											<p className="text-sm md:text-base">
 												<span className="font-semibold">주소:</span>{" "}
 												{scheduleDetails.stadium.address}
 											</p>
-											<p>
+											<p className="text-sm md:text-base">
 												<span className="font-semibold">수용인원:</span>{" "}
 												{scheduleDetails.stadium.capacity.toLocaleString()}석
 											</p>
@@ -205,14 +211,18 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 									</div>
 
 									{/* 교통정보 */}
-									<div className="mb-6">
-										<h2 className="text-xl font-bold mb-4">🚇 교통정보</h2>
-										<div className="space-y-3">
+									<div className="mb-4 md:mb-6">
+										<h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4">
+											🚇 교통정보
+										</h2>
+										<div className="space-y-2 md:space-y-3">
 											{scheduleDetails.stadium.subwayInfo &&
 												scheduleDetails.stadium.subwayInfo.length > 0 && (
 													<div>
-														<p className="font-semibold mb-1">지하철:</p>
-														<ul className="text-sm bg-gray-100 p-2 rounded list-disc list-inside">
+														<p className="font-semibold mb-1 text-sm md:text-base">
+															지하철:
+														</p>
+														<ul className="text-xs md:text-sm bg-gray-100 p-2 md:p-3 rounded list-disc list-inside">
 															{scheduleDetails.stadium.subwayInfo.map(
 																(info, index) => (
 																	<li key={index}>{info}</li>
@@ -224,8 +234,10 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 											{scheduleDetails.stadium.busInfo &&
 												scheduleDetails.stadium.busInfo.length > 0 && (
 													<div>
-														<p className="font-semibold mb-1">버스:</p>
-														<ul className="text-sm bg-gray-100 p-2 rounded list-disc list-inside">
+														<p className="font-semibold mb-1 text-sm md:text-base">
+															버스:
+														</p>
+														<ul className="text-xs md:text-sm bg-gray-100 p-2 md:p-3 rounded list-disc list-inside">
 															{scheduleDetails.stadium.busInfo.map(
 																(info, index) => (
 																	<li key={index}>{info}</li>
@@ -236,8 +248,10 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 												)}
 											{scheduleDetails.stadium.intercityRoute && (
 												<div>
-													<p className="font-semibold mb-1">시외교통:</p>
-													<p className="text-sm whitespace-pre-line bg-gray-100 p-2 rounded">
+													<p className="font-semibold mb-1 text-sm md:text-base">
+														시외교통:
+													</p>
+													<p className="text-xs md:text-sm whitespace-pre-line bg-gray-100 p-2 md:p-3 rounded">
 														{scheduleDetails.stadium.intercityRoute}
 													</p>
 												</div>
@@ -248,10 +262,10 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 							)}
 
 							{/* 직관일지 버튼 (gameId가 있으면 보러가기, 없으면 작성하기) */}
-							<div className="mt-6">
+							<div className="mt-4 md:mt-6">
 								<button
 									onClick={handleCreateDiary}
-									className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
+									className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 md:py-3 px-4 rounded-lg transition-colors text-sm md:text-base"
 								>
 									{scheduleDetails.gameId
 										? "직관일지 보러가기"
