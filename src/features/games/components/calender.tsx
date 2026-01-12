@@ -24,6 +24,26 @@ const formatYearMonth = (date: Date): string => {
 
 const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 
+// 한국 시간대(KST) 기준으로 Date를 ISO 문자열로 변환하는 헬퍼 함수
+const formatKSTToISO = (date: Date): string => {
+	// 한국 시간대(Asia/Seoul) 기준으로 날짜 정보를 가져옴
+	const kstDateStr = date.toLocaleString("en-US", {
+		timeZone: "Asia/Seoul",
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
+		hour: "2-digit",
+		minute: "2-digit",
+		second: "2-digit",
+		hour12: false,
+	});
+
+	// "MM/DD/YYYY, HH:mm:ss" 형식을 "YYYY-MM-DDTHH:mm:ss+09:00" 형식으로 변환
+	const [datePart, timePart] = kstDateStr.split(", ");
+	const [month, day, year] = datePart.split("/");
+	return `${year}-${month}-${day}T${timePart}.000+09:00`;
+};
+
 // 타임존 정보가 없는 ISO 문자열을 한국 시간대(KST)로 정규화하는 헬퍼 함수
 // 백엔드에서 타임존 없이 보내는 경우, 프론트엔드에서 명시적으로 KST로 변환
 const normalizeToKST = (isoString: string): string => {
@@ -107,10 +127,11 @@ const Calendar: React.FC<CalendarProps> = ({
 					999
 				);
 
-				// ISO 8601 형식으로 변환 (toISOString()은 자동으로 UTC로 변환)
-				// 예: 2026-02-01 00:00:00 KST → 2026-01-31 15:00:00.000Z
-				const startISO = start.toISOString();
-				const endISO = end.toISOString();
+				// 한국 시간대(KST) 기준으로 ISO 문자열 생성
+				// toISOString() 대신 KST 오프셋을 명시적으로 포함하여 타임존 문제 해결
+				// 예: 2026-02-01 00:00:00 KST → 2026-02-01T00:00:00.000+09:00 (이전: 2026-01-31T15:00:00.000Z)
+				const startISO = formatKSTToISO(start);
+				const endISO = formatKSTToISO(end);
 
 				const response = await fetch(
 					`/api/schedules?start=${startISO}&end=${endISO}`
