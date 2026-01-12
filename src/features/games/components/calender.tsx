@@ -188,24 +188,9 @@ const Calendar: React.FC<CalendarProps> = ({
 				const scheduleDate = format(scheduleDateObj, "yyyy-MM-dd");
 				return scheduleDate === formattedDate;
 			} catch (error) {
-				console.error("[캘린더] 날짜 파싱 오류:", {
-					startDateTime: schedule.startDateTime,
-					error,
-				});
 				return false;
 			}
 		});
-
-		if (todaySchedules.length > 0) {
-			console.log(`[캘린더] ${formattedDate} 일정 렌더링:`, {
-				count: todaySchedules.length,
-				schedules: todaySchedules.map((s) => ({
-					id: s.id,
-					title: s.title,
-					time: s.startDateTime,
-				})),
-			});
-		}
 
 		return todaySchedules.map((schedule, index) => {
 			// 시간 추출 (HH:mm 형식) - 백엔드 데이터를 그대로 파싱
