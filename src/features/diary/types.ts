@@ -52,15 +52,37 @@ export interface DiaryEntry {
 	};
 }
 
-// 일지 생성 요청 타입
+// 일지 생성 요청 타입 (모든 필드 nullable)
 export interface CreateDiaryRequest {
-	gameId?: string;
-	watchType: "DIRECT" | "HOUSE";
-	content: string;
-	photoUrls: string[];
-	seatId?: string;
-	gameWinner?: "HOME" | "AWAY";
-	companion?: string[];
+	gameId?: string | null;
+	watchType?: "DIRECT" | "HOUSE" | null;
+	content?: string | null;
+	photoUrls?: string[] | null;
+	seatId?: string | null;
+	seatRow?: string | null;
+	seatNumber?: string | null;
+	companion?: string[] | null;
+	mvpPlayerName?: string | null;
+	cheeredPlayerName?: string | null;
+	gameHomeScore?: number | null;
+	gameAwayScore?: number | null;
+	gameWinner?: "HOME" | "AWAY" | null;
+	cheeredPlayerPoints?: number | null;
+	cheeredPlayerAssists?: number | null;
+	cheeredPlayerRebounds?: number | null;
+	cheeredPlayerTwoPointMade?: number | null;
+	cheeredPlayerTwoPointPercent?: number | null;
+	cheeredPlayerThreePointMade?: number | null;
+	cheeredPlayerThreePointPercent?: number | null;
+	cheeredPlayerFreeThrowMade?: number | null;
+	cheeredPlayerFreeThrowPercent?: number | null;
+	cheeredPlayerFouls?: number | null;
+	cheeredPlayerBlocks?: number | null;
+	cheeredPlayerTurnovers?: number | null;
+	cheeredPlayerMemo?: string | null;
+	date?: string | null;
+	weather?: string | null;
+	location?: string | null;
 }
 
 // 일지 수정 요청 타입

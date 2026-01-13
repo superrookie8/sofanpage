@@ -1,33 +1,35 @@
-// src/app/diary/create/page.tsx
+// src/app/diary/[id]/edit/page.tsx
 "use client";
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { DiaryEditor } from "@/features/diary/editor/DiaryEditor";
-import { useCreateDiaryMutation } from "@/features/diary/mutations";
+import { useDiaryQuery } from "@/features/diary/queries";
+import { useUpdateDiaryMutation } from "@/features/diary/mutations";
+import { diaryEntryToDraft } from "@/features/diary/editor/utils";
+import LoadingSpinner from "@/shared/ui/loadingSpinner";
 import type { DiaryDraft } from "@/features/diary/editor/types";
 import type { CreateDiaryRequest } from "@/features/diary/types";
 
-export default function DiaryCreatePage() {
+export default function DiaryEditPage() {
+	const params = useParams();
 	const router = useRouter();
-	const createDiaryMutation = useCreateDiaryMutation();
+	const diaryId = params?.id as string;
 
-	const handleSave = async (draft: DiaryDraft) => {
-		// DiaryDraft를 CreateDiaryRequest로 변환
-		// 사진 R2 key들을 배열로 합치기 (빈 문자열 제외)
+	const { data: diary, isLoading, error } = useDiaryQuery(diaryId);
+	const updateDiaryMutation = useUpdateDiaryMutation();
+
+	// DiaryDraft를 CreateDiaryRequest로 변환하는 함수 (create와 동일)
+	const convertDraftToRequest = (draft: DiaryDraft): CreateDiaryRequest => {
 		const photoUrls = [
 			draft.ticketPhoto,
 			draft.viewPhoto,
 			draft.additionalPhoto,
 		].filter((url) => url && url.trim() !== "");
 
-		// 날짜와 시간을 합쳐서 date 필드에 저장 (YYYY-MM-DD 형식)
 		const dateStr = draft.base.date || undefined;
-
-		// 첫 번째 선수 정보 추출 (백엔드가 단일 선수만 지원하는 경우)
 		const firstPlayer =
 			draft.players && draft.players.length > 0 ? draft.players[0] : null;
 
-		// 2점 야투율 계산
 		const calculateFg2Percent = (made: number | "", att: number | "") => {
 			if (typeof made === "number" && typeof att === "number" && att > 0) {
 				return Math.round((made / att) * 100);
@@ -35,7 +37,6 @@ export default function DiaryCreatePage() {
 			return null;
 		};
 
-		// 3점 야투율 계산
 		const calculateFg3Percent = (made: number | "", att: number | "") => {
 			if (typeof made === "number" && typeof att === "number" && att > 0) {
 				return Math.round((made / att) * 100);
@@ -43,9 +44,7 @@ export default function DiaryCreatePage() {
 			return null;
 		};
 
-		// 빈 값은 undefined로 처리 (API 문서: 모든 필드 nullable)
-		const request: CreateDiaryRequest = {
-			// 기본 정보
+		return {
 			gameId:
 				draft.base.stadiumId && draft.base.stadiumId.trim()
 					? draft.base.stadiumId
@@ -63,8 +62,6 @@ export default function DiaryCreatePage() {
 					: undefined,
 			content: draft.memo && draft.memo.trim() ? draft.memo : undefined,
 			photoUrls: photoUrls.length > 0 ? photoUrls : undefined,
-
-			// 좌석 정보
 			seatId:
 				draft.base.seatId && draft.base.seatId.trim()
 					? draft.base.seatId
@@ -77,8 +74,6 @@ export default function DiaryCreatePage() {
 				draft.base.seatNumber && draft.base.seatNumber.trim()
 					? draft.base.seatNumber
 					: undefined,
-
-			// 경기 정보
 			gameWinner:
 				draft.base.result === "승"
 					? "HOME"
@@ -92,12 +87,8 @@ export default function DiaryCreatePage() {
 							.map((c) => c.trim())
 							.filter((c) => c.length > 0)
 					: undefined,
-
-			// MVP 정보
 			mvpPlayerName:
 				draft.mvp.name && draft.mvp.name.trim() ? draft.mvp.name : undefined,
-
-			// 응원 선수 정보 (첫 번째 선수만)
 			cheeredPlayerName:
 				firstPlayer && firstPlayer.name && firstPlayer.name.trim()
 					? firstPlayer.name
@@ -151,9 +142,15 @@ export default function DiaryCreatePage() {
 					? firstPlayer.team
 					: undefined,
 		};
+	};
 
-		await createDiaryMutation.mutateAsync(request);
-		router.push("/diary/read");
+	const handleSave = async (draft: DiaryDraft) => {
+		const request = convertDraftToRequest(draft);
+		await updateDiaryMutation.mutateAsync({
+			diaryId,
+			data: request,
+		});
+		router.push(`/diary/${diaryId}`);
 	};
 
 	const handleSaveDraft = async (draft: DiaryDraft) => {
@@ -161,5 +158,37 @@ export default function DiaryCreatePage() {
 		console.log("임시저장:", draft);
 	};
 
-	return <DiaryEditor onSave={handleSave} onSaveDraft={handleSaveDraft} />;
+	if (isLoading) {
+		return (
+			<div className="flex items-center justify-center min-h-screen">
+				<LoadingSpinner />
+			</div>
+		);
+	}
+
+	if (error || !diary) {
+		return (
+			<div className="flex items-center justify-center min-h-screen">
+				<div className="text-center">
+					<p className="text-lg mb-4">일지를 불러올 수 없습니다.</p>
+					<button
+						onClick={() => router.push("/diary/read")}
+						className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+					>
+						목록으로 돌아가기
+					</button>
+				</div>
+			</div>
+		);
+	}
+
+	const initialDraft = diaryEntryToDraft(diary);
+
+	return (
+		<DiaryEditor
+			initialDraft={initialDraft}
+			onSave={handleSave}
+			onSaveDraft={handleSaveDraft}
+		/>
+	);
 }

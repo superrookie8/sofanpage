@@ -41,17 +41,17 @@ export const setupClientInterceptors = (instance: AxiosInstance) => {
 			originalRequest._retry = true;
 
 			if (typeof window !== "undefined") {
-				const { getSession } = await import("next-auth/react");
+				const { getSession, signOut } = await import("next-auth/react");
 				const session = await getSession();
 				
-				// 세션이 실제로 없을 때만 로그아웃 처리
+				// 401 에러는 토큰 만료 또는 인증 실패를 의미하므로 로그아웃 처리
 				if (!session || !session.accessToken) {
 					console.warn("401 error: No valid session, signing out");
-					const { signOut } = await import("next-auth/react");
 					await signOut({ redirect: true, callbackUrl: "/login" });
 				} else {
-					// 세션이 있는데 401이면 토큰 만료일 수 있으므로 그냥 에러만 반환
-					console.warn("401 error but session exists, token may be expired");
+					// 세션이 있어도 401이면 백엔드 토큰이 만료된 것으로 간주하고 로그아웃
+					console.warn("401 error: Token expired, signing out");
+					await signOut({ redirect: true, callbackUrl: "/login" });
 				}
 			}
 		}

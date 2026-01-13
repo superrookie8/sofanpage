@@ -106,7 +106,7 @@ const Header: React.FC = () => {
 
 						{isLoggedIn && (
 							<>
-								<Link href="/diary/create" className={linkStyle("/diary")}>
+								<Link href="/diary/read" className={linkStyle("/diary")}>
 									직관일지
 								</Link>
 								<Link href="/mypage" className={linkStyle("/mypage")}>
@@ -221,7 +221,7 @@ const Header: React.FC = () => {
 						{isLoggedIn && (
 							<>
 								<Link
-									href="/diary/create"
+									href="/diary/read"
 									className={`${mobileLinkStyle(
 										"/diary"
 									)} hover:bg-red-200 active:bg-red-600`}
