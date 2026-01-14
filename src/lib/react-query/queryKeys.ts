@@ -10,6 +10,8 @@ export const queryKeys = {
 			[...queryKeys.diary.lists(), filters] as const,
 		details: () => [...queryKeys.diary.all, "detail"] as const,
 		detail: (id: string) => [...queryKeys.diary.details(), id] as const,
+		byGameId: (gameId: string) =>
+			[...queryKeys.diary.all, "game", gameId] as const,
 		userDiaries: (nickname: string) =>
 			[...queryKeys.diary.all, "user", nickname] as const,
 		stats: (nickname: string) =>

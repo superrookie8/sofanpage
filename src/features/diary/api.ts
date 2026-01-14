@@ -58,6 +58,16 @@ export const fetchDiaryById = async (diaryId: string): Promise<DiaryEntry> => {
 	return response.data;
 };
 
+// gameId로 일지 조회 (없으면 null)
+export const fetchDiaryByGameId = async (
+	gameId: string
+): Promise<DiaryEntry | null> => {
+	const response = await clientAxiosService.get<DiaryEntry | null>(
+		`/api/diary/game/${gameId}`
+	);
+	return response.data ?? null;
+};
+
 // 일지 생성
 export const createDiary = async (
 	data: CreateDiaryRequest

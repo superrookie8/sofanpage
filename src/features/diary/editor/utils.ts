@@ -18,9 +18,10 @@ export function diaryEntryToDraft(diary: DiaryEntry): Partial<DiaryDraft> {
 	// 날짜 파싱 (YYYY-MM-DD 형식에서 date와 time 분리)
 	const dateStr = diary.date || diary.createdAt || "";
 	const date = dateStr ? dateStr.split("T")[0] : "";
-	const time = dateStr && dateStr.includes("T")
-		? dateStr.split("T")[1]?.substring(0, 5) || ""
-		: "";
+	const time =
+		dateStr && dateStr.includes("T")
+			? dateStr.split("T")[1]?.substring(0, 5) || ""
+			: "";
 
 	// 사진 URL에서 R2 key 추출 (Presigned URL이면 key만 추출, 아니면 그대로 사용)
 	const extractR2Key = (url: string | undefined): string => {
@@ -94,7 +95,10 @@ export function diaryEntryToDraft(diary: DiaryEntry): Partial<DiaryDraft> {
 			date,
 			time,
 			location: diary.location || "",
-			stadiumId: diary.gameId || "",
+			// gameId는 games 테이블의 실제 id (stadiumId와 혼용 금지)
+			gameId: diary.gameId || "",
+			// stadiumId는 "경기장 선택/좌석 조회"용 id인데 DiaryEntry에 없어서 여기서 복원 불가
+			stadiumId: undefined,
 			watchType: diary.watchType === "DIRECT" ? "직관" : "집관",
 			companions: diary.companion?.join(", ") || "",
 			result: diary.gameWinner === "HOME" ? "승" : "패",

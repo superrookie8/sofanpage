@@ -39,12 +39,12 @@ export const useScheduleDetailsQuery = (
 		queryKey: queryKeys.games.detail(scheduleId || ""),
 		queryFn: () => fetchScheduleDetails(scheduleId!),
 		enabled: enabled && !!scheduleId,
-		// 캐시된 데이터를 10분간 사용 (스케줄 정보는 자주 변경되지 않음)
-		staleTime: 1000 * 60 * 10,
+		// gameId 등 "현재 상태"가 중요해서 모달 열 때마다 최신 값을 받도록 함
+		staleTime: 0,
 		// 캐시를 30분간 유지
 		gcTime: 1000 * 60 * 30,
-		// 백그라운드 refetch 비활성화 (모달이 열릴 때만 fetch)
-		refetchOnMount: false,
+		// 모달을 열 때마다 항상 refetch (캐시로 인해 gameId=null이 고정되는 현상 방지)
+		refetchOnMount: "always",
 		refetchOnWindowFocus: false,
 	});
 };

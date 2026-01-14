@@ -5,6 +5,7 @@ import {
 	fetchAllDiaries,
 	fetchPersonalDiaries,
 	fetchDiaryById,
+	fetchDiaryByGameId,
 } from "./api";
 import type { DiaryListFilter } from "./types";
 
@@ -32,5 +33,18 @@ export const useDiaryQuery = (diaryId: string, enabled = true) => {
 		queryKey: queryKeys.diary.detail(diaryId),
 		queryFn: () => fetchDiaryById(diaryId),
 		enabled: enabled && !!diaryId,
+	});
+};
+
+// gameId로 해당 경기의 일지 조회 (없으면 null)
+export const useDiaryByGameIdQuery = (gameId: string | null, enabled = true) => {
+	return useQuery({
+		queryKey: queryKeys.diary.byGameId(gameId || ""),
+		queryFn: () => fetchDiaryByGameId(gameId!),
+		enabled: enabled && !!gameId,
+		staleTime: 1000 * 30, // 30초 정도면 충분
+		gcTime: 1000 * 60 * 10,
+		refetchOnMount: false,
+		refetchOnWindowFocus: false,
 	});
 };

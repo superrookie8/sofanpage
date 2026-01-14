@@ -6,6 +6,12 @@ export interface BaseInfo {
 	date: string;
 	time: string;
 	location: string; // 경기장 이름 (드롭다운에서 선택)
+	/**
+	 * games 테이블의 실제 game id
+	 * - 백엔드 Diary API의 gameId에 들어가야 하는 값
+	 * - stadiumId(경기장 id)와 절대 혼용하면 안 됨
+	 */
+	gameId?: string;
 	stadiumId?: string; // 경기장 ID
 	watchType: WatchType;
 	companions: string;

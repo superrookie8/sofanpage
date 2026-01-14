@@ -61,12 +61,18 @@ export async function GET(
 
 		const backendData = await backendResponse.json();
 
-		// 캐싱 헤더 추가 (10분간 캐시)
 		const response = NextResponse.json(backendData, { status: 200 });
-		response.headers.set(
-			"Cache-Control",
-			"public, s-maxage=600, stale-while-revalidate=300"
-		);
+		// 캐싱 헤더
+		// - 개발 환경: gameId 반영/디버깅을 위해 캐시 금지
+		// - 운영 환경: 10분 캐시
+		if (isDevelopment) {
+			response.headers.set("Cache-Control", "no-store");
+		} else {
+			response.headers.set(
+				"Cache-Control",
+				"public, s-maxage=600, stale-while-revalidate=300"
+			);
+		}
 
 		return response;
 	} catch (error: any) {

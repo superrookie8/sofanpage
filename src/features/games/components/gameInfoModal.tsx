@@ -6,6 +6,7 @@ import Map from "./kakaoMap";
 import { format, parseISO } from "date-fns";
 import { useScheduleDetailsQuery } from "../queries";
 import { locations } from "../constants";
+import { useDiaryByGameIdQuery } from "@/features/diary/queries";
 
 // 타임존 정보가 없는 ISO 문자열을 한국 시간대(KST)로 정규화하는 헬퍼 함수
 const normalizeToKST = (isoString: string): string => {
@@ -84,6 +85,12 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 		return location;
 	}, [scheduleDetails]);
 
+	// scheduleDetails가 있어야 gameId를 알 수 있음
+	const gameId = scheduleDetails?.gameId ?? null;
+	// 훅 호출 순서 보장을 위해 항상 호출하고, enabled로만 실행 제어
+	const { data: diaryForGame, isLoading: isDiaryLoading } =
+		useDiaryByGameIdQuery(gameId, isOpen && !!gameId);
+
 	if (!isOpen) return null;
 
 	const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -94,11 +101,9 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 
 	const handleCreateDiary = () => {
 		// 로그인 체크는 middleware에서 처리됨
-		if (scheduleDetails?.gameId) {
-			router.push(`/diary/game/${scheduleDetails.gameId}`);
-		} else {
-			router.push("/diary/create");
-		}
+		if (!gameId) return router.push("/diary/create");
+		// /diary/game/[gameId] 페이지에서 "있으면 보기/없으면 작성"으로 최종 라우팅
+		router.push(`/diary/game/${gameId}`);
 	};
 
 	const formatDateTime = (dateTime: string) => {
@@ -267,7 +272,11 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 									onClick={handleCreateDiary}
 									className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 md:py-3 px-4 rounded-lg transition-colors text-sm md:text-base"
 								>
-									{scheduleDetails.gameId
+									{!gameId
+										? "직관일지 작성하기"
+										: isDiaryLoading
+										? "직관일지 확인 중..."
+										: diaryForGame
 										? "직관일지 보러가기"
 										: "직관일지 작성하기"}
 								</button>

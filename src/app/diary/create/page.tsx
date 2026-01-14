@@ -1,7 +1,7 @@
 // src/app/diary/create/page.tsx
 "use client";
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { DiaryEditor } from "@/features/diary/editor/DiaryEditor";
 import { useCreateDiaryMutation } from "@/features/diary/mutations";
 import type { DiaryDraft } from "@/features/diary/editor/types";
@@ -9,7 +9,10 @@ import type { CreateDiaryRequest } from "@/features/diary/types";
 
 export default function DiaryCreatePage() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const createDiaryMutation = useCreateDiaryMutation();
+
+	const gameIdFromUrl = searchParams.get("gameId");
 
 	const handleSave = async (draft: DiaryDraft) => {
 		// DiaryDraft를 CreateDiaryRequest로 변환
@@ -47,8 +50,8 @@ export default function DiaryCreatePage() {
 		const request: CreateDiaryRequest = {
 			// 기본 정보
 			gameId:
-				draft.base.stadiumId && draft.base.stadiumId.trim()
-					? draft.base.stadiumId
+				draft.base.gameId && draft.base.gameId.trim()
+					? draft.base.gameId
 					: undefined,
 			watchType:
 				draft.base.watchType === "직관"
@@ -161,5 +164,15 @@ export default function DiaryCreatePage() {
 		console.log("임시저장:", draft);
 	};
 
-	return <DiaryEditor onSave={handleSave} onSaveDraft={handleSaveDraft} />;
+	return (
+		<DiaryEditor
+			initialDraft={{
+				base: {
+					gameId: gameIdFromUrl || undefined,
+				},
+			}}
+			onSave={handleSave}
+			onSaveDraft={handleSaveDraft}
+		/>
+	);
 }

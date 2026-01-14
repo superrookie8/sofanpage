@@ -11,8 +11,18 @@ import AlertModal from "@/shared/ui/alertModal";
 import type { DiaryDraft, PlayerStats, StatKey } from "./types";
 import { uid } from "./utils";
 
+type DiaryEditorInitialDraft = Partial<
+	Omit<DiaryDraft, "base" | "mvp" | "highlights" | "players">
+> & {
+	base?: Partial<DiaryDraft["base"]>;
+	mvp?: Partial<DiaryDraft["mvp"]>;
+	highlights?: Partial<DiaryDraft["highlights"]>;
+	players?: PlayerStats[];
+};
+
 interface DiaryEditorProps {
-	initialDraft?: Partial<DiaryDraft>;
+	// create/edit 화면에서 필요한 값만 일부 주입할 수 있도록 deep-partial 형태로 받음
+	initialDraft?: DiaryEditorInitialDraft;
 	onSave?: (draft: DiaryDraft) => Promise<void>;
 	onSaveDraft?: (draft: DiaryDraft) => Promise<void>;
 }

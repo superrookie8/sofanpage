@@ -46,8 +46,8 @@ export default function DiaryEditPage() {
 
 		return {
 			gameId:
-				draft.base.stadiumId && draft.base.stadiumId.trim()
-					? draft.base.stadiumId
+				draft.base.gameId && draft.base.gameId.trim()
+					? draft.base.gameId
 					: undefined,
 			watchType:
 				draft.base.watchType === "직관"

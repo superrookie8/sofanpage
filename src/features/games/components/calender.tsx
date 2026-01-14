@@ -134,10 +134,11 @@ const Calendar: React.FC<CalendarProps> = ({
 		endISO
 	);
 
-	// type이 "game"인 스케줄만 필터링
+	// type이 "game" 또는 "specialGame"인 스케줄만 필터링
 	const schedules = useMemo(() => {
 		return allSchedules.filter(
-			(schedule: ScheduleResponse) => schedule.type === "game"
+			(schedule: ScheduleResponse) =>
+				schedule.type === "game" || schedule.type === "specialGame"
 		);
 	}, [allSchedules]);
 
