@@ -15,6 +15,14 @@ export default function DiaryCreatePage() {
 	const gameIdFromUrl = searchParams.get("gameId");
 
 	const handleSave = async (draft: DiaryDraft) => {
+		// gameId는 반드시 필요함 (URL 파라미터 또는 draft에서)
+		const gameId = gameIdFromUrl || draft.base.gameId;
+		
+		if (!gameId || !gameId.trim()) {
+			alert("경기 정보가 없습니다. 다시 시도해주세요.");
+			return;
+		}
+
 		// DiaryDraft를 CreateDiaryRequest로 변환
 		// 사진 R2 key들을 배열로 합치기 (빈 문자열 제외)
 		const photoUrls = [
@@ -48,11 +56,8 @@ export default function DiaryCreatePage() {
 
 		// 빈 값은 undefined로 처리 (API 문서: 모든 필드 nullable)
 		const request: CreateDiaryRequest = {
-			// 기본 정보
-			gameId:
-				draft.base.gameId && draft.base.gameId.trim()
-					? draft.base.gameId
-					: undefined,
+			// 기본 정보 - gameId는 반드시 전달
+			gameId: gameId.trim(),
 			watchType:
 				draft.base.watchType === "직관"
 					? "DIRECT"
@@ -155,8 +160,17 @@ export default function DiaryCreatePage() {
 					: undefined,
 		};
 
-		await createDiaryMutation.mutateAsync(request);
-		router.push("/diary/read");
+		const result = await createDiaryMutation.mutateAsync(request);
+		
+		// 백엔드에서 일지 아이디가 반환되는지 확인
+		if (!result || !result.id) {
+			alert("일지가 생성되었지만 일지 ID를 받지 못했습니다. 일지 목록 페이지로 이동합니다.");
+			router.push("/diary/read");
+			return;
+		}
+		
+		// 일지 상세 페이지로 이동
+		router.push(`/diary/${result.id}`);
 	};
 
 	const handleSaveDraft = async (draft: DiaryDraft) => {
@@ -164,11 +178,30 @@ export default function DiaryCreatePage() {
 		console.log("임시저장:", draft);
 	};
 
+	// gameId가 없으면 경고하고 리다이렉트
+	if (!gameIdFromUrl) {
+		return (
+			<div className="flex items-center justify-center min-h-screen">
+				<div className="text-center">
+					<p className="text-red-500 text-lg mb-4">
+						경기 정보가 없습니다.
+					</p>
+					<button
+						onClick={() => router.push("/schedule")}
+						className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+					>
+						경기 일정으로 돌아가기
+					</button>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<DiaryEditor
 			initialDraft={{
 				base: {
-					gameId: gameIdFromUrl || undefined,
+					gameId: gameIdFromUrl,
 				},
 			}}
 			onSave={handleSave}

@@ -62,10 +62,19 @@ export const fetchDiaryById = async (diaryId: string): Promise<DiaryEntry> => {
 export const fetchDiaryByGameId = async (
 	gameId: string
 ): Promise<DiaryEntry | null> => {
-	const response = await clientAxiosService.get<DiaryEntry | null>(
-		`/api/diary/game/${gameId}`
-	);
-	return response.data ?? null;
+	try {
+		const response = await clientAxiosService.get<DiaryEntry | null>(
+			`/api/diary/game/${gameId}`
+		);
+		return response.data ?? null;
+	} catch (error: any) {
+		// 404 에러는 해당 경기에 대한 일지가 없다는 의미이므로 null 반환
+		if (error.response?.status === 404) {
+			return null;
+		}
+		// 다른 에러는 다시 던짐
+		throw error;
+	}
 };
 
 // 일지 생성

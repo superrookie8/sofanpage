@@ -46,5 +46,13 @@ export const useDiaryByGameIdQuery = (gameId: string | null, enabled = true) => 
 		gcTime: 1000 * 60 * 10,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
+		// 404는 에러가 아닌 정상 케이스로 처리
+		retry: (failureCount, error: any) => {
+			// 404 에러는 재시도하지 않음
+			if (error?.response?.status === 404) {
+				return false;
+			}
+			return failureCount < 3;
+		},
 	});
 };
