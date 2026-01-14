@@ -12,6 +12,11 @@ import Background from "@/components/opening/background";
 import { LoadingProvider } from "@/context/LoadingContext";
 import LoadingSpinner from "@/shared/ui/loadingSpinner";
 
+// next-auth(getServerSession)가 headers/cookies를 사용하므로
+// 루트 레이아웃은 정적 프리렌더링(SSG) 대상이 되면 빌드가 실패할 수 있음.
+// 전체 앱을 동적 렌더링으로 명시해 빌드/배포에서 안정적으로 동작하게 함.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
 	title: {
 		default: "농구선수 이소희 팬페이지 SUPER SOHEE",
