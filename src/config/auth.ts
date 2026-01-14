@@ -142,7 +142,7 @@ export const authOptions: NextAuthOptions = {
 			? "dev-secret-key-change-in-production"
 			: undefined),
 
-	// 개발 환경에서 쿠키 문제 해결
+	// 개발 환경에서 쿠키 문제 해결 (모바일 사파리 호환성 개선)
 	cookies: {
 		sessionToken: {
 			name:
@@ -154,6 +154,8 @@ export const authOptions: NextAuthOptions = {
 				sameSite: "lax",
 				path: "/",
 				secure: process.env.NODE_ENV === "production",
+				// 모바일 사파리에서 쿠키가 제대로 설정되도록 maxAge 명시
+				maxAge: 30 * 24 * 60 * 60, // 30일
 			},
 		},
 	},

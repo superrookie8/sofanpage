@@ -118,7 +118,11 @@ const Login: React.FC = () => {
 			if (result?.error) {
 				setMessage("이메일 또는 비밀번호가 올바르지 않습니다.");
 			} else if (result?.ok) {
-				router.push("/home");
+				// 모바일 사파리에서 세션 쿠키가 제대로 설정되도록
+				// router.refresh()로 세션을 강제로 새로고침한 후 리다이렉트
+				router.refresh();
+				// 모바일 사파리 호환성을 위해 window.location.href 사용
+				window.location.href = "/home";
 			}
 		} catch (error) {
 			console.error("Login error:", error);

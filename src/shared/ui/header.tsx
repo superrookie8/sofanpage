@@ -59,7 +59,17 @@ const Header: React.FC = () => {
 	};
 
 	const handleLogout = async () => {
-		await signOut({ redirect: true, callbackUrl: "/home" });
+		try {
+			// 모바일 사파리에서 리다이렉트가 제대로 작동하지 않을 수 있으므로
+			// redirect: false로 설정하고 수동으로 리다이렉트
+			await signOut({ redirect: false, callbackUrl: "/home" });
+			// 모바일 사파리 호환성을 위해 window.location.href 사용
+			window.location.href = "/home";
+		} catch (error) {
+			console.error("Logout error:", error);
+			// 에러가 발생해도 홈으로 이동
+			window.location.href = "/home";
+		}
 	};
 
 	const toggleMenu = () => {

@@ -6,11 +6,14 @@ const nextConfig = {
 	async headers() {
 		return [
 			{
+				// API 응답은 사용자/세션에 따라 달라질 수 있어 캐싱 금지
+				// (특히 next-auth의 /api/auth/*, 그리고 인증이 필요한 /api/diary 등)
+				// 모바일 Safari에서 로그아웃/세션 반영이 안 되는 원인이 될 수 있음
 				source: "/api/(.*)",
 				headers: [
 					{
 						key: "Cache-Control",
-						value: "public, max-age=0, stale-while-revalidate=86400",
+						value: "private, no-store, max-age=0",
 					},
 				],
 			},

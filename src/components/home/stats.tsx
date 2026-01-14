@@ -102,7 +102,6 @@ const Stats: React.FC = () => {
 				}
 
 				const backendData: PlayerStat[] = await response.json();
-				console.log("Fetched data:", backendData);
 
 				// 백엔드 응답을 StatsData 형식으로 변환
 				const convertedData: StatsData[] = backendData.map((stat) => ({
