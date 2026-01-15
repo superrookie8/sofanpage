@@ -132,7 +132,7 @@ export const authOptions: NextAuthOptions = {
 
 	session: {
 		strategy: "jwt",
-		maxAge: 30 * 24 * 60 * 60, // 30일
+		maxAge: 24 * 60 * 60, // 24시간 (1일) - 보안을 위해 세션 만료 시간 단축
 	},
 
 	// NEXTAUTH_SECRET이 없으면 경고하고 기본값 사용 (개발 환경)
@@ -154,8 +154,9 @@ export const authOptions: NextAuthOptions = {
 				sameSite: "lax",
 				path: "/",
 				secure: process.env.NODE_ENV === "production",
-				// 모바일 사파리에서 쿠키가 제대로 설정되도록 maxAge 명시
-				maxAge: 30 * 24 * 60 * 60, // 30일
+				// 보안을 위해 세션 쿠키로 설정 (브라우저 닫으면 만료)
+				// 모바일 사파리 호환성을 위해 최소한의 maxAge 설정 (24시간)
+				maxAge: 24 * 60 * 60, // 24시간 (1일)
 			},
 		},
 	},

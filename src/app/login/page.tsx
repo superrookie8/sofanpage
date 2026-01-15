@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 import EyeIcon from "@/icons/eyeicon";
 
@@ -35,6 +35,8 @@ const Spinner = () => (
 
 const Login: React.FC = () => {
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const callbackUrl = searchParams.get("callbackUrl");
 	const { data: session } = useSession();
 	const [message, setMessage] = useState("");
 	const [emailMessage, setEmailMessage] = useState<ValidationState>({
@@ -54,9 +56,11 @@ const Login: React.FC = () => {
 	// 로그인 상태 체크 및 리다이렉트
 	useEffect(() => {
 		if (session) {
-			router.push("/home");
+			// callbackUrl이 있으면 해당 경로로, 없으면 홈으로
+			const redirectUrl = callbackUrl || "/home";
+			router.push(redirectUrl);
 		}
-	}, [session, router]);
+	}, [session, router, callbackUrl]);
 
 	const checkFormValid = useCallback(() => {
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -121,8 +125,10 @@ const Login: React.FC = () => {
 				// 모바일 사파리에서 세션 쿠키가 제대로 설정되도록
 				// router.refresh()로 세션을 강제로 새로고침한 후 리다이렉트
 				router.refresh();
+				// callbackUrl이 있으면 해당 경로로, 없으면 홈으로
+				const redirectUrl = callbackUrl || "/home";
 				// 모바일 사파리 호환성을 위해 window.location.href 사용
-				window.location.href = "/home";
+				window.location.href = redirectUrl;
 			}
 		} catch (error) {
 			console.error("Login error:", error);
@@ -133,7 +139,9 @@ const Login: React.FC = () => {
 	};
 
 	const handleGoogleLogin = () => {
-		signIn("google", { callbackUrl: "/home" });
+		// callbackUrl이 있으면 해당 경로로, 없으면 홈으로
+		const redirectUrl = callbackUrl || "/home";
+		signIn("google", { callbackUrl: redirectUrl });
 	};
 
 	return (

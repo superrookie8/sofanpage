@@ -135,7 +135,7 @@ const Calendar: React.FC<CalendarProps> = ({
 	);
 
 	// type이 "game" 또는 "specialGame"인 스케줄만 필터링
-	const schedules = useMemo(() => {
+	const schedules: ScheduleResponse[] = useMemo(() => {
 		return allSchedules.filter(
 			(schedule: ScheduleResponse) =>
 				schedule.type === "game" || schedule.type === "specialGame"
@@ -193,7 +193,7 @@ const Calendar: React.FC<CalendarProps> = ({
 			}
 		});
 
-		return todaySchedules.map((schedule, index) => {
+		return todaySchedules.map((schedule: ScheduleResponse, index: number) => {
 			// 시간 추출 (HH:mm 형식) - 백엔드 데이터를 그대로 파싱
 			const time = format(parseISO(schedule.startDateTime), "HH:mm");
 			const isHome = schedule.location === "Home";

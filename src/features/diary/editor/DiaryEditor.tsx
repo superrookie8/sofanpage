@@ -208,7 +208,7 @@ export const DiaryEditor: React.FC<DiaryEditorProps> = ({
 					<div className="flex items-center gap-2">
 						<button
 							type="button"
-							onClick={() => router.back()}
+							onClick={() => router.push("/diary/read")}
 							className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-md transition"
 						>
 							← 목록으로

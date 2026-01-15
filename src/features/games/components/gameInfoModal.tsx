@@ -7,6 +7,7 @@ import { format, parseISO } from "date-fns";
 import { useScheduleDetailsQuery } from "../queries";
 import { locations } from "../constants";
 import { useDiaryByGameIdQuery } from "@/features/diary/queries";
+import { useSession } from "next-auth/react";
 
 // 타임존 정보가 없는 ISO 문자열을 한국 시간대(KST)로 정규화하는 헬퍼 함수
 const normalizeToKST = (isoString: string): string => {
@@ -39,6 +40,7 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 	onClose,
 }) => {
 	const router = useRouter();
+	const { data: session } = useSession();
 
 	const {
 		data: scheduleDetailsRaw,
@@ -87,9 +89,9 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 
 	// scheduleDetails가 있어야 gameId를 알 수 있음
 	const gameId = scheduleDetails?.gameId ?? null;
-	// 훅 호출 순서 보장을 위해 항상 호출하고, enabled로만 실행 제어
+	// 로그인한 사용자에게만 일지 조회 (로그인하지 않은 사용자는 모달을 볼 수 있어야 함)
 	const { data: diaryForGame, isLoading: isDiaryLoading } =
-		useDiaryByGameIdQuery(gameId, isOpen && !!gameId);
+		useDiaryByGameIdQuery(gameId, isOpen && !!gameId && !!session);
 
 	if (!isOpen) return null;
 
@@ -273,6 +275,8 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 									className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 md:py-3 px-4 rounded-lg transition-colors text-sm md:text-base"
 								>
 									{!gameId
+										? "직관일지 작성하기"
+										: !session
 										? "직관일지 작성하기"
 										: isDiaryLoading
 										? "직관일지 확인 중..."
