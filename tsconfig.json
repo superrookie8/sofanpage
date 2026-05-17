@@ -37,8 +37,6 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "src/states/**/*",
-    "src/utils/recoilRootProvider.tsx"
+    "node_modules"
   ]
 }

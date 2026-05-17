@@ -16,6 +16,20 @@ interface BaseInfoSectionProps {
 	onChange: (base: BaseInfo) => void;
 }
 
+/** 경기장 이름으로 목록에서 id 매칭 (스케줄 상세에 stadium.id가 없을 때) */
+const resolveStadiumId = (
+	stadiums: StadiumInfo[],
+	location?: string
+): string | undefined => {
+	if (!location?.trim()) return undefined;
+	const name = location.trim();
+	const exact = stadiums.find((s) => s.name === name);
+	if (exact) return exact.id;
+	return stadiums.find(
+		(s) => s.name.includes(name) || name.includes(s.name)
+	)?.id;
+};
+
 export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 	base,
 	onChange,
@@ -42,6 +56,18 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 		};
 		loadStadiums();
 	}, []);
+
+	// 경기 선택 등으로 경기장 이름만 채워진 경우 → stadiumId 매칭 후 좌석 API 호출 가능하게
+	useEffect(() => {
+		if (base.stadiumId || !base.location?.trim() || stadiums.length === 0) {
+			return;
+		}
+		const matchedId = resolveStadiumId(stadiums, base.location);
+		if (matchedId) {
+			onChange({ ...base, stadiumId: matchedId });
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [base.location, base.stadiumId, stadiums]);
 
 	// 경기장 선택 시 좌석 계층 구조 로드
 	useEffect(() => {

@@ -8,6 +8,7 @@ import {
 	fetchSchedulesByDateRange,
 } from "@/features/games/api";
 import type { ScheduleResponse } from "@/features/games/types";
+import { locations } from "@/features/games/constants";
 import type { BaseInfo } from "../types";
 import { SectionTitle } from "./SectionTitle";
 
@@ -70,6 +71,13 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 				...base,
 				scheduleId: undefined,
 				gameId: undefined,
+				stadiumId: undefined,
+				location: "",
+				seatId: undefined,
+				seatZone: undefined,
+				seatBlock: undefined,
+				seatRow: undefined,
+				seatNumber: undefined,
 			});
 			return;
 		}
@@ -93,14 +101,25 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 				// 날짜 파싱 실패 시 기존 값 유지
 			}
 
+			const isHome = details.location === "Home";
+			const locationName =
+				details.stadium?.name ||
+				(isHome ? locations["부산 사직실내체육관"].name : details.location) ||
+				base.location;
+
 			onChange({
 				...base,
 				scheduleId,
 				gameId: details.gameId,
 				date,
 				time,
-				location: details.stadium?.name || details.location || base.location,
-				stadiumId: details.stadium?.id || base.stadiumId,
+				location: locationName,
+				stadiumId: details.stadium?.id,
+				seatId: undefined,
+				seatZone: undefined,
+				seatBlock: undefined,
+				seatRow: undefined,
+				seatNumber: undefined,
 			});
 		} catch {
 			alert("경기 정보를 불러오지 못했습니다. 다시 시도해주세요.");

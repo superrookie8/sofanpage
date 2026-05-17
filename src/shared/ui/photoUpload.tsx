@@ -1,5 +1,5 @@
 import React, { useRef, ChangeEvent, useState } from "react";
-import { PhotoData } from "@/states/photoPreviewState";
+import type { PhotoData } from "@/types/photoUpload";
 import Image from "next/image";
 
 interface PhotoUploadProps {

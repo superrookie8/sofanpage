@@ -62,9 +62,6 @@ importers:
       react-modal:
         specifier: ^3.16.1
         version: 3.16.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react-query:
-        specifier: ^3.39.3
-        version: 3.39.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-slick:
         specifier: ^0.30.2
         version: 0.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -92,9 +89,6 @@ importers:
       uuid:
         specifier: ^10.0.0
         version: 10.0.0
-      zustand:
-        specifier: ^4.5.0
-        version: 4.5.7(@types/react@18.3.27)(react@18.3.1)
     devDependencies:
       '@babel/preset-react':
         specifier: ^7.25.9
@@ -1488,10 +1482,6 @@ packages:
     resolution: {integrity: sha512-Sg0xJUNDU1sJNGdfGWhVHX0kkZ+HWcvmVymJbj6NSgZZmW/8S9Y2HQ5euytnIgakgxN6papOAWiwDo1ctFDcoQ==}
     hasBin: true
 
-  big-integer@1.6.52:
-    resolution: {integrity: sha512-QxD8cf2eVqJOOz63z6JIN9BzvVs/dlySa5HGSBH5xtR8dPteIRQnBxxKqkNTiT6jbDTF6jAfrd4oMcND9RGbQg==}
-    engines: {node: '>=0.6'}
-
   binary-extensions@2.3.0:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
     engines: {node: '>=8'}
@@ -1505,9 +1495,6 @@ packages:
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
     engines: {node: '>=8'}
-
-  broadcast-channel@3.7.0:
-    resolution: {integrity: sha512-cIAKJXAxGJceNZGTZSBzMxzyOn72cVgPnKx4dc6LRjQgbaJUQqhy5rzL3zbMxkMWsGKkv2hSFkPRMEXfoMZ2Mg==}
 
   browser-image-compression@2.0.2:
     resolution: {integrity: sha512-pBLlQyUf6yB8SmmngrcOw3EoS4RpQ1BcylI3T9Yqn7+4nrQTXJD4sJDe5ODnJdrvNMaio5OicFo75rDyJD2Ucw==}
@@ -1679,9 +1666,6 @@ packages:
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
-
-  detect-node@2.1.0:
-    resolution: {integrity: sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==}
 
   dezalgo@1.0.4:
     resolution: {integrity: sha512-rXSP0bf+5n0Qonsb+SVVfNfIsimO4HEtmnIpPHY8Q1UCzKlQrDMfdobr8nJOOsRgWCyMRqeSBQzmWUMq7zvVig==}
@@ -2235,9 +2219,6 @@ packages:
   jquery@3.7.1:
     resolution: {integrity: sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==}
 
-  js-sha3@0.8.0:
-    resolution: {integrity: sha512-gF1cRrHhIzNfToc802P800N8PpXS+evLLXfsVpowqmAFR9uwbi89WvXg2QspOmXL8QL86J4T1EpFu+yUkwJY3Q==}
-
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
@@ -2317,9 +2298,6 @@ packages:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
 
-  match-sorter@6.3.4:
-    resolution: {integrity: sha512-jfZW7cWS5y/1xswZo8VBOdudUiSd9nifYRWphc9M5D/ee4w4AoXLgBEdRbgVaxbMuagBPeUC5y2Hi8DO6o9aDg==}
-
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
@@ -2331,9 +2309,6 @@ packages:
   micromatch@4.0.8:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
     engines: {node: '>=8.6'}
-
-  microseconds@0.2.0:
-    resolution: {integrity: sha512-n7DHHMjR1avBbSpsTBj6fmMGh2AGrifVV4e+WYc3Q9lO+xnSZ3NyhcBND3vzzatt05LFhoKFRxrIyklmLlUtyA==}
 
   mime-db@1.52.0:
     resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
@@ -2368,9 +2343,6 @@ packages:
 
   mz@2.7.0:
     resolution: {integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==}
-
-  nano-time@1.0.0:
-    resolution: {integrity: sha512-flnngywOoQ0lLQOTRNexn2gGSNuM9bKj9RZAWSzhQ+UJYaAFG9bac4DW9VHjUAzrOaIcajHybCTHe/bkvozQqA==}
 
   nanoid@3.3.11:
     resolution: {integrity: sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==}
@@ -2478,9 +2450,6 @@ packages:
   object.values@1.2.1:
     resolution: {integrity: sha512-gXah6aZrcUxjWg2zR2MwouP2eHlCBzdV4pygudehaKXSGW4v2AsRQUK+lwwXhii6KFZcunEnmSUoYp5CXibxtA==}
     engines: {node: '>= 0.4'}
-
-  oblivious-set@1.0.0:
-    resolution: {integrity: sha512-z+pI07qxo4c2CulUHCDf9lcqDlMSo72N/4rLUpRXf6fu+q8vjt8y0xS+Tlf8NTJDdTXHbdeO1n3MlbctwEoXZw==}
 
   oidc-token-hash@5.2.0:
     resolution: {integrity: sha512-6gj2m8cJZ+iSW8bm0FXdGF0YhIQbKrfP4yWTNzxc31U6MOjfEmB1rHvlYvxI1B7t7BCi1F2vYTT6YhtQRG4hxw==}
@@ -2654,18 +2623,6 @@ packages:
       react: ^0.14.0 || ^15.0.0 || ^16 || ^17 || ^18 || ^19
       react-dom: ^0.14.0 || ^15.0.0 || ^16 || ^17 || ^18 || ^19
 
-  react-query@3.39.3:
-    resolution: {integrity: sha512-nLfLz7GiohKTJDuT4us4X3h/8unOh+00MLb2yJoGTPjxKs2bc1iDhkNx2bd5MKklXnOD3NrVZ+J2UXujA5In4g==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: '*'
-      react-native: '*'
-    peerDependenciesMeta:
-      react-dom:
-        optional: true
-      react-native:
-        optional: true
-
   react-slick@0.30.3:
     resolution: {integrity: sha512-B4x0L9GhkEWUMApeHxr/Ezp2NncpGc+5174R02j+zFiWuYboaq98vmxwlpafZfMjZic1bjdIqqmwLDcQY0QaFA==}
     peerDependencies:
@@ -2725,9 +2682,6 @@ packages:
   regjsparser@0.13.0:
     resolution: {integrity: sha512-NZQZdC5wOE/H3UT28fVGL+ikOZcEzfMGk/c3iN9UGxzWHMa1op7274oyiUVrAG4B2EuFhus8SvkaYnhvW92p9Q==}
     hasBin: true
-
-  remove-accents@0.5.0:
-    resolution: {integrity: sha512-8g3/Otx1eJaVD12e31UbJj1YzdtVvzH85HV7t+9MJYk/u3XmkOUJ5Ys9wQrf9PCPK8+xn4ymzqYCiZl6QWKn+A==}
 
   resize-observer-polyfill@1.5.1:
     resolution: {integrity: sha512-LwZrotdHOo12nQuZlHEmtuXdqGoOD0OhaxopaNFxWzInpEgaLWoVuAMbTzixuosCx2nEG58ngzW3vxdWoxIgdg==}
@@ -3055,9 +3009,6 @@ packages:
     resolution: {integrity: sha512-hpbDzxUY9BFwX+UeBnxv3Sh1q7HFxj48DTmXchNgRa46lO8uj3/1iEn3MiNUYTg1g9ctIqXCCERn8gYZhHC5lQ==}
     engines: {node: '>=4'}
 
-  unload@2.2.0:
-    resolution: {integrity: sha512-B60uB5TNBLtN6/LsgAf3udH9saB5p7gqJwcFfbOEZ8BcBHnGwCf6G/TGiEqkRAxX7zAFIUtzdrXQSdL3Q/wqNA==}
-
   unrs-resolver@1.11.1:
     resolution: {integrity: sha512-bSjt9pjaEBnNiGgc9rUiHGKv5l4/TGzDmYw3RhnkJGtLhbnnA/5qJj7x3dNDCRx/PJxu774LlH8lCOlB4hEfKg==}
 
@@ -3069,11 +3020,6 @@ packages:
 
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
-
-  use-sync-external-store@1.6.0:
-    resolution: {integrity: sha512-Pp6GSwGP/NrPIrxVFAIkOQeyw8lFenOHijQWkUTrDvrF4ALqylP2C/KCkeS9dpUM3KvYRQhna5vt7IL95+ZQ9w==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
@@ -3133,21 +3079,6 @@ packages:
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
-
-  zustand@4.5.7:
-    resolution: {integrity: sha512-CHOUy7mu3lbD6o6LJLfllpjkzhHXSBlX8B9+qPddUsIfeF5S/UZ5q0kmCsnRqT1UHFQZchNFDDzMbQsuesHWlw==}
-    engines: {node: '>=12.7.0'}
-    peerDependencies:
-      '@types/react': '>=16.8'
-      immer: '>=9.0.6'
-      react: '>=16.8'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      immer:
-        optional: true
-      react:
-        optional: true
 
 snapshots:
 
@@ -4648,8 +4579,6 @@ snapshots:
 
   baseline-browser-mapping@2.9.11: {}
 
-  big-integer@1.6.52: {}
-
   binary-extensions@2.3.0: {}
 
   brace-expansion@1.1.12:
@@ -4664,17 +4593,6 @@ snapshots:
   braces@3.0.3:
     dependencies:
       fill-range: 7.1.1
-
-  broadcast-channel@3.7.0:
-    dependencies:
-      '@babel/runtime': 7.28.4
-      detect-node: 2.1.0
-      js-sha3: 0.8.0
-      microseconds: 0.2.0
-      nano-time: 1.0.0
-      oblivious-set: 1.0.0
-      rimraf: 3.0.2
-      unload: 2.2.0
 
   browser-image-compression@2.0.2:
     dependencies:
@@ -4841,8 +4759,6 @@ snapshots:
   depd@1.1.2: {}
 
   detect-libc@2.1.2: {}
-
-  detect-node@2.1.0: {}
 
   dezalgo@1.0.4:
     dependencies:
@@ -5556,8 +5472,6 @@ snapshots:
 
   jquery@3.7.1: {}
 
-  js-sha3@0.8.0: {}
-
   js-tokens@4.0.0: {}
 
   js-yaml@4.1.1:
@@ -5628,11 +5542,6 @@ snapshots:
     dependencies:
       yallist: 4.0.0
 
-  match-sorter@6.3.4:
-    dependencies:
-      '@babel/runtime': 7.28.4
-      remove-accents: 0.5.0
-
   math-intrinsics@1.1.0: {}
 
   merge2@1.4.1: {}
@@ -5641,8 +5550,6 @@ snapshots:
     dependencies:
       braces: 3.0.3
       picomatch: 2.3.1
-
-  microseconds@0.2.0: {}
 
   mime-db@1.52.0: {}
 
@@ -5679,10 +5586,6 @@ snapshots:
       any-promise: 1.3.0
       object-assign: 4.1.1
       thenify-all: 1.6.0
-
-  nano-time@1.0.0:
-    dependencies:
-      big-integer: 1.6.52
 
   nanoid@3.3.11: {}
 
@@ -5787,8 +5690,6 @@ snapshots:
       call-bound: 1.0.4
       define-properties: 1.2.1
       es-object-atoms: 1.1.1
-
-  oblivious-set@1.0.0: {}
 
   oidc-token-hash@5.2.0: {}
 
@@ -5943,15 +5844,6 @@ snapshots:
       react-lifecycles-compat: 3.0.4
       warning: 4.0.3
 
-  react-query@3.39.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
-    dependencies:
-      '@babel/runtime': 7.28.4
-      broadcast-channel: 3.7.0
-      match-sorter: 6.3.4
-      react: 18.3.1
-    optionalDependencies:
-      react-dom: 18.3.1(react@18.3.1)
-
   react-slick@0.30.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       classnames: 2.5.1
@@ -6031,8 +5923,6 @@ snapshots:
   regjsparser@0.13.0:
     dependencies:
       jsesc: 3.1.0
-
-  remove-accents@0.5.0: {}
 
   resize-observer-polyfill@1.5.1: {}
 
@@ -6476,11 +6366,6 @@ snapshots:
 
   unicode-property-aliases-ecmascript@2.2.0: {}
 
-  unload@2.2.0:
-    dependencies:
-      '@babel/runtime': 7.28.4
-      detect-node: 2.1.0
-
   unrs-resolver@1.11.1:
     dependencies:
       napi-postinstall: 0.3.4
@@ -6514,10 +6399,6 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
-
-  use-sync-external-store@1.6.0(react@18.3.1):
-    dependencies:
-      react: 18.3.1
 
   util-deprecate@1.0.2: {}
 
@@ -6587,10 +6468,3 @@ snapshots:
   yallist@4.0.0: {}
 
   yocto-queue@0.1.0: {}
-
-  zustand@4.5.7(@types/react@18.3.27)(react@18.3.1):
-    dependencies:
-      use-sync-external-store: 1.6.0(react@18.3.1)
-    optionalDependencies:
-      '@types/react': 18.3.27
-      react: 18.3.1
