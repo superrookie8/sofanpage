@@ -1,6 +1,6 @@
 // src/lib/infra/http/axiosFactory.ts
 import axios, { AxiosInstance } from "axios";
-import { axiosConfig } from "@/config/http/axiosConfig";
+import { axiosConfig, clientAxiosConfig } from "@/config/http/axiosConfig";
 import {
 	setupClientInterceptors,
 	setupServerInterceptors,
@@ -9,7 +9,7 @@ import {
 export default class axiosFactory {
 	// 클라이언트 사이드 인스턴스 생성
 	static createClientInstance(): AxiosInstance {
-		const instance = axios.create(axiosConfig);
+		const instance = axios.create(clientAxiosConfig);
 		setupClientInterceptors(instance);
 		return instance;
 	}
