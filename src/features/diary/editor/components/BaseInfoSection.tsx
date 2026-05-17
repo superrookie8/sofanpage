@@ -10,6 +10,7 @@ import {
 	type SeatHierarchyResponse,
 } from "../api";
 import type { StadiumInfo } from "@/features/games/types";
+import { diaryEditError, diaryEditLog, diaryEditWarn } from "../debug";
 
 interface BaseInfoSectionProps {
 	base: BaseInfo;
@@ -69,9 +70,19 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 				(s) => s.name === base.stadiumId || s.id === base.stadiumId
 			);
 			if (byName) {
+				diaryEditLog("stadiumId 정규화 (이름→목록 id)", {
+					from: base.stadiumId,
+					to: byName.id,
+					stadiumName: byName.name,
+				});
 				onChange({ ...base, stadiumId: byName.id });
 				return;
 			}
+			diaryEditWarn("stadiumId가 경기장 목록과 매칭되지 않음", {
+				stadiumId: base.stadiumId,
+				location: base.location,
+				stadiumIdsSample: stadiums.slice(0, 3).map((s) => s.id),
+			});
 		}
 
 		if (!base.location?.trim()) return;
@@ -92,18 +103,58 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 
 		const loadHierarchy = async () => {
 			setLoadingHierarchy(true);
+			diaryEditLog("GET hierarchy 요청", { stadiumId: base.stadiumId });
 			try {
 				const data = await fetchSeatHierarchy(base.stadiumId!);
+				const zones = data?.zones ?? [];
+				const matchedZone = zones.find((z) => z.zoneName === base.seatZone);
+				let rowInHierarchy: string | undefined;
+				let numberInHierarchy: boolean | undefined;
+				if (matchedZone) {
+					const rows =
+						matchedZone.blocks && matchedZone.blocks.length > 0
+							? matchedZone.blocks.find(
+									(b) => b.blockName === base.seatBlock
+							  )?.rows ?? []
+							: matchedZone.rows ?? [];
+					const matchedRow = rows.find((r) => r.row === base.seatRow);
+					rowInHierarchy = matchedRow?.row;
+					numberInHierarchy = matchedRow?.numbers?.includes(
+						base.seatNumber ?? ""
+					);
+				}
+				diaryEditLog("GET hierarchy 성공", {
+					stadiumId: base.stadiumId,
+					zonesCount: zones.length,
+					formSeat: {
+						zone: base.seatZone,
+						block: base.seatBlock,
+						row: base.seatRow,
+						number: base.seatNumber,
+						seatId: base.seatId,
+					},
+					hierarchyMatch: {
+						zoneFound: !!matchedZone,
+						rowFound: !!rowInHierarchy,
+						numberFound: numberInHierarchy,
+						firstZoneNames: zones.slice(0, 5).map((z) => z.zoneName),
+					},
+				});
+				if (base.seatZone && !matchedZone) {
+					diaryEditWarn("seatInfo.zoneName이 hierarchy에 없음", {
+						seatZone: base.seatZone,
+					});
+				}
 				setHierarchy(data);
 			} catch (error) {
-				console.error("좌석 계층 구조 로드 실패:", error);
+				diaryEditError("GET hierarchy 실패", error);
 				setHierarchy(null);
 			} finally {
 				setLoadingHierarchy(false);
 			}
 		};
 		loadHierarchy();
-	}, [base.stadiumId]);
+	}, [base.stadiumId, base.seatBlock, base.seatNumber, base.seatRow, base.seatZone, base.seatId]);
 
 	// 좌석 선택 완료 시 seatId 가져오기
 	useEffect(() => {

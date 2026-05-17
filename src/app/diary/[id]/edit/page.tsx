@@ -1,10 +1,11 @@
 // src/app/diary/[id]/edit/page.tsx
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { DiaryEditor } from "@/features/diary/editor/DiaryEditor";
 import { useDiaryQuery } from "@/features/diary/queries";
 import { useUpdateDiaryMutation } from "@/features/diary/mutations";
+import { diaryEditError, diaryEditLog } from "@/features/diary/editor/debug";
 import {
 	diaryEntryToDraft,
 	pickSeatFieldsForRequest,
@@ -20,6 +21,43 @@ export default function DiaryEditPage() {
 
 	const { data: diary, isLoading, error } = useDiaryQuery(diaryId);
 	const updateDiaryMutation = useUpdateDiaryMutation();
+
+	useEffect(() => {
+		if (isLoading) {
+			diaryEditLog("GET /api/diary/{id} 로딩 중", { diaryId });
+			return;
+		}
+		if (error) {
+			diaryEditError("GET /api/diary/{id} 실패", error);
+			return;
+		}
+		if (!diary) return;
+
+		diaryEditLog("GET /api/diary/{id} 응답 (raw)", {
+			id: diary.id,
+			gameId: diary.gameId,
+			date: diary.date,
+			time: (diary as { time?: string }).time,
+			location: diary.location,
+			stadiumId: diary.stadiumId,
+			seatId: diary.seatId,
+			seat: diary.seat,
+			seatRow: diary.seatRow,
+			seatNumber: diary.seatNumber,
+			seatInfo: diary.seatInfo,
+		});
+
+		const draft = diaryEntryToDraft(diary);
+		diaryEditLog("diaryEntryToDraft → 폼 초기값 (base)", {
+			stadiumId: draft.base?.stadiumId,
+			seatId: draft.base?.seatId,
+			seatZone: draft.base?.seatZone,
+			seatBlock: draft.base?.seatBlock,
+			seatRow: draft.base?.seatRow,
+			seatNumber: draft.base?.seatNumber,
+			gameId: draft.base?.gameId,
+		});
+	}, [diary, diaryId, error, isLoading]);
 
 	// DiaryDraft를 CreateDiaryRequest로 변환하는 함수 (create와 동일)
 	const convertDraftToRequest = (draft: DiaryDraft): CreateDiaryRequest => {
@@ -138,6 +176,10 @@ export default function DiaryEditPage() {
 
 	const handleSave = async (draft: DiaryDraft) => {
 		const request = convertDraftToRequest(draft);
+		diaryEditLog("PUT /api/diary/{id} body (좌석 필드)", {
+			diaryId,
+			seatFields: pickSeatFieldsForRequest(draft.base),
+		});
 		await updateDiaryMutation.mutateAsync({
 			diaryId,
 			data: request,
