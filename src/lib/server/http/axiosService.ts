@@ -19,29 +19,45 @@ class ServerAxiosService {
 		return this.instance;
 	}
 
+	/** 요청마다 토큰 지정 (BFF에서 클라이언트 Authorization 전달 시) */
+	private async getInstanceWithToken(
+		token: string
+	): Promise<AxiosInstance> {
+		return axiosFactory.createServerInstance(async () => token);
+	}
+
 	async get<T = any>(
 		url: string,
-		config?: AxiosRequestConfig
+		config?: AxiosRequestConfig,
+		token?: string
 	): Promise<AxiosResponse<T>> {
-		const instance = await this.getInstance();
+		const instance = token
+			? await this.getInstanceWithToken(token)
+			: await this.getInstance();
 		return instance.get<T>(url, config);
 	}
 
 	async post<T = any>(
 		url: string,
 		data?: any,
-		config?: AxiosRequestConfig
+		config?: AxiosRequestConfig,
+		token?: string
 	): Promise<AxiosResponse<T>> {
-		const instance = await this.getInstance();
+		const instance = token
+			? await this.getInstanceWithToken(token)
+			: await this.getInstance();
 		return instance.post<T>(url, data, config);
 	}
 
 	async put<T = any>(
 		url: string,
 		data?: any,
-		config?: AxiosRequestConfig
+		config?: AxiosRequestConfig,
+		token?: string
 	): Promise<AxiosResponse<T>> {
-		const instance = await this.getInstance();
+		const instance = token
+			? await this.getInstanceWithToken(token)
+			: await this.getInstance();
 		return instance.put<T>(url, data, config);
 	}
 
@@ -56,9 +72,12 @@ class ServerAxiosService {
 
 	async delete<T = any>(
 		url: string,
-		config?: AxiosRequestConfig
+		config?: AxiosRequestConfig,
+		token?: string
 	): Promise<AxiosResponse<T>> {
-		const instance = await this.getInstance();
+		const instance = token
+			? await this.getInstanceWithToken(token)
+			: await this.getInstance();
 		return instance.delete<T>(url, config);
 	}
 }

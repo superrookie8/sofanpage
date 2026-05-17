@@ -12,6 +12,10 @@ export const queryKeys = {
 		detail: (id: string) => [...queryKeys.diary.details(), id] as const,
 		byGameId: (gameId: string) =>
 			[...queryKeys.diary.all, "game", gameId] as const,
+		checkByGameId: (gameId: string) =>
+			[...queryKeys.diary.all, "check", "game", gameId] as const,
+		checkByDate: (date: string) =>
+			[...queryKeys.diary.all, "check", "date", date] as const,
 		userDiaries: (nickname: string) =>
 			[...queryKeys.diary.all, "user", nickname] as const,
 		stats: (nickname: string) =>

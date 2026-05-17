@@ -1,6 +1,11 @@
 // src/features/diary/api.ts
 import clientAxiosService from "@/lib/client/http/axiosService";
-import type { DiaryEntry, CreateDiaryRequest, DiaryListFilter } from "./types";
+import type {
+	DiaryCheckResponse,
+	DiaryEntry,
+	CreateDiaryRequest,
+	DiaryListFilter,
+} from "./types";
 
 // 전체 일지 목록 조회
 export const fetchAllDiaries = async (
@@ -58,23 +63,32 @@ export const fetchDiaryById = async (diaryId: string): Promise<DiaryEntry> => {
 	return response.data;
 };
 
-// gameId로 일지 조회 (없으면 null)
+// 경기(gameId) 기준 일지 존재 여부 확인
+export const checkDiaryByGameId = async (
+	gameId: string
+): Promise<DiaryCheckResponse> => {
+	const response = await clientAxiosService.get<DiaryCheckResponse>(
+		`/api/diary/game/${encodeURIComponent(gameId)}`
+	);
+	return response.data;
+};
+
+// 날짜 기준 일지 존재 여부 확인 (yyyy-MM-dd)
+export const checkDiaryByDate = async (
+	date: string
+): Promise<DiaryCheckResponse> => {
+	const response = await clientAxiosService.get<DiaryCheckResponse>(
+		`/api/diary/date/${encodeURIComponent(date)}`
+	);
+	return response.data;
+};
+
+/** @deprecated checkDiaryByGameId 사용 권장 */
 export const fetchDiaryByGameId = async (
 	gameId: string
 ): Promise<DiaryEntry | null> => {
-	try {
-		const response = await clientAxiosService.get<DiaryEntry | null>(
-			`/api/diary/game/${gameId}`
-		);
-		return response.data ?? null;
-	} catch (error: any) {
-		// 404 에러는 해당 경기에 대한 일지가 없다는 의미이므로 null 반환
-		if (error.response?.status === 404) {
-			return null;
-		}
-		// 다른 에러는 다시 던짐
-		throw error;
-	}
+	const check = await checkDiaryByGameId(gameId);
+	return check.exists && check.diary ? check.diary : null;
 };
 
 // 일지 생성

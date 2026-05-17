@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import serverAxiosService from "@/lib/server/http/axiosService";
+import { getRequestAccessToken } from "@/lib/server/http/getRequestAccessToken";
 
 // GET: 일지 상세 조회
 export async function GET(
@@ -7,8 +8,20 @@ export async function GET(
 	{ params }: { params: Promise<{ diaryId: string }> }
 ) {
 	try {
+		const token = await getRequestAccessToken(req);
+		if (!token) {
+			return NextResponse.json(
+				{ message: "인증이 필요합니다" },
+				{ status: 401 }
+			);
+		}
+
 		const { diaryId } = await params;
-		const response = await serverAxiosService.get(`/api/diary/${diaryId}`);
+		const response = await serverAxiosService.get(
+			`/api/diary/${diaryId}`,
+			undefined,
+			token
+		);
 		return NextResponse.json(response.data, { status: 200 });
 	} catch (error: any) {
 		if (error.response?.status === 404) {
@@ -47,9 +60,22 @@ export async function PUT(
 	{ params }: { params: Promise<{ diaryId: string }> }
 ) {
 	try {
+		const token = await getRequestAccessToken(req);
+		if (!token) {
+			return NextResponse.json(
+				{ message: "인증이 필요합니다" },
+				{ status: 401 }
+			);
+		}
+
 		const { diaryId } = await params;
 		const body = await req.json();
-		const response = await serverAxiosService.put(`/api/diary/${diaryId}`, body);
+		const response = await serverAxiosService.put(
+			`/api/diary/${diaryId}`,
+			body,
+			undefined,
+			token
+		);
 		return NextResponse.json(response.data, { status: 200 });
 	} catch (error: any) {
 		if (error.response?.status === 404) {
@@ -88,8 +114,16 @@ export async function DELETE(
 	{ params }: { params: Promise<{ diaryId: string }> }
 ) {
 	try {
+		const token = await getRequestAccessToken(req);
+		if (!token) {
+			return NextResponse.json(
+				{ message: "인증이 필요합니다" },
+				{ status: 401 }
+			);
+		}
+
 		const { diaryId } = await params;
-		const response = await serverAxiosService.delete(`/api/diary/${diaryId}`);
+		await serverAxiosService.delete(`/api/diary/${diaryId}`, undefined, token);
 		return NextResponse.json(
 			{ message: "일지가 삭제되었습니다" },
 			{ status: 200 }

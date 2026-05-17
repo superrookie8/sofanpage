@@ -1,4 +1,24 @@
 // src/features/diary/types.ts
+
+/** GET /api/diary/game/{gameId}, GET /api/diary/date/{date} */
+export interface DiaryCheckResponse {
+	exists: boolean;
+	diaryId: string | null;
+	diary: DiaryEntry | null;
+}
+
+/** GET 일지 상세 시 seatId로 조회한 좌석 상세 */
+export interface DiarySeatInfo {
+	seatId: string;
+	stadiumId: string;
+	zoneName: string;
+	blockName?: string | null;
+	row: string;
+	number: string;
+	seatType?: string;
+	floor?: string | null;
+}
+
 export interface DiaryEntry {
 	id: string;
 	userId: string;
@@ -7,8 +27,12 @@ export interface DiaryEntry {
 	content: string;
 	photoUrls: string[]; // 서명된 URL 배열
 	seatId?: string;
-	seatRow: string;
-	seatNumber: string;
+	/** 사람이 읽기 좋은 좌석 문자열 (예: "2층 D구역 3열 15번") */
+	seat?: string;
+	stadiumId?: string;
+	seatInfo?: DiarySeatInfo | null;
+	seatRow?: string;
+	seatNumber?: string;
 	companion?: string[];
 	mvpPlayerName?: string;
 	cheeredPlayerName?: string;

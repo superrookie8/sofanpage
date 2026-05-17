@@ -1,19 +1,65 @@
 // src/app/diary/create/page.tsx
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { DiaryEditor } from "@/features/diary/editor/DiaryEditor";
+import { ExistingDiaryDialog } from "@/features/diary/editor/components/ExistingDiaryDialog";
 import { useCreateDiaryMutation } from "@/features/diary/mutations";
+import { findExistingDiary } from "@/features/diary/utils/findExistingDiary";
 import type { DiaryDraft } from "@/features/diary/editor/types";
+import { pickSeatFieldsForRequest } from "@/features/diary/editor/utils";
 import type { CreateDiaryRequest } from "@/features/diary/types";
 import { getApiErrorMessage } from "@/lib/http/getApiErrorMessage";
+import LoadingSpinner from "@/shared/ui/loadingSpinner";
+import { isAxiosError } from "axios";
 
 export default function DiaryCreatePage() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
+	const { data: session } = useSession();
 	const createDiaryMutation = useCreateDiaryMutation();
 
 	const gameIdFromUrl = searchParams.get("gameId");
+	const [existingDiaryId, setExistingDiaryId] = useState<string | null>(null);
+	const [urlCheckDone, setUrlCheckDone] = useState(!gameIdFromUrl);
+
+	useEffect(() => {
+		if (!gameIdFromUrl) {
+			setUrlCheckDone(true);
+			return;
+		}
+		if (!session) return;
+
+		let cancelled = false;
+		(async () => {
+			const existing = await findExistingDiary({ gameId: gameIdFromUrl });
+			if (!cancelled) {
+				if (existing) {
+					setExistingDiaryId(existing.diaryId);
+				}
+				setUrlCheckDone(true);
+			}
+		})();
+
+		return () => {
+			cancelled = true;
+		};
+	}, [gameIdFromUrl, session]);
+
+	const handleConfirmEdit = () => {
+		if (existingDiaryId) {
+			router.push(`/diary/${existingDiaryId}/edit`);
+		}
+		setExistingDiaryId(null);
+	};
+
+	const handleCancelEdit = () => {
+		setExistingDiaryId(null);
+		if (gameIdFromUrl) {
+			router.replace("/diary/create");
+		}
+	};
 
 	const handleSave = async (draft: DiaryDraft) => {
 		const gameId = gameIdFromUrl || draft.base.gameId;
@@ -24,14 +70,22 @@ export default function DiaryCreatePage() {
 		}
 
 		const trimmedGameId = gameId.trim();
+		const dateStr = draft.base.date || undefined;
+
+		const existing = await findExistingDiary({
+			gameId: trimmedGameId,
+			date: dateStr,
+		});
+		if (existing) {
+			setExistingDiaryId(existing.diaryId);
+			return;
+		}
 
 		const photoUrls = [
 			draft.ticketPhoto,
 			draft.viewPhoto,
 			draft.additionalPhoto,
 		].filter((url) => url && url.trim() !== "");
-
-		const dateStr = draft.base.date || undefined;
 
 		const firstPlayer =
 			draft.players && draft.players.length > 0 ? draft.players[0] : null;
@@ -65,20 +119,7 @@ export default function DiaryCreatePage() {
 					: undefined,
 			content: draft.memo && draft.memo.trim() ? draft.memo : undefined,
 			photoUrls: photoUrls.length > 0 ? photoUrls : undefined,
-
-			seatId:
-				draft.base.seatId && draft.base.seatId.trim()
-					? draft.base.seatId
-					: undefined,
-			seatRow:
-				draft.base.seatRow && draft.base.seatRow.trim()
-					? draft.base.seatRow
-					: undefined,
-			seatNumber:
-				draft.base.seatNumber && draft.base.seatNumber.trim()
-					? draft.base.seatNumber
-					: undefined,
-
+			...pickSeatFieldsForRequest(draft.base),
 			gameWinner:
 				draft.base.result === "승"
 					? "HOME"
@@ -163,6 +204,16 @@ export default function DiaryCreatePage() {
 
 			router.push(`/diary/${result.id}`);
 		} catch (error) {
+			if (isAxiosError(error) && error.response?.status === 409) {
+				const again = await findExistingDiary({
+					gameId: trimmedGameId,
+					date: dateStr,
+				});
+				if (again) {
+					setExistingDiaryId(again.diaryId);
+					return;
+				}
+			}
 			throw new Error(
 				getApiErrorMessage(error, "일지 저장에 실패했습니다.")
 			);
@@ -173,16 +224,36 @@ export default function DiaryCreatePage() {
 		console.log("임시저장:", draft);
 	};
 
+	const showEditor =
+		urlCheckDone && !(gameIdFromUrl && existingDiaryId);
+
+	if (!urlCheckDone) {
+		return (
+			<div className="flex items-center justify-center min-h-screen">
+				<LoadingSpinner />
+			</div>
+		);
+	}
+
 	return (
-		<DiaryEditor
-			gameIdLocked={Boolean(gameIdFromUrl)}
-			initialDraft={{
-				base: {
-					...(gameIdFromUrl ? { gameId: gameIdFromUrl } : {}),
-				},
-			}}
-			onSave={handleSave}
-			onSaveDraft={handleSaveDraft}
-		/>
+		<>
+			<ExistingDiaryDialog
+				open={!!existingDiaryId}
+				onConfirm={handleConfirmEdit}
+				onCancel={handleCancelEdit}
+			/>
+			{showEditor && (
+				<DiaryEditor
+					gameIdLocked={Boolean(gameIdFromUrl)}
+					initialDraft={{
+						base: {
+							...(gameIdFromUrl ? { gameId: gameIdFromUrl } : {}),
+						},
+					}}
+					onSave={handleSave}
+					onSaveDraft={handleSaveDraft}
+				/>
+			)}
+		</>
 	);
 }

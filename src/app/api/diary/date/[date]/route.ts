@@ -4,7 +4,7 @@ import { getRequestAccessToken } from "@/lib/server/http/getRequestAccessToken";
 
 export async function GET(
 	req: NextRequest,
-	{ params }: { params: Promise<{ gameId: string }> }
+	{ params }: { params: Promise<{ date: string }> }
 ) {
 	try {
 		const token = await getRequestAccessToken(req);
@@ -15,10 +15,10 @@ export async function GET(
 			);
 		}
 
-		const { gameId } = await params;
+		const { date } = await params;
 
 		const response = await serverAxiosService.get(
-			`/api/diary/game/${gameId}`,
+			`/api/diary/date/${date}`,
 			undefined,
 			token
 		);

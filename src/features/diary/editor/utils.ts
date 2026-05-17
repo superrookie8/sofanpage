@@ -1,6 +1,21 @@
 // src/features/diary/editor/utils.ts
-import type { DiaryEntry } from "@/features/diary/types";
-import type { DiaryDraft, PlayerStats } from "./types";
+import type { CreateDiaryRequest, DiaryEntry } from "@/features/diary/types";
+import type { BaseInfo, DiaryDraft, PlayerStats } from "./types";
+
+/** PUT/POST 시 빈 문자열로 기존 좌석을 덮어쓰지 않도록, 값이 있을 때만 포함 */
+export function pickSeatFieldsForRequest(
+	base: BaseInfo
+): Pick<CreateDiaryRequest, "seatId" | "seatRow" | "seatNumber"> {
+	const result: Pick<CreateDiaryRequest, "seatId" | "seatRow" | "seatNumber"> =
+		{};
+	const seatId = base.seatId?.trim();
+	const seatRow = base.seatRow?.trim();
+	const seatNumber = base.seatNumber?.trim();
+	if (seatId) result.seatId = seatId;
+	if (seatRow) result.seatRow = seatRow;
+	if (seatNumber) result.seatNumber = seatNumber;
+	return result;
+}
 
 export function uid(): string {
 	return Math.random().toString(36).slice(2, 9);
@@ -90,21 +105,31 @@ export function diaryEntryToDraft(diary: DiaryEntry): Partial<DiaryDraft> {
 		});
 	}
 
+	const seat = diary.seatInfo;
+
 	return {
 		base: {
 			date,
 			time,
 			location: diary.location || "",
-			// gameId는 games 테이블의 실제 id (stadiumId와 혼용 금지)
 			gameId: diary.gameId || "",
-			// stadiumId는 "경기장 선택/좌석 조회"용 id인데 DiaryEntry에 없어서 여기서 복원 불가
-			stadiumId: undefined,
+			stadiumId: diary.stadiumId || seat?.stadiumId || undefined,
 			watchType: diary.watchType === "DIRECT" ? "직관" : "집관",
 			companions: diary.companion?.join(", ") || "",
 			result: diary.gameWinner === "HOME" ? "승" : "패",
-			seatId: diary.seatId || "",
-			seatRow: diary.seatRow || diary.seat_info?.row || "",
-			seatNumber: diary.seatNumber || diary.seat_info?.number || "",
+			seatId: seat?.seatId || diary.seatId || undefined,
+			seatZone: seat?.zoneName || undefined,
+			seatBlock: seat?.blockName?.trim() || undefined,
+			seatRow:
+				seat?.row ||
+				diary.seatRow ||
+				diary.seat_info?.row ||
+				undefined,
+			seatNumber:
+				seat?.number ||
+				diary.seatNumber ||
+				diary.seat_info?.number ||
+				undefined,
 		},
 		mvp: {
 			name: diary.mvpPlayerName || "",

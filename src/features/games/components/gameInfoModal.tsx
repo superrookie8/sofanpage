@@ -1,13 +1,14 @@
 "use client";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { ScheduleDetailsResponse, GameLocation } from "../types";
 import { useRouter } from "next/navigation";
 import Map from "./kakaoMap";
 import { format, parseISO } from "date-fns";
 import { useScheduleDetailsQuery } from "../queries";
 import { locations } from "../constants";
-import { useDiaryByGameIdQuery } from "@/features/diary/queries";
+import { useDiaryCheckByGameIdQuery } from "@/features/diary/queries";
 import { useSession } from "next-auth/react";
+import { ExistingDiaryDialog } from "@/features/diary/editor/components/ExistingDiaryDialog";
 
 // 타임존 정보가 없는 ISO 문자열을 한국 시간대(KST)로 정규화하는 헬퍼 함수
 const normalizeToKST = (isoString: string): string => {
@@ -41,6 +42,7 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 }) => {
 	const router = useRouter();
 	const { data: session } = useSession();
+	const [existingDiaryId, setExistingDiaryId] = useState<string | null>(null);
 
 	const {
 		data: scheduleDetailsRaw,
@@ -90,8 +92,8 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 	// scheduleDetails가 있어야 gameId를 알 수 있음
 	const gameId = scheduleDetails?.gameId ?? null;
 	// 로그인한 사용자에게만 일지 조회 (로그인하지 않은 사용자는 모달을 볼 수 있어야 함)
-	const { data: diaryForGame, isLoading: isDiaryLoading } =
-		useDiaryByGameIdQuery(gameId, isOpen && !!gameId && !!session);
+	const { data: diaryCheck, isLoading: isDiaryLoading } =
+		useDiaryCheckByGameIdQuery(gameId, isOpen && !!gameId && !!session);
 
 	if (!isOpen) return null;
 
@@ -102,13 +104,27 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 	};
 
 	const handleCreateDiary = () => {
-		// 로그인 체크는 middleware에서 처리됨
 		if (!gameId) {
 			router.push("/diary/create");
 			return;
 		}
-		// /diary/game/[gameId] 페이지에서 "있으면 보기/없으면 작성"으로 최종 라우팅
-		router.push(`/diary/game/${gameId}`);
+		if (diaryCheck?.exists && diaryCheck.diaryId) {
+			setExistingDiaryId(diaryCheck.diaryId);
+			return;
+		}
+		router.push(`/diary/create?gameId=${encodeURIComponent(gameId)}`);
+	};
+
+	const handleConfirmEdit = () => {
+		if (existingDiaryId) {
+			onClose();
+			router.push(`/diary/${existingDiaryId}/edit`);
+		}
+		setExistingDiaryId(null);
+	};
+
+	const handleCancelEdit = () => {
+		setExistingDiaryId(null);
 	};
 
 	const formatDateTime = (dateTime: string) => {
@@ -122,7 +138,13 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 	};
 
 	return (
-		<div
+		<>
+			<ExistingDiaryDialog
+				open={!!existingDiaryId}
+				onConfirm={handleConfirmEdit}
+				onCancel={handleCancelEdit}
+			/>
+			<div
 			className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 md:p-4 z-50"
 			onClick={handleOutsideClick}
 		>
@@ -283,8 +305,8 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 										? "직관일지 작성하기"
 										: isDiaryLoading
 										? "직관일지 확인 중..."
-										: diaryForGame
-										? "직관일지 보러가기"
+										: diaryCheck?.exists
+										? "직관일지 수정하기"
 										: "직관일지 작성하기"}
 								</button>
 							</div>
@@ -293,6 +315,7 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 				</div>
 			</div>
 		</div>
+		</>
 	);
 };
 

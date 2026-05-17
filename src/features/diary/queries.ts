@@ -2,6 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/react-query/queryKeys";
 import {
+	checkDiaryByGameId,
 	fetchAllDiaries,
 	fetchPersonalDiaries,
 	fetchDiaryById,
@@ -39,23 +40,31 @@ export const useDiaryQuery = (diaryId: string, enabled = true) => {
 	});
 };
 
-// gameId로 해당 경기의 일지 조회 (없으면 null)
+// gameId로 일지 존재 여부 확인 (DiaryCheckResponse)
+export const useDiaryCheckByGameIdQuery = (
+	gameId: string | null,
+	enabled = true
+) => {
+	return useQuery({
+		queryKey: queryKeys.diary.checkByGameId(gameId || ""),
+		queryFn: () => checkDiaryByGameId(gameId!),
+		enabled: enabled && !!gameId,
+		staleTime: 1000 * 30,
+		gcTime: 1000 * 60 * 10,
+		refetchOnMount: "always",
+		refetchOnWindowFocus: false,
+	});
+};
+
+/** @deprecated useDiaryCheckByGameIdQuery 사용 권장 */
 export const useDiaryByGameIdQuery = (gameId: string | null, enabled = true) => {
 	return useQuery({
 		queryKey: queryKeys.diary.byGameId(gameId || ""),
 		queryFn: () => fetchDiaryByGameId(gameId!),
 		enabled: enabled && !!gameId,
-		staleTime: 1000 * 30, // 30초 정도면 충분
+		staleTime: 1000 * 30,
 		gcTime: 1000 * 60 * 10,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
-		// 404는 에러가 아닌 정상 케이스로 처리
-		retry: (failureCount, error: any) => {
-			// 404 에러는 재시도하지 않음
-			if (error?.response?.status === 404) {
-				return false;
-			}
-			return failureCount < 3;
-		},
 	});
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { addMonths, format, parseISO, subMonths } from "date-fns";
 import {
@@ -9,8 +10,10 @@ import {
 } from "@/features/games/api";
 import type { ScheduleResponse } from "@/features/games/types";
 import { locations } from "@/features/games/constants";
+import { findExistingDiary } from "@/features/diary/utils/findExistingDiary";
 import type { BaseInfo } from "../types";
 import { SectionTitle } from "./SectionTitle";
+import { ExistingDiaryDialog } from "./ExistingDiaryDialog";
 
 interface GameSelectFieldProps {
 	base: BaseInfo;
@@ -33,7 +36,9 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 	onChange,
 	locked = false,
 }) => {
+	const router = useRouter();
 	const [isResolving, setIsResolving] = useState(false);
+	const [existingDiaryId, setExistingDiaryId] = useState<string | null>(null);
 
 	const { startISO, endISO } = useMemo(() => {
 		const now = new Date();
@@ -78,6 +83,41 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 		});
 	};
 
+	const applyGameSelection = (
+		scheduleId: string,
+		details: Awaited<ReturnType<typeof fetchScheduleDetails>>
+	) => {
+		let date = base.date;
+		let time = base.time;
+		try {
+			date = format(parseISO(details.startDateTime), "yyyy-MM-dd");
+			time = format(parseISO(details.startDateTime), "HH:mm");
+		} catch {
+			// 날짜 파싱 실패 시 기존 값 유지
+		}
+
+		const isHome = details.location === "Home";
+		const locationName =
+			details.stadium?.name ||
+			(isHome ? locations["부산 사직실내체육관"].name : details.location) ||
+			base.location;
+
+		onChange({
+			...base,
+			scheduleId,
+			gameId: details.gameId!,
+			date,
+			time,
+			location: locationName,
+			stadiumId: details.stadium?.id,
+			seatId: undefined,
+			seatZone: undefined,
+			seatBlock: undefined,
+			seatRow: undefined,
+			seatNumber: undefined,
+		});
+	};
+
 	const handleSelect = async (scheduleId: string) => {
 		if (!scheduleId) {
 			clearGameSelection();
@@ -95,35 +135,25 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 				return;
 			}
 
-			let date = base.date;
-			let time = base.time;
+			let date = "";
 			try {
 				date = format(parseISO(details.startDateTime), "yyyy-MM-dd");
-				time = format(parseISO(details.startDateTime), "HH:mm");
 			} catch {
-				// 날짜 파싱 실패 시 기존 값 유지
+				// ignore
 			}
 
-			const isHome = details.location === "Home";
-			const locationName =
-				details.stadium?.name ||
-				(isHome ? locations["부산 사직실내체육관"].name : details.location) ||
-				base.location;
-
-			onChange({
-				...base,
-				scheduleId,
+			const existing = await findExistingDiary({
 				gameId: details.gameId,
 				date,
-				time,
-				location: locationName,
-				stadiumId: details.stadium?.id,
-				seatId: undefined,
-				seatZone: undefined,
-				seatBlock: undefined,
-				seatRow: undefined,
-				seatNumber: undefined,
 			});
+
+			if (existing) {
+				clearGameSelection();
+				setExistingDiaryId(existing.diaryId);
+				return;
+			}
+
+			applyGameSelection(scheduleId, details);
 		} catch {
 			alert("경기 정보를 불러오지 못했습니다. 다시 시도해주세요.");
 			clearGameSelection();
@@ -132,45 +162,63 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 		}
 	};
 
+	const handleConfirmEdit = () => {
+		if (existingDiaryId) {
+			router.push(`/diary/${existingDiaryId}/edit`);
+		}
+		setExistingDiaryId(null);
+	};
+
+	const handleCancelEdit = () => {
+		setExistingDiaryId(null);
+	};
+
 	if (locked && base.gameId) {
 		return null;
 	}
 
 	return (
-		<div className="bg-white rounded-2xl border border-red-200 p-5">
-			<SectionTitle
-				icon={<span className="text-xl">🏀</span>}
-				title="경기 선택"
-				desc="어떤 경기에 대한 일지인지 먼저 선택해주세요."
+		<>
+			<ExistingDiaryDialog
+				open={!!existingDiaryId}
+				onConfirm={handleConfirmEdit}
+				onCancel={handleCancelEdit}
 			/>
-			<div className="mt-4 space-y-2">
-				<label className="text-sm text-gray-500">경기</label>
-				<select
-					value={base.scheduleId || ""}
-					onChange={(e) => handleSelect(e.target.value)}
-					disabled={isLoading || isResolving}
-					className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
-				>
-					<option value="">
-						{isLoading || isResolving
-							? "경기 목록 불러오는 중..."
-							: "경기를 선택하세요"}
-					</option>
-					{gameSchedules.map((schedule) => (
-						<option key={schedule.id} value={schedule.id}>
-							{formatScheduleLabel(schedule)}
+			<div className="bg-white rounded-2xl border border-red-200 p-5">
+				<SectionTitle
+					icon={<span className="text-xl">🏀</span>}
+					title="경기 선택"
+					desc="어떤 경기에 대한 일지인지 먼저 선택해주세요."
+				/>
+				<div className="mt-4 space-y-2">
+					<label className="text-sm text-gray-500">경기</label>
+					<select
+						value={base.scheduleId || ""}
+						onChange={(e) => handleSelect(e.target.value)}
+						disabled={isLoading || isResolving}
+						className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
+					>
+						<option value="">
+							{isLoading || isResolving
+								? "경기 목록 불러오는 중..."
+								: "경기를 선택하세요"}
 						</option>
-					))}
-				</select>
-				{!isLoading && gameSchedules.length === 0 && (
-					<p className="text-sm text-gray-500">
-						선택 가능한 경기가 없습니다. 경기 스케줄을 확인해주세요.
-					</p>
-				)}
-				{base.gameId && (
-					<p className="text-sm text-green-700">경기가 선택되었습니다.</p>
-				)}
+						{gameSchedules.map((schedule) => (
+							<option key={schedule.id} value={schedule.id}>
+								{formatScheduleLabel(schedule)}
+							</option>
+						))}
+					</select>
+					{!isLoading && gameSchedules.length === 0 && (
+						<p className="text-sm text-gray-500">
+							선택 가능한 경기가 없습니다. 경기 스케줄을 확인해주세요.
+						</p>
+					)}
+					{base.gameId && (
+						<p className="text-sm text-green-700">경기가 선택되었습니다.</p>
+					)}
+				</div>
 			</div>
-		</div>
+		</>
 	);
 };

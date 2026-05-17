@@ -5,7 +5,10 @@ import { useParams, useRouter } from "next/navigation";
 import { DiaryEditor } from "@/features/diary/editor/DiaryEditor";
 import { useDiaryQuery } from "@/features/diary/queries";
 import { useUpdateDiaryMutation } from "@/features/diary/mutations";
-import { diaryEntryToDraft } from "@/features/diary/editor/utils";
+import {
+	diaryEntryToDraft,
+	pickSeatFieldsForRequest,
+} from "@/features/diary/editor/utils";
 import LoadingSpinner from "@/shared/ui/loadingSpinner";
 import type { DiaryDraft } from "@/features/diary/editor/types";
 import type { CreateDiaryRequest } from "@/features/diary/types";
@@ -62,18 +65,7 @@ export default function DiaryEditPage() {
 					: undefined,
 			content: draft.memo && draft.memo.trim() ? draft.memo : undefined,
 			photoUrls: photoUrls.length > 0 ? photoUrls : undefined,
-			seatId:
-				draft.base.seatId && draft.base.seatId.trim()
-					? draft.base.seatId
-					: undefined,
-			seatRow:
-				draft.base.seatRow && draft.base.seatRow.trim()
-					? draft.base.seatRow
-					: undefined,
-			seatNumber:
-				draft.base.seatNumber && draft.base.seatNumber.trim()
-					? draft.base.seatNumber
-					: undefined,
+			...pickSeatFieldsForRequest(draft.base),
 			gameWinner:
 				draft.base.result === "승"
 					? "HOME"
