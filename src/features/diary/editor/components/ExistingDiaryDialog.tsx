@@ -19,9 +19,9 @@ export const ExistingDiaryDialog: React.FC<ExistingDiaryDialogProps> = ({
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
 			<div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6">
 				<p className="text-gray-800 text-center leading-relaxed">
-					이미 작성한 일지가 있습니다.
+					이미 일지가 있습니다.
 					<br />
-					수정하시겠습니까?
+					수정하겠습니까?
 				</p>
 				<div className="mt-6 flex gap-3 justify-center">
 					<button

@@ -26,6 +26,8 @@ interface DiaryEditorProps {
 	initialDraft?: DiaryEditorInitialDraft;
 	/** URL 등으로 gameId가 이미 정해진 경우 경기 선택 UI 숨김 */
 	gameIdLocked?: boolean;
+	/** 작성 화면: 같은 경기 일지가 있을 때 부모에서 모달·에디터 숨김 처리 */
+	onDuplicateDiary?: (diaryId: string) => void;
 	onSave?: (draft: DiaryDraft) => Promise<void>;
 	onSaveDraft?: (draft: DiaryDraft) => Promise<void>;
 }
@@ -33,6 +35,7 @@ interface DiaryEditorProps {
 export const DiaryEditor: React.FC<DiaryEditorProps> = ({
 	initialDraft,
 	gameIdLocked = false,
+	onDuplicateDiary,
 	onSave,
 	onSaveDraft,
 }) => {
@@ -256,6 +259,7 @@ export const DiaryEditor: React.FC<DiaryEditorProps> = ({
 						base={draft.base}
 						onChange={(base) => setDraft((d) => ({ ...d, base }))}
 						locked={gameIdLocked}
+						onDuplicateDiary={onDuplicateDiary}
 					/>
 					<BaseInfoSection
 						base={draft.base}

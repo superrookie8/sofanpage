@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import Image from "next/image";
 import { statMeta } from "@/features/diary/editor/constants";
 import { weather } from "@/shared/constants";
+import { formatDiarySeatLabel } from "@/features/diary/seatLabel";
 
 export default function DiaryDetailPage() {
 	const params = useParams();
@@ -51,30 +52,7 @@ export default function DiaryDetailPage() {
 		);
 	}
 
-	// 좌석 정보 포맷팅
-	const seatInfo =
-		diary.seat?.trim() ||
-		(diary.seatInfo
-			? [
-					diary.seatInfo.floor,
-					diary.seatInfo.zoneName,
-					diary.seatInfo.blockName,
-					diary.seatInfo.row,
-					diary.seatInfo.number,
-				]
-					.filter(Boolean)
-					.join(" ")
-			: diary.seatRow && diary.seatNumber
-			? `${diary.seatRow} ${diary.seatNumber}`.replace(/\s+/g, " ").trim()
-			: diary.seat_info
-			? [
-					diary.seat_info.section,
-					diary.seat_info.row,
-					diary.seat_info.number,
-				]
-					.filter(Boolean)
-					.join(" ")
-			: "") || "-";
+	const seatInfo = formatDiarySeatLabel(diary) || "-";
 
 	// 날씨 정보
 	const weatherText = diary.weather

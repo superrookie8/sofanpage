@@ -1,17 +1,39 @@
 // src/features/diary/editor/utils.ts
+import { formatDiarySeatLabel } from "@/features/diary/seatLabel";
 import type { CreateDiaryRequest, DiaryEntry } from "@/features/diary/types";
 import type { BaseInfo, DiaryDraft, PlayerStats } from "./types";
 
 /** PUT/POST 시 빈 문자열로 기존 좌석을 덮어쓰지 않도록, 값이 있을 때만 포함 */
 export function pickSeatFieldsForRequest(
 	base: BaseInfo
-): Pick<CreateDiaryRequest, "seatId" | "seatRow" | "seatNumber"> {
-	const result: Pick<CreateDiaryRequest, "seatId" | "seatRow" | "seatNumber"> =
-		{};
+): Pick<
+	CreateDiaryRequest,
+	| "seatId"
+	| "stadiumId"
+	| "seatZoneName"
+	| "blockName"
+	| "seatRow"
+	| "seatNumber"
+> {
+	const result: Pick<
+		CreateDiaryRequest,
+		| "seatId"
+		| "stadiumId"
+		| "seatZoneName"
+		| "blockName"
+		| "seatRow"
+		| "seatNumber"
+	> = {};
 	const seatId = base.seatId?.trim();
+	const stadiumId = base.stadiumId?.trim();
+	const seatZoneName = base.seatZone?.trim();
+	const blockName = base.seatBlock?.trim();
 	const seatRow = base.seatRow?.trim();
 	const seatNumber = base.seatNumber?.trim();
 	if (seatId) result.seatId = seatId;
+	if (stadiumId) result.stadiumId = stadiumId;
+	if (seatZoneName) result.seatZoneName = seatZoneName;
+	if (blockName) result.blockName = blockName;
 	if (seatRow) result.seatRow = seatRow;
 	if (seatNumber) result.seatNumber = seatNumber;
 	return result;
@@ -106,6 +128,7 @@ export function diaryEntryToDraft(diary: DiaryEntry): Partial<DiaryDraft> {
 	}
 
 	const seat = diary.seatInfo;
+	const seatLabel = formatDiarySeatLabel(diary);
 
 	return {
 		base: {
@@ -130,7 +153,7 @@ export function diaryEntryToDraft(diary: DiaryEntry): Partial<DiaryDraft> {
 				diary.seatNumber ||
 				diary.seat_info?.number ||
 				undefined,
-			seatLabel: diary.seat?.trim() || undefined,
+			seatLabel: seatLabel || undefined,
 		},
 		mvp: {
 			name: diary.mvpPlayerName || "",

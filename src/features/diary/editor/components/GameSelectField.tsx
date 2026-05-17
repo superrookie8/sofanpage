@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { addMonths, format, parseISO, subMonths } from "date-fns";
 import { isAxiosError } from "axios";
@@ -15,12 +14,11 @@ import { findExistingDiary } from "@/features/diary/utils/findExistingDiary";
 import { getApiErrorMessage } from "@/lib/http/getApiErrorMessage";
 import type { BaseInfo } from "../types";
 import { SectionTitle } from "./SectionTitle";
-import { ExistingDiaryDialog } from "./ExistingDiaryDialog";
-
 interface GameSelectFieldProps {
 	base: BaseInfo;
 	onChange: (base: BaseInfo) => void;
 	locked?: boolean;
+	onDuplicateDiary?: (diaryId: string) => void;
 }
 
 const formatScheduleLabel = (schedule: ScheduleResponse) => {
@@ -37,10 +35,9 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 	base,
 	onChange,
 	locked = false,
+	onDuplicateDiary,
 }) => {
-	const router = useRouter();
 	const [isResolving, setIsResolving] = useState(false);
-	const [existingDiaryId, setExistingDiaryId] = useState<string | null>(null);
 	/** 드롭다운 표시용 (중복 일지 모달 시에도 선택 경기 유지) */
 	const [selectedScheduleId, setSelectedScheduleId] = useState("");
 
@@ -157,7 +154,7 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 			});
 
 			if (existing) {
-				setExistingDiaryId(existing.diaryId);
+				onDuplicateDiary?.(existing.diaryId);
 				return;
 			}
 
@@ -176,29 +173,11 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 		}
 	};
 
-	const handleConfirmEdit = () => {
-		if (existingDiaryId) {
-			router.push(`/diary/${existingDiaryId}/edit`);
-		}
-		setExistingDiaryId(null);
-	};
-
-	const handleCancelEdit = () => {
-		setExistingDiaryId(null);
-		clearGameSelection();
-	};
-
 	if (locked && base.gameId) {
 		return null;
 	}
 
 	return (
-		<>
-			<ExistingDiaryDialog
-				open={!!existingDiaryId}
-				onConfirm={handleConfirmEdit}
-				onCancel={handleCancelEdit}
-			/>
 			<div className="bg-white rounded-2xl border border-red-200 p-5">
 				<SectionTitle
 					icon={<span className="text-xl">🏀</span>}
@@ -249,6 +228,5 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 					)}
 				</div>
 			</div>
-		</>
 	);
 };

@@ -218,8 +218,7 @@ export default function DiaryCreatePage() {
 		console.log("임시저장:", draft);
 	};
 
-	const showEditor =
-		urlCheckDone && !(gameIdFromUrl && existingDiaryId);
+	const showEditor = urlCheckDone && !existingDiaryId;
 
 	if (!urlCheckDone) {
 		return (
@@ -244,6 +243,7 @@ export default function DiaryCreatePage() {
 							...(gameIdFromUrl ? { gameId: gameIdFromUrl } : {}),
 						},
 					}}
+					onDuplicateDiary={(id) => setExistingDiaryId(id)}
 					onSave={handleSave}
 					onSaveDraft={handleSaveDraft}
 				/>

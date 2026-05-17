@@ -8,6 +8,7 @@ import { useLoading } from "@/context/LoadingContext";
 import LoadingSpinner from "@/shared/ui/loadingSpinner";
 import AlertModal from "@/shared/ui/alertModal";
 import { useDiaryListQuery } from "@/features/diary/queries";
+import { formatDiarySeatLabel } from "@/features/diary/seatLabel";
 
 interface Props {}
 
@@ -58,10 +59,7 @@ const DiaryRead: React.FC<Props> = (props) => {
 									const diaryId = diary.id || diary._id || "";
 									const diaryDate = diary.date || diary.createdAt || "";
 									const diaryWeather = diary.weather || "";
-									const seatSection = diary.seat_info?.section || "";
-									const seatRow = diary.seatRow || diary.seat_info?.row || "";
-									const seatNumber =
-										diary.seatNumber || diary.seat_info?.number || "";
+									const seatLabel = formatDiarySeatLabel(diary);
 									const diaryName = diary.name || diary.nickname || "";
 
 									// 백엔드 API 응답: photoUrls는 이미 서명된 URL 배열
@@ -107,15 +105,8 @@ const DiaryRead: React.FC<Props> = (props) => {
 															{weather[diaryWeather as keyof typeof weather]}
 														</span>
 													)}
-													{(seatSection || seatRow || seatNumber) && (
-														<span>
-															좌석:{" "}
-															{seatSection && seatRow && seatNumber
-																? `${seatSection}/${seatRow}/${seatNumber}`
-																: seatRow && seatNumber
-																? `${seatRow}/${seatNumber}`
-																: "-"}
-														</span>
+													{seatLabel && (
+														<span>좌석: {seatLabel}</span>
 													)}
 												</div>
 											</div>

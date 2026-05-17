@@ -83,6 +83,9 @@ export interface CreateDiaryRequest {
 	content?: string | null;
 	photoUrls?: string[] | null;
 	seatId?: string | null;
+	stadiumId?: string | null;
+	seatZoneName?: string | null;
+	blockName?: string | null;
 	seatRow?: string | null;
 	seatNumber?: string | null;
 	companion?: string[] | null;

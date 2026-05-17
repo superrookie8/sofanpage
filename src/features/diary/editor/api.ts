@@ -1,8 +1,6 @@
 // src/features/diary/editor/api.ts
 import type { StadiumInfo } from "@/features/games/types";
 import { encodeStadiumPathParam } from "@/lib/stadium/encodeStadiumPathParam";
-import { diaryEditLog } from "./debug";
-
 // 경기장 목록 조회
 export const fetchStadiums = async (): Promise<StadiumInfo[]> => {
 	const response = await fetch("/api/stadiums", {
@@ -42,9 +40,7 @@ export const fetchSeatHierarchy = async (
 	stadiumId: string
 ): Promise<SeatHierarchyResponse> => {
 	const encoded = encodeStadiumPathParam(stadiumId);
-	const url = `/api/stadiums/${encoded}/seats/hierarchy`;
-	diaryEditLog("fetchSeatHierarchy", { stadiumId, url });
-	const response = await fetch(url, {
+	const response = await fetch(`/api/stadiums/${encoded}/seats/hierarchy`, {
 		method: "GET",
 		cache: "no-store",
 	});
@@ -95,5 +91,8 @@ export const fetchSeatId = async (
 	}
 
 	const data = await response.json();
-	return data;
+	if (typeof data === "string") {
+		return data.replace(/^"|"$/g, "").trim();
+	}
+	return String(data);
 };

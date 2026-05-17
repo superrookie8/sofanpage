@@ -1,5 +1,5 @@
 // src/features/diary/editor/components/BaseInfoSection.tsx
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { SectionTitle } from "./SectionTitle";
 import { Chip } from "./Chip";
 import type { BaseInfo } from "../types";
@@ -10,8 +10,6 @@ import {
 	type SeatHierarchyResponse,
 } from "../api";
 import type { StadiumInfo } from "@/features/games/types";
-import { diaryEditError, diaryEditLog, diaryEditWarn } from "../debug";
-import { resolveSeatFieldsFromLabel } from "../resolveSeatFromHierarchy";
 
 interface BaseInfoSectionProps {
 	base: BaseInfo;
@@ -45,22 +43,8 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 	const [hierarchyError, setHierarchyError] = useState<string | null>(null);
 	const [hierarchyReloadKey, setHierarchyReloadKey] = useState(0);
 
-	const savedSeatSummary = useMemo(() => {
-		if (base.seatLabel?.trim()) return base.seatLabel.trim();
-		const parts = [
-			base.seatZone,
-			base.seatBlock,
-			base.seatRow,
-			base.seatNumber,
-		].filter(Boolean);
-		return parts.length > 0 ? parts.join(" ") : null;
-	}, [
-		base.seatLabel,
-		base.seatZone,
-		base.seatBlock,
-		base.seatRow,
-		base.seatNumber,
-	]);
+	/** GET diary.seat — 드롭다운 바로 위에만 표시 */
+	const savedSeatText = base.seatLabel?.trim() || null;
 
 	// 경기장 목록 로드
 	useEffect(() => {
@@ -90,19 +74,9 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 				(s) => s.name === base.stadiumId || s.id === base.stadiumId
 			);
 			if (byName) {
-				diaryEditLog("stadiumId 정규화 (이름→목록 id)", {
-					from: base.stadiumId,
-					to: byName.id,
-					stadiumName: byName.name,
-				});
 				onChange({ ...base, stadiumId: byName.id });
 				return;
 			}
-			diaryEditWarn("stadiumId가 경기장 목록과 매칭되지 않음", {
-				stadiumId: base.stadiumId,
-				location: base.location,
-				stadiumIdsSample: stadiums.slice(0, 3).map((s) => s.id),
-			});
 		}
 
 		if (!base.location?.trim()) return;
@@ -123,75 +97,10 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 
 		setLoadingHierarchy(true);
 		setHierarchyError(null);
-		diaryEditLog("GET hierarchy 요청", { stadiumId: base.stadiumId });
 		try {
 			const data = await fetchSeatHierarchy(base.stadiumId!);
-				const zones = data?.zones ?? [];
-				const matchedZone = zones.find((z) => z.zoneName === base.seatZone);
-				let rowInHierarchy: string | undefined;
-				let numberInHierarchy: boolean | undefined;
-				if (matchedZone) {
-					const rows =
-						matchedZone.blocks && matchedZone.blocks.length > 0
-							? matchedZone.blocks.find(
-									(b) => b.blockName === base.seatBlock
-							  )?.rows ?? []
-							: matchedZone.rows ?? [];
-					const matchedRow = rows.find((r) => r.row === base.seatRow);
-					rowInHierarchy = matchedRow?.row;
-					numberInHierarchy = matchedRow?.numbers?.includes(
-						base.seatNumber ?? ""
-					);
-				}
-				diaryEditLog("GET hierarchy 성공", {
-					stadiumId: base.stadiumId,
-					zonesCount: zones.length,
-					formSeat: {
-						zone: base.seatZone,
-						block: base.seatBlock,
-						row: base.seatRow,
-						number: base.seatNumber,
-						seatId: base.seatId,
-					},
-					hierarchyMatch: {
-						zoneFound: !!matchedZone,
-						rowFound: !!rowInHierarchy,
-						numberFound: numberInHierarchy,
-						firstZoneNames: zones.slice(0, 5).map((z) => z.zoneName),
-					},
-				});
-				if (base.seatZone && !matchedZone) {
-					diaryEditWarn("seatInfo.zoneName이 hierarchy에 없음", {
-						seatZone: base.seatZone,
-					});
-				}
-
-				if (
-					!base.seatZone &&
-					base.seatId &&
-					base.seatLabel &&
-					!matchedZone
-				) {
-					const fromLabel = resolveSeatFieldsFromLabel(
-						base.seatLabel,
-						data
-					);
-					if (fromLabel) {
-						diaryEditLog("diary.seat 문자열로 좌석 필드 복원", {
-							seatLabel: base.seatLabel,
-							...fromLabel,
-						});
-						onChange({ ...base, ...fromLabel });
-					} else {
-						diaryEditWarn("diary.seat으로 hierarchy 매칭 실패", {
-							seatLabel: base.seatLabel,
-						});
-					}
-				}
-
 			setHierarchy(data);
 		} catch (error) {
-			diaryEditError("GET hierarchy 실패", error);
 			setHierarchy(null);
 			setHierarchyError(
 				error instanceof Error ? error.message : "좌석 목록을 불러오지 못했습니다"
@@ -199,16 +108,7 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 		} finally {
 			setLoadingHierarchy(false);
 		}
-	}, [
-		base.stadiumId,
-		base.seatBlock,
-		base.seatId,
-		base.seatLabel,
-		base.seatNumber,
-		base.seatRow,
-		base.seatZone,
-		onChange,
-	]);
+	}, [base.stadiumId]);
 
 	useEffect(() => {
 		loadHierarchy();
@@ -299,6 +199,7 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 								seatBlock: undefined,
 								seatRow: undefined,
 								seatNumber: undefined,
+								seatLabel: undefined,
 							});
 						}}
 						className="w-full h-9 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -369,13 +270,6 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 						<div className="text-sm text-gray-500 flex items-center gap-2">
 							<span>🎫</span> 좌석
 						</div>
-						{(savedSeatSummary || base.seatId) && (
-							<p className="text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-md px-3 py-2">
-								저장된 좌석: {savedSeatSummary || `ID ${base.seatId}`}
-								{!savedSeatSummary &&
-									" (목록 로드 후 구역·열·번호를 고르거나, 그대로 저장해도 됩니다)"}
-							</p>
-						)}
 						{!base.stadiumId ? (
 							<div className="text-xs text-gray-400">
 								경기장을 먼저 선택해주세요
@@ -386,6 +280,9 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 							</div>
 						) : hierarchyError ? (
 							<div className="text-sm space-y-2">
+								{savedSeatText && (
+									<p className="text-sm text-gray-700">{savedSeatText}</p>
+								)}
 								<p className="text-amber-800">
 									좌석 목록 API 오류: {hierarchyError}
 								</p>
@@ -407,6 +304,9 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 						  !hierarchy.zones ||
 						  hierarchy.zones.length === 0 ? (
 							<div className="text-xs text-gray-400 space-y-2">
+								{savedSeatText && (
+									<p className="text-sm text-gray-700">{savedSeatText}</p>
+								)}
 								<p>이 경기장의 좌석 목록이 비어 있습니다.</p>
 								<button
 									type="button"
@@ -419,8 +319,11 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 								</button>
 							</div>
 						) : (
-							<div className="grid gap-3 md:grid-cols-4">
-								{/* Zone 선택 */}
+							<div className="space-y-2">
+								{savedSeatText && (
+									<p className="text-sm text-gray-700">{savedSeatText}</p>
+								)}
+								<div className="grid gap-3 md:grid-cols-4">
 								<div className="space-y-2">
 									<div className="text-xs text-gray-500">구역</div>
 									<select
@@ -433,6 +336,7 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 												seatRow: undefined,
 												seatNumber: undefined,
 												seatId: undefined,
+												seatLabel: undefined,
 											});
 										}}
 										className="w-full h-9 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
@@ -468,6 +372,7 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 																seatRow: undefined,
 																seatNumber: undefined,
 																seatId: undefined,
+																seatLabel: undefined,
 															});
 														}}
 														className="w-full h-9 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
@@ -513,6 +418,7 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 																seatRow: e.target.value || undefined,
 																seatNumber: undefined,
 																seatId: undefined,
+																seatLabel: undefined,
 															});
 														}}
 														className="w-full h-9 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
@@ -557,6 +463,7 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 																...base,
 																seatNumber: e.target.value || undefined,
 																seatId: undefined,
+																seatLabel: undefined,
 															});
 														}}
 														className="w-full h-9 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
@@ -573,6 +480,7 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 										}
 										return null;
 									})()}
+								</div>
 							</div>
 						)}
 					</div>
