@@ -23,7 +23,7 @@ export const setupClientInterceptors = (instance: AxiosInstance) => {
 		},
 		(error: AxiosError) => {
 			return Promise.reject(error);
-		}
+		},
 	);
 
 	// Response 인터셉터 - 에러 처리
@@ -36,35 +36,35 @@ export const setupClientInterceptors = (instance: AxiosInstance) => {
 				_retry?: boolean;
 			};
 
-		// 401 에러 시 처리
-		if (error.response?.status === 401 && !originalRequest._retry) {
-			originalRequest._retry = true;
+			// 401 에러 시 처리
+			if (error.response?.status === 401 && !originalRequest._retry) {
+				originalRequest._retry = true;
 
-			if (typeof window !== "undefined") {
-				const { getSession, signOut } = await import("next-auth/react");
-				const session = await getSession();
-				
-				// 401 에러는 토큰 만료 또는 인증 실패를 의미하므로 로그아웃 처리
-				if (!session || !session.accessToken) {
-					console.warn("401 error: No valid session, signing out");
-					await signOut({ redirect: true, callbackUrl: "/login" });
-				} else {
-					// 세션이 있어도 401이면 백엔드 토큰이 만료된 것으로 간주하고 로그아웃
-					console.warn("401 error: Token expired, signing out");
-					await signOut({ redirect: true, callbackUrl: "/login" });
+				if (typeof window !== "undefined") {
+					const { getSession, signOut } = await import("next-auth/react");
+					const session = await getSession();
+
+					// 401 에러는 토큰 만료 또는 인증 실패를 의미하므로 로그아웃 처리
+					if (!session || !session.accessToken) {
+						console.warn("401 error: No valid session, signing out");
+						await signOut({ redirect: true, callbackUrl: "/login" });
+					} else {
+						// 세션이 있어도 401이면 백엔드 토큰이 만료된 것으로 간주하고 로그아웃
+						console.warn("401 error: Token expired, signing out");
+						await signOut({ redirect: true, callbackUrl: "/login" });
+					}
 				}
 			}
-		}
 
 			return Promise.reject(error);
-		}
+		},
 	);
 };
 
 // 서버 사이드 인터셉터 설정
 export const setupServerInterceptors = (
 	instance: AxiosInstance,
-	getToken: () => Promise<string | null>
+	getToken: () => Promise<string | null>,
 ) => {
 	// Request 인터셉터 - 서버에서 토큰 가져오기
 	instance.interceptors.request.use(
@@ -77,7 +77,7 @@ export const setupServerInterceptors = (
 		},
 		(error: AxiosError) => {
 			return Promise.reject(error);
-		}
+		},
 	);
 
 	// Response 인터셉터
@@ -87,6 +87,6 @@ export const setupServerInterceptors = (
 		},
 		(error: AxiosError) => {
 			return Promise.reject(error);
-		}
+		},
 	);
 };

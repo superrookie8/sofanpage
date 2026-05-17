@@ -1,7 +1,12 @@
 "use client";
 import React, { useState } from "react";
-// import BrickBreakerGame from "@/components/arcade/brickbreakergame";
-import UnityGame from "@/components/arcade/unityGame";
+import dynamic from "next/dynamic";
+
+// UnityGame을 dynamic import로 변경 (ssr: false 설정)
+const UnityGame = dynamic(() => import("@/components/arcade/unityGame"), {
+	ssr: false,
+	loading: () => <p>Loading Game...</p>,
+});
 
 interface Props {}
 

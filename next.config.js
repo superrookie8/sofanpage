@@ -32,12 +32,40 @@ const nextConfig = {
 				],
 			},
 			{
-				// WebAssembly 파일에 대한 헤더 설정 (필요한 경우)
-				source: "/unity/:all*.wasm",
+				// WebAssembly 파일에 대한 헤더 설정
+				source: "/Build/:all*.wasm",
 				headers: [
 					{
 						key: "Content-Type",
 						value: "application/wasm",
+					},
+				],
+			},
+			{
+				// Unity .data 파일에 대한 헤더 설정 (텍스처 포함)
+				source: "/Build/:all*.data",
+				headers: [
+					{
+						key: "Content-Type",
+						value: "application/octet-stream",
+					},
+					{
+						key: "Cross-Origin-Embedder-Policy",
+						value: "require-corp",
+					},
+					{
+						key: "Cross-Origin-Opener-Policy",
+						value: "same-origin",
+					},
+				],
+			},
+			{
+				// Unity JavaScript 파일에 대한 헤더 설정
+				source: "/Build/:all*.js",
+				headers: [
+					{
+						key: "Content-Type",
+						value: "application/javascript",
 					},
 				],
 			},
