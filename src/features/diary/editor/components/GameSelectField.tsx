@@ -4,6 +4,7 @@ import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { addMonths, format, parseISO, subMonths } from "date-fns";
+import { isAxiosError } from "axios";
 import {
 	fetchScheduleDetails,
 	fetchSchedulesByDateRange,
@@ -11,6 +12,7 @@ import {
 import type { ScheduleResponse } from "@/features/games/types";
 import { locations } from "@/features/games/constants";
 import { findExistingDiary } from "@/features/diary/utils/findExistingDiary";
+import { getApiErrorMessage } from "@/lib/http/getApiErrorMessage";
 import type { BaseInfo } from "../types";
 import { SectionTitle } from "./SectionTitle";
 import { ExistingDiaryDialog } from "./ExistingDiaryDialog";
@@ -39,6 +41,8 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 	const router = useRouter();
 	const [isResolving, setIsResolving] = useState(false);
 	const [existingDiaryId, setExistingDiaryId] = useState<string | null>(null);
+	/** 드롭다운 표시용 (중복 일지 모달 시에도 선택 경기 유지) */
+	const [selectedScheduleId, setSelectedScheduleId] = useState("");
 
 	const { startISO, endISO } = useMemo(() => {
 		const now = new Date();
@@ -50,10 +54,17 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 		};
 	}, []);
 
-	const { data: allSchedules = [], isLoading } = useQuery({
+	const {
+		data: allSchedules = [],
+		isLoading,
+		isError,
+		error: schedulesError,
+		refetch,
+	} = useQuery({
 		queryKey: ["games", "schedules", "diary-picker", startISO, endISO],
 		queryFn: () => fetchSchedulesByDateRange(startISO, endISO),
 		staleTime: 1000 * 60 * 5,
+		retry: 2,
 	});
 
 	const gameSchedules = useMemo(
@@ -68,7 +79,11 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 		[allSchedules]
 	);
 
+	const selectValue =
+		selectedScheduleId || base.scheduleId || "";
+
 	const clearGameSelection = () => {
+		setSelectedScheduleId("");
 		onChange({
 			...base,
 			scheduleId: undefined,
@@ -124,6 +139,7 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 			return;
 		}
 
+		setSelectedScheduleId(scheduleId);
 		setIsResolving(true);
 		try {
 			const details = await fetchScheduleDetails(scheduleId);
@@ -135,27 +151,25 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 				return;
 			}
 
-			let date = "";
-			try {
-				date = format(parseISO(details.startDateTime), "yyyy-MM-dd");
-			} catch {
-				// ignore
-			}
-
+			// 같은 경기(gameId)에 대한 일지만 확인 — 날짜만으로 검사하면 다른 경기 일지에 걸림
 			const existing = await findExistingDiary({
 				gameId: details.gameId,
-				date,
 			});
 
 			if (existing) {
-				clearGameSelection();
 				setExistingDiaryId(existing.diaryId);
 				return;
 			}
 
 			applyGameSelection(scheduleId, details);
-		} catch {
-			alert("경기 정보를 불러오지 못했습니다. 다시 시도해주세요.");
+		} catch (err) {
+			if (isAxiosError(err) && err.response?.status === 401) {
+				alert("로그인이 필요합니다. 다시 로그인한 뒤 경기를 선택해주세요.");
+			} else {
+				alert(
+					getApiErrorMessage(err, "경기 정보를 불러오지 못했습니다. 다시 시도해주세요.")
+				);
+			}
 			clearGameSelection();
 		} finally {
 			setIsResolving(false);
@@ -171,6 +185,7 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 
 	const handleCancelEdit = () => {
 		setExistingDiaryId(null);
+		clearGameSelection();
 	};
 
 	if (locked && base.gameId) {
@@ -193,7 +208,7 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 				<div className="mt-4 space-y-2">
 					<label className="text-sm text-gray-500">경기</label>
 					<select
-						value={base.scheduleId || ""}
+						value={selectValue}
 						onChange={(e) => handleSelect(e.target.value)}
 						disabled={isLoading || isResolving}
 						className="w-full h-10 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
@@ -209,7 +224,22 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 							</option>
 						))}
 					</select>
-					{!isLoading && gameSchedules.length === 0 && (
+					{isError && (
+						<div className="text-sm text-red-600 space-y-1">
+							<p>
+								경기 목록을 불러오지 못했습니다:{" "}
+								{getApiErrorMessage(schedulesError, "네트워크 오류")}
+							</p>
+							<button
+								type="button"
+								onClick={() => refetch()}
+								className="text-red-700 underline"
+							>
+								다시 시도
+							</button>
+						</div>
+					)}
+					{!isLoading && !isError && gameSchedules.length === 0 && (
 						<p className="text-sm text-gray-500">
 							선택 가능한 경기가 없습니다. 경기 스케줄을 확인해주세요.
 						</p>

@@ -130,6 +130,7 @@ export function diaryEntryToDraft(diary: DiaryEntry): Partial<DiaryDraft> {
 				diary.seatNumber ||
 				diary.seat_info?.number ||
 				undefined,
+			seatLabel: diary.seat?.trim() || undefined,
 		},
 		mvp: {
 			name: diary.mvpPlayerName || "",

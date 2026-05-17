@@ -68,7 +68,8 @@ export const checkDiaryByGameId = async (
 	gameId: string
 ): Promise<DiaryCheckResponse> => {
 	const response = await clientAxiosService.get<DiaryCheckResponse>(
-		`/api/diary/game/${encodeURIComponent(gameId)}`
+		`/api/diary/game/${encodeURIComponent(gameId)}`,
+		{ skipAuthRedirect: true }
 	);
 	return response.data;
 };
@@ -78,7 +79,8 @@ export const checkDiaryByDate = async (
 	date: string
 ): Promise<DiaryCheckResponse> => {
 	const response = await clientAxiosService.get<DiaryCheckResponse>(
-		`/api/diary/date/${encodeURIComponent(date)}`
+		`/api/diary/date/${encodeURIComponent(date)}`,
+		{ skipAuthRedirect: true }
 	);
 	return response.data;
 };

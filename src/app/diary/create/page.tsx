@@ -72,10 +72,7 @@ export default function DiaryCreatePage() {
 		const trimmedGameId = gameId.trim();
 		const dateStr = draft.base.date || undefined;
 
-		const existing = await findExistingDiary({
-			gameId: trimmedGameId,
-			date: dateStr,
-		});
+		const existing = await findExistingDiary({ gameId: trimmedGameId });
 		if (existing) {
 			setExistingDiaryId(existing.diaryId);
 			return;
@@ -205,10 +202,7 @@ export default function DiaryCreatePage() {
 			router.push(`/diary/${result.id}`);
 		} catch (error) {
 			if (isAxiosError(error) && error.response?.status === 409) {
-				const again = await findExistingDiary({
-					gameId: trimmedGameId,
-					date: dateStr,
-				});
+				const again = await findExistingDiary({ gameId: trimmedGameId });
 				if (again) {
 					setExistingDiaryId(again.diaryId);
 					return;

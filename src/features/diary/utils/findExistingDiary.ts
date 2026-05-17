@@ -6,7 +6,11 @@ export type ExistingDiaryResult = {
 	diary: DiaryCheckResponse["diary"];
 };
 
-/** 백엔드와 동일: gameId 우선, 없으면 date(yyyy-MM-dd) */
+/**
+ * 일지 중복 확인
+ * - gameId가 있으면 해당 경기 일지만 검사 (date로 넘어가지 않음)
+ * - gameId 없이 date만 있으면 날짜 기준 검사
+ */
 export async function findExistingDiary(params: {
 	gameId?: string;
 	date?: string;
@@ -19,6 +23,7 @@ export async function findExistingDiary(params: {
 		if (check.exists && check.diaryId) {
 			return { diaryId: check.diaryId, diary: check.diary };
 		}
+		return null;
 	}
 
 	if (date) {

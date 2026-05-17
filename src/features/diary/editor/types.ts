@@ -24,6 +24,8 @@ export interface BaseInfo {
 	seatBlock?: string;
 	seatRow?: string;
 	seatNumber?: string;
+	/** GET diary.seat 표시 문자열 (저장 API 미전송, hierarchy 매칭용) */
+	seatLabel?: string;
 }
 
 export type StatKey =

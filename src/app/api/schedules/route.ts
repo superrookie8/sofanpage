@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
 			headers: {
 				"Content-Type": "application/json",
 			},
-			cache: isDevelopment ? "no-store" : "default",
+			cache: "no-store",
 		});
 
 		// 백엔드 응답 상태 확인

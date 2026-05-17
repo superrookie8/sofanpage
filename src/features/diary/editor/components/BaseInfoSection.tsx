@@ -11,6 +11,7 @@ import {
 } from "../api";
 import type { StadiumInfo } from "@/features/games/types";
 import { diaryEditError, diaryEditLog, diaryEditWarn } from "../debug";
+import { resolveSeatFieldsFromLabel } from "../resolveSeatFromHierarchy";
 
 interface BaseInfoSectionProps {
 	base: BaseInfo;
@@ -145,6 +146,30 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 						seatZone: base.seatZone,
 					});
 				}
+
+				if (
+					!base.seatZone &&
+					base.seatId &&
+					base.seatLabel &&
+					!matchedZone
+				) {
+					const fromLabel = resolveSeatFieldsFromLabel(
+						base.seatLabel,
+						data
+					);
+					if (fromLabel) {
+						diaryEditLog("diary.seat 문자열로 좌석 필드 복원", {
+							seatLabel: base.seatLabel,
+							...fromLabel,
+						});
+						onChange({ ...base, ...fromLabel });
+					} else {
+						diaryEditWarn("diary.seat으로 hierarchy 매칭 실패", {
+							seatLabel: base.seatLabel,
+						});
+					}
+				}
+
 				setHierarchy(data);
 			} catch (error) {
 				diaryEditError("GET hierarchy 실패", error);
@@ -154,7 +179,15 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 			}
 		};
 		loadHierarchy();
-	}, [base.stadiumId, base.seatBlock, base.seatNumber, base.seatRow, base.seatZone, base.seatId]);
+	}, [
+		base.stadiumId,
+		base.seatBlock,
+		base.seatNumber,
+		base.seatRow,
+		base.seatZone,
+		base.seatId,
+		base.seatLabel,
+	]);
 
 	// 좌석 선택 완료 시 seatId 가져오기
 	useEffect(() => {

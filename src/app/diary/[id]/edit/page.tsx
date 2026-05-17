@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { DiaryEditor } from "@/features/diary/editor/DiaryEditor";
 import { useDiaryQuery } from "@/features/diary/queries";
 import { useUpdateDiaryMutation } from "@/features/diary/mutations";
-import { diaryEditError, diaryEditLog } from "@/features/diary/editor/debug";
+import { diaryEditError, diaryEditLog, diaryEditWarn } from "@/features/diary/editor/debug";
 import {
 	diaryEntryToDraft,
 	pickSeatFieldsForRequest,
@@ -33,6 +33,7 @@ export default function DiaryEditPage() {
 		}
 		if (!diary) return;
 
+		const hasSeatInfo = !!diary.seatInfo;
 		diaryEditLog("GET /api/diary/{id} 응답 (raw)", {
 			id: diary.id,
 			gameId: diary.gameId,
@@ -45,7 +46,20 @@ export default function DiaryEditPage() {
 			seatRow: diary.seatRow,
 			seatNumber: diary.seatNumber,
 			seatInfo: diary.seatInfo,
+			hasSeatInfo,
 		});
+
+		if (diary.seatId && !hasSeatInfo) {
+			diaryEditWarn(
+				"백엔드 GET이 seatId만 주고 seatInfo/stadiumId/구역·열·번이 없습니다. toDiaryResponse 좌석 조회 확인 필요",
+				{
+					seatId: diary.seatId,
+					stadiumId: diary.stadiumId,
+					seat: diary.seat,
+					gameId: diary.gameId,
+				}
+			);
+		}
 
 		const draft = diaryEntryToDraft(diary);
 		diaryEditLog("diaryEntryToDraft → 폼 초기값 (base)", {

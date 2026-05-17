@@ -36,8 +36,12 @@ export const setupClientInterceptors = (instance: AxiosInstance) => {
 				_retry?: boolean;
 			};
 
-			// 401 에러 시 처리
-			if (error.response?.status === 401 && !originalRequest._retry) {
+			// 401 에러 시 처리 (중복 일지 확인 등은 로그아웃하지 않음)
+			if (
+				error.response?.status === 401 &&
+				!originalRequest._retry &&
+				!originalRequest.skipAuthRedirect
+			) {
 				originalRequest._retry = true;
 
 				if (typeof window !== "undefined") {
