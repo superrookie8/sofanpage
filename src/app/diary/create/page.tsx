@@ -6,6 +6,7 @@ import { DiaryEditor } from "@/features/diary/editor/DiaryEditor";
 import { useCreateDiaryMutation } from "@/features/diary/mutations";
 import type { DiaryDraft } from "@/features/diary/editor/types";
 import type { CreateDiaryRequest } from "@/features/diary/types";
+import { GameSchedulePicker } from "@/features/diary/components/GameSchedulePicker";
 
 export default function DiaryCreatePage() {
 	const router = useRouter();
@@ -178,23 +179,9 @@ export default function DiaryCreatePage() {
 		console.log("임시저장:", draft);
 	};
 
-	// gameId가 없으면 경고하고 리다이렉트
+	// gameId가 없으면 경기 선택 화면 표시
 	if (!gameIdFromUrl) {
-		return (
-			<div className="flex items-center justify-center min-h-screen">
-				<div className="text-center">
-					<p className="text-red-500 text-lg mb-4">
-						경기 정보가 없습니다.
-					</p>
-					<button
-						onClick={() => router.push("/schedule")}
-						className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-					>
-						경기 일정으로 돌아가기
-					</button>
-				</div>
-			</div>
-		);
+		return <GameSchedulePicker />;
 	}
 
 	return (

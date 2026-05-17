@@ -103,7 +103,12 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 
 	const handleCreateDiary = () => {
 		// 로그인 체크는 middleware에서 처리됨
-		if (!gameId) return router.push("/diary/create");
+		if (!gameId) {
+			alert(
+				"이 경기는 아직 직관일지 작성이 연결되지 않았습니다. 다른 경기를 선택해주세요."
+			);
+			return;
+		}
 		// /diary/game/[gameId] 페이지에서 "있으면 보기/없으면 작성"으로 최종 라우팅
 		router.push(`/diary/game/${gameId}`);
 	};

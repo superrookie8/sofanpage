@@ -31,11 +31,17 @@ const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 interface CalendarProps {
 	onLocationSelect: (location: GameLocation) => void;
 	onGameClick?: (scheduleId: string) => void;
+	/** false면 URL과 동기화하지 않음 (직관일지 작성 등 다른 페이지에서 사용 시) */
+	syncUrl?: boolean;
+	/** syncUrl이 true일 때 월 변경 시 반영할 경로 (기본: /schedule) */
+	urlPath?: string;
 }
 
 const Calendar: React.FC<CalendarProps> = ({
 	onLocationSelect,
 	onGameClick,
+	syncUrl = true,
+	urlPath = "/schedule",
 }) => {
 	const searchParams = useSearchParams();
 	const router = useRouter();
@@ -45,6 +51,9 @@ const Calendar: React.FC<CalendarProps> = ({
 	const monthParam = searchParams.get("month");
 
 	const initialMonth = useMemo(() => {
+		if (!syncUrl) {
+			return new Date();
+		}
 		if (yearParam && monthParam) {
 			const year = parseInt(yearParam);
 			const month = parseInt(monthParam) - 1; // 0-based (1월 = 0)
@@ -53,7 +62,7 @@ const Calendar: React.FC<CalendarProps> = ({
 			}
 		}
 		return new Date(); // URL에 없으면 현재 날짜
-	}, [yearParam, monthParam]);
+	}, [yearParam, monthParam, syncUrl]);
 
 	const [currentMonth, setCurrentMonth] = useState(initialMonth);
 	const isUpdatingFromURL = useRef(false);
@@ -75,8 +84,8 @@ const Calendar: React.FC<CalendarProps> = ({
 
 	// currentMonth가 변경될 때 URL 업데이트 (URL에서 온 변경은 제외)
 	useEffect(() => {
-		if (isUpdatingFromURL.current) {
-			return; // URL에서 온 변경이면 URL 업데이트 안 함
+		if (!syncUrl || isUpdatingFromURL.current) {
+			return;
 		}
 
 		const year = currentMonth.getFullYear();
@@ -89,9 +98,17 @@ const Calendar: React.FC<CalendarProps> = ({
 			const params = new URLSearchParams(searchParams.toString());
 			params.set("year", year.toString());
 			params.set("month", month.toString());
-			router.replace(`/schedule?${params.toString()}`, { scroll: false });
+			router.replace(`${urlPath}?${params.toString()}`, { scroll: false });
 		}
-	}, [currentMonth, yearParam, monthParam, searchParams, router]);
+	}, [
+		currentMonth,
+		yearParam,
+		monthParam,
+		searchParams,
+		router,
+		syncUrl,
+		urlPath,
+	]);
 
 	// useMemo로 날짜 범위 계산
 	const { daysInCurrentMonth, emptyDays, startISO, endISO } = useMemo(() => {
