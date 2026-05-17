@@ -1,5 +1,6 @@
 // src/features/diary/editor/api.ts
 import type { StadiumInfo } from "@/features/games/types";
+import { encodeStadiumPathParam } from "@/lib/stadium/encodeStadiumPathParam";
 
 // 경기장 목록 조회
 export const fetchStadiums = async (): Promise<StadiumInfo[]> => {
@@ -39,13 +40,21 @@ export interface SeatHierarchyResponse {
 export const fetchSeatHierarchy = async (
 	stadiumId: string
 ): Promise<SeatHierarchyResponse> => {
-	const response = await fetch(`/api/stadiums/${stadiumId}/seats/hierarchy`, {
+	const encoded = encodeStadiumPathParam(stadiumId);
+	const response = await fetch(`/api/stadiums/${encoded}/seats/hierarchy`, {
 		method: "GET",
 		cache: "no-store",
 	});
 
 	if (!response.ok) {
-		throw new Error("좌석 계층 구조 조회 실패");
+		let message = "좌석 계층 구조 조회 실패";
+		try {
+			const body = await response.json();
+			if (body?.message) message = body.message;
+		} catch {
+			// ignore
+		}
+		throw new Error(`${message} (${response.status})`);
 	}
 
 	const data = await response.json();
@@ -69,8 +78,9 @@ export const fetchSeatId = async (
 		params.append("blockName", blockName);
 	}
 
+	const encoded = encodeStadiumPathParam(stadiumId);
 	const response = await fetch(
-		`/api/stadiums/${stadiumId}/seat?${params.toString()}`,
+		`/api/stadiums/${encoded}/seat?${params.toString()}`,
 		{
 			method: "GET",
 			cache: "no-store",

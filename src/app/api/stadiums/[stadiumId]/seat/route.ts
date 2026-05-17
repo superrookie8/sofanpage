@@ -1,14 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+	decodeStadiumPathParam,
+	encodeStadiumPathParam,
+} from "@/lib/stadium/encodeStadiumPathParam";
 
 export async function GET(
 	req: NextRequest,
 	{ params }: { params: Promise<{ stadiumId: string }> }
 ) {
 	try {
-		const { stadiumId } = await params;
-		// 경기장 이름을 URL 디코딩 (프론트엔드에서 인코딩했을 수 있음)
-		const stadiumName = decodeURIComponent(stadiumId);
-		const encodedStadiumName = encodeURIComponent(stadiumName);
+		const backApiUrl = process.env.NEXT_PUBLIC_BACKAPI_URL;
+		if (!backApiUrl) {
+			return NextResponse.json(
+				{ message: "NEXT_PUBLIC_BACKAPI_URL이 설정되지 않았습니다" },
+				{ status: 500 }
+			);
+		}
+
+		const { stadiumId: rawParam } = await params;
+		const encodedStadiumName = encodeStadiumPathParam(
+			decodeStadiumPathParam(rawParam)
+		);
 		
 		const { searchParams } = new URL(req.url);
 		const zoneName = searchParams.get("zoneName");
@@ -34,7 +46,7 @@ export async function GET(
 		}
 
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/stadiums/${encodedStadiumName}/seat?${queryParams.toString()}`,
+			`${backApiUrl}/api/stadiums/${encodedStadiumName}/seat?${queryParams.toString()}`,
 			{
 				method: "GET",
 				headers: {

@@ -57,13 +57,27 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 		loadStadiums();
 	}, []);
 
-	// 경기 선택 등으로 경기장 이름만 채워진 경우 → stadiumId 매칭 후 좌석 API 호출 가능하게
+	// 경기장 id 정규화: 일지 API의 stadiumId가 목록 id와 다를 때(이름 등) 매칭
 	useEffect(() => {
-		if (base.stadiumId || !base.location?.trim() || stadiums.length === 0) {
-			return;
+		if (stadiums.length === 0) return;
+
+		if (base.stadiumId) {
+			const exists = stadiums.some((s) => s.id === base.stadiumId);
+			if (exists) return;
+
+			const byName = stadiums.find(
+				(s) => s.name === base.stadiumId || s.id === base.stadiumId
+			);
+			if (byName) {
+				onChange({ ...base, stadiumId: byName.id });
+				return;
+			}
 		}
+
+		if (!base.location?.trim()) return;
+
 		const matchedId = resolveStadiumId(stadiums, base.location);
-		if (matchedId) {
+		if (matchedId && matchedId !== base.stadiumId) {
 			onChange({ ...base, stadiumId: matchedId });
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
