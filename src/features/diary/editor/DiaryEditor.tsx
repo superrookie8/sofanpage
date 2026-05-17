@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { BaseInfoSection } from "./components/BaseInfoSection";
+import { GameSelectField } from "./components/GameSelectField";
 import { MVPSection } from "./components/MVPSection";
 import { PlayerStatsSection } from "./components/PlayerStatsSection";
 import { HighlightsSection } from "./components/HighlightsSection";
@@ -23,12 +24,15 @@ type DiaryEditorInitialDraft = Partial<
 interface DiaryEditorProps {
 	// create/edit 화면에서 필요한 값만 일부 주입할 수 있도록 deep-partial 형태로 받음
 	initialDraft?: DiaryEditorInitialDraft;
+	/** URL 등으로 gameId가 이미 정해진 경우 경기 선택 UI 숨김 */
+	gameIdLocked?: boolean;
 	onSave?: (draft: DiaryDraft) => Promise<void>;
 	onSaveDraft?: (draft: DiaryDraft) => Promise<void>;
 }
 
 export const DiaryEditor: React.FC<DiaryEditorProps> = ({
 	initialDraft,
+	gameIdLocked = false,
 	onSave,
 	onSaveDraft,
 }) => {
@@ -91,9 +95,12 @@ export const DiaryEditor: React.FC<DiaryEditorProps> = ({
 	const [modalOpen, setModalOpen] = useState(false);
 
 	const canSave = useMemo(() => {
-		// minimal: date + location
-		return Boolean(draft.base.date && draft.base.location);
-	}, [draft.base.date, draft.base.location]);
+		return Boolean(
+			draft.base.gameId?.trim() &&
+				draft.base.date &&
+				draft.base.location
+		);
+	}, [draft.base.gameId, draft.base.date, draft.base.location]);
 
 	const addPlayer = () => {
 		setDraft((d) => ({
@@ -245,6 +252,11 @@ export const DiaryEditor: React.FC<DiaryEditorProps> = ({
 			{/* Content */}
 			<div className="mx-auto max-w-5xl px-4 py-6">
 				<div className="grid gap-6">
+					<GameSelectField
+						base={draft.base}
+						onChange={(base) => setDraft((d) => ({ ...d, base }))}
+						locked={gameIdLocked}
+					/>
 					<BaseInfoSection
 						base={draft.base}
 						onChange={(base) => setDraft((d) => ({ ...d, base }))}

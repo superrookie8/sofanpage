@@ -6,7 +6,6 @@ import { DiaryEditor } from "@/features/diary/editor/DiaryEditor";
 import { useCreateDiaryMutation } from "@/features/diary/mutations";
 import type { DiaryDraft } from "@/features/diary/editor/types";
 import type { CreateDiaryRequest } from "@/features/diary/types";
-import { GameSchedulePicker } from "@/features/diary/components/GameSchedulePicker";
 
 export default function DiaryCreatePage() {
 	const router = useRouter();
@@ -16,30 +15,24 @@ export default function DiaryCreatePage() {
 	const gameIdFromUrl = searchParams.get("gameId");
 
 	const handleSave = async (draft: DiaryDraft) => {
-		// gameId는 반드시 필요함 (URL 파라미터 또는 draft에서)
 		const gameId = gameIdFromUrl || draft.base.gameId;
-		
+
 		if (!gameId || !gameId.trim()) {
-			alert("경기 정보가 없습니다. 다시 시도해주세요.");
+			alert("경기를 선택해주세요.");
 			return;
 		}
 
-		// DiaryDraft를 CreateDiaryRequest로 변환
-		// 사진 R2 key들을 배열로 합치기 (빈 문자열 제외)
 		const photoUrls = [
 			draft.ticketPhoto,
 			draft.viewPhoto,
 			draft.additionalPhoto,
 		].filter((url) => url && url.trim() !== "");
 
-		// 날짜와 시간을 합쳐서 date 필드에 저장 (YYYY-MM-DD 형식)
 		const dateStr = draft.base.date || undefined;
 
-		// 첫 번째 선수 정보 추출 (백엔드가 단일 선수만 지원하는 경우)
 		const firstPlayer =
 			draft.players && draft.players.length > 0 ? draft.players[0] : null;
 
-		// 2점 야투율 계산
 		const calculateFg2Percent = (made: number | "", att: number | "") => {
 			if (typeof made === "number" && typeof att === "number" && att > 0) {
 				return Math.round((made / att) * 100);
@@ -47,7 +40,6 @@ export default function DiaryCreatePage() {
 			return null;
 		};
 
-		// 3점 야투율 계산
 		const calculateFg3Percent = (made: number | "", att: number | "") => {
 			if (typeof made === "number" && typeof att === "number" && att > 0) {
 				return Math.round((made / att) * 100);
@@ -55,9 +47,7 @@ export default function DiaryCreatePage() {
 			return null;
 		};
 
-		// 빈 값은 undefined로 처리 (API 문서: 모든 필드 nullable)
 		const request: CreateDiaryRequest = {
-			// 기본 정보 - gameId는 반드시 전달
 			gameId: gameId.trim(),
 			watchType:
 				draft.base.watchType === "직관"
@@ -73,7 +63,6 @@ export default function DiaryCreatePage() {
 			content: draft.memo && draft.memo.trim() ? draft.memo : undefined,
 			photoUrls: photoUrls.length > 0 ? photoUrls : undefined,
 
-			// 좌석 정보
 			seatId:
 				draft.base.seatId && draft.base.seatId.trim()
 					? draft.base.seatId
@@ -87,7 +76,6 @@ export default function DiaryCreatePage() {
 					? draft.base.seatNumber
 					: undefined,
 
-			// 경기 정보
 			gameWinner:
 				draft.base.result === "승"
 					? "HOME"
@@ -102,11 +90,9 @@ export default function DiaryCreatePage() {
 							.filter((c) => c.length > 0)
 					: undefined,
 
-			// MVP 정보
 			mvpPlayerName:
 				draft.mvp.name && draft.mvp.name.trim() ? draft.mvp.name : undefined,
 
-			// 응원 선수 정보 (첫 번째 선수만)
 			cheeredPlayerName:
 				firstPlayer && firstPlayer.name && firstPlayer.name.trim()
 					? firstPlayer.name
@@ -162,33 +148,28 @@ export default function DiaryCreatePage() {
 		};
 
 		const result = await createDiaryMutation.mutateAsync(request);
-		
-		// 백엔드에서 일지 아이디가 반환되는지 확인
+
 		if (!result || !result.id) {
-			alert("일지가 생성되었지만 일지 ID를 받지 못했습니다. 일지 목록 페이지로 이동합니다.");
+			alert(
+				"일지가 생성되었지만 일지 ID를 받지 못했습니다. 일지 목록 페이지로 이동합니다."
+			);
 			router.push("/diary/read");
 			return;
 		}
-		
-		// 일지 상세 페이지로 이동
+
 		router.push(`/diary/${result.id}`);
 	};
 
 	const handleSaveDraft = async (draft: DiaryDraft) => {
-		// TODO: 임시저장 로직 구현
 		console.log("임시저장:", draft);
 	};
 
-	// gameId가 없으면 경기 선택 화면 표시
-	if (!gameIdFromUrl) {
-		return <GameSchedulePicker />;
-	}
-
 	return (
 		<DiaryEditor
+			gameIdLocked={Boolean(gameIdFromUrl)}
 			initialDraft={{
 				base: {
-					gameId: gameIdFromUrl,
+					...(gameIdFromUrl ? { gameId: gameIdFromUrl } : {}),
 				},
 			}}
 			onSave={handleSave}

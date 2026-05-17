@@ -12,6 +12,8 @@ export interface BaseInfo {
 	 * - stadiumId(경기장 id)와 절대 혼용하면 안 됨
 	 */
 	gameId?: string;
+	/** 폼에서 경기 선택 시 사용 (저장 API에는 미전송) */
+	scheduleId?: string;
 	stadiumId?: string; // 경기장 ID
 	watchType: WatchType;
 	companions: string;

@@ -10,6 +10,7 @@ const ClientWrapper = ({ children }: { children: React.ReactNode }) => {
 
 	return (
 		<motion.div
+			className="relative z-10"
 			key={pathname}
 			initial={{ opacity: 0, x: "100vw" }}
 			animate={{

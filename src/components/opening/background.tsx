@@ -25,7 +25,7 @@ const Background: React.FC = () => {
 		return null;
 	}
 	return (
-		<div className="fixed w-full h-full z-0">
+		<div className="fixed inset-0 -z-10 pointer-events-none">
 			<Image
 				src="/images/soheeposter34.png"
 				alt="Background"
