@@ -1,5 +1,5 @@
 // src/features/diary/editor/components/BaseInfoSection.tsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { SectionTitle } from "./SectionTitle";
 import { Chip } from "./Chip";
 import type { BaseInfo } from "../types";
@@ -42,6 +42,25 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 	);
 	const [loadingStadiums, setLoadingStadiums] = useState(false);
 	const [loadingHierarchy, setLoadingHierarchy] = useState(false);
+	const [hierarchyError, setHierarchyError] = useState<string | null>(null);
+	const [hierarchyReloadKey, setHierarchyReloadKey] = useState(0);
+
+	const savedSeatSummary = useMemo(() => {
+		if (base.seatLabel?.trim()) return base.seatLabel.trim();
+		const parts = [
+			base.seatZone,
+			base.seatBlock,
+			base.seatRow,
+			base.seatNumber,
+		].filter(Boolean);
+		return parts.length > 0 ? parts.join(" ") : null;
+	}, [
+		base.seatLabel,
+		base.seatZone,
+		base.seatBlock,
+		base.seatRow,
+		base.seatNumber,
+	]);
 
 	// 경기장 목록 로드
 	useEffect(() => {
@@ -95,18 +114,18 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [base.location, base.stadiumId, stadiums]);
 
-	// 경기장 선택 시 좌석 계층 구조 로드
-	useEffect(() => {
+	const loadHierarchy = useCallback(async () => {
 		if (!base.stadiumId) {
 			setHierarchy(null);
+			setHierarchyError(null);
 			return;
 		}
 
-		const loadHierarchy = async () => {
-			setLoadingHierarchy(true);
-			diaryEditLog("GET hierarchy 요청", { stadiumId: base.stadiumId });
-			try {
-				const data = await fetchSeatHierarchy(base.stadiumId!);
+		setLoadingHierarchy(true);
+		setHierarchyError(null);
+		diaryEditLog("GET hierarchy 요청", { stadiumId: base.stadiumId });
+		try {
+			const data = await fetchSeatHierarchy(base.stadiumId!);
 				const zones = data?.zones ?? [];
 				const matchedZone = zones.find((z) => z.zoneName === base.seatZone);
 				let rowInHierarchy: string | undefined;
@@ -170,24 +189,30 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 					}
 				}
 
-				setHierarchy(data);
-			} catch (error) {
-				diaryEditError("GET hierarchy 실패", error);
-				setHierarchy(null);
-			} finally {
-				setLoadingHierarchy(false);
-			}
-		};
-		loadHierarchy();
+			setHierarchy(data);
+		} catch (error) {
+			diaryEditError("GET hierarchy 실패", error);
+			setHierarchy(null);
+			setHierarchyError(
+				error instanceof Error ? error.message : "좌석 목록을 불러오지 못했습니다"
+			);
+		} finally {
+			setLoadingHierarchy(false);
+		}
 	}, [
 		base.stadiumId,
 		base.seatBlock,
+		base.seatId,
+		base.seatLabel,
 		base.seatNumber,
 		base.seatRow,
 		base.seatZone,
-		base.seatId,
-		base.seatLabel,
+		onChange,
 	]);
+
+	useEffect(() => {
+		loadHierarchy();
+	}, [loadHierarchy, hierarchyReloadKey]);
 
 	// 좌석 선택 완료 시 seatId 가져오기
 	useEffect(() => {
@@ -344,19 +369,54 @@ export const BaseInfoSection: React.FC<BaseInfoSectionProps> = ({
 						<div className="text-sm text-gray-500 flex items-center gap-2">
 							<span>🎫</span> 좌석
 						</div>
+						{(savedSeatSummary || base.seatId) && (
+							<p className="text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-md px-3 py-2">
+								저장된 좌석: {savedSeatSummary || `ID ${base.seatId}`}
+								{!savedSeatSummary &&
+									" (목록 로드 후 구역·열·번호를 고르거나, 그대로 저장해도 됩니다)"}
+							</p>
+						)}
 						{!base.stadiumId ? (
 							<div className="text-xs text-gray-400">
 								경기장을 먼저 선택해주세요
 							</div>
 						) : loadingHierarchy ? (
 							<div className="text-xs text-gray-400">
-								좌석 정보를 불러오는 중...
+								좌석 목록을 불러오는 중...
+							</div>
+						) : hierarchyError ? (
+							<div className="text-sm space-y-2">
+								<p className="text-amber-800">
+									좌석 목록 API 오류: {hierarchyError}
+								</p>
+								<p className="text-xs text-gray-500">
+									백엔드/서버 문제일 수 있습니다. 경기장을 다시 선택하거나
+									잠시 후 다시 시도해주세요.
+								</p>
+								<button
+									type="button"
+									onClick={() =>
+										setHierarchyReloadKey((k) => k + 1)
+									}
+									className="text-sm text-red-600 underline"
+								>
+									좌석 목록 다시 불러오기
+								</button>
 							</div>
 						) : !hierarchy ||
 						  !hierarchy.zones ||
 						  hierarchy.zones.length === 0 ? (
-							<div className="text-xs text-gray-400">
-								좌석 정보를 불러올 수 없습니다
+							<div className="text-xs text-gray-400 space-y-2">
+								<p>이 경기장의 좌석 목록이 비어 있습니다.</p>
+								<button
+									type="button"
+									onClick={() =>
+										setHierarchyReloadKey((k) => k + 1)
+									}
+									className="text-red-600 underline"
+								>
+									다시 불러오기
+								</button>
 							</div>
 						) : (
 							<div className="grid gap-3 md:grid-cols-4">
