@@ -6,6 +6,7 @@ import { DiaryEditor } from "@/features/diary/editor/DiaryEditor";
 import { useCreateDiaryMutation } from "@/features/diary/mutations";
 import type { DiaryDraft } from "@/features/diary/editor/types";
 import type { CreateDiaryRequest } from "@/features/diary/types";
+import { getApiErrorMessage } from "@/lib/http/getApiErrorMessage";
 
 export default function DiaryCreatePage() {
 	const router = useRouter();
@@ -21,6 +22,8 @@ export default function DiaryCreatePage() {
 			alert("경기를 선택해주세요.");
 			return;
 		}
+
+		const trimmedGameId = gameId.trim();
 
 		const photoUrls = [
 			draft.ticketPhoto,
@@ -48,7 +51,7 @@ export default function DiaryCreatePage() {
 		};
 
 		const request: CreateDiaryRequest = {
-			gameId: gameId.trim(),
+			gameId: trimmedGameId,
 			watchType:
 				draft.base.watchType === "직관"
 					? "DIRECT"
@@ -147,17 +150,23 @@ export default function DiaryCreatePage() {
 					: undefined,
 		};
 
-		const result = await createDiaryMutation.mutateAsync(request);
+		try {
+			const result = await createDiaryMutation.mutateAsync(request);
 
-		if (!result || !result.id) {
-			alert(
-				"일지가 생성되었지만 일지 ID를 받지 못했습니다. 일지 목록 페이지로 이동합니다."
+			if (!result || !result.id) {
+				alert(
+					"일지가 생성되었지만 일지 ID를 받지 못했습니다. 일지 목록 페이지로 이동합니다."
+				);
+				router.push("/diary/read");
+				return;
+			}
+
+			router.push(`/diary/${result.id}`);
+		} catch (error) {
+			throw new Error(
+				getApiErrorMessage(error, "일지 저장에 실패했습니다.")
 			);
-			router.push("/diary/read");
-			return;
 		}
-
-		router.push(`/diary/${result.id}`);
 	};
 
 	const handleSaveDraft = async (draft: DiaryDraft) => {

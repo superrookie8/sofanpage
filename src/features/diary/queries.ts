@@ -10,11 +10,14 @@ import {
 import type { DiaryListFilter } from "./types";
 
 // 전체 일지 목록 조회 Query
-export const useDiaryListQuery = (filter?: DiaryListFilter) => {
+export const useDiaryListQuery = (
+	filter?: DiaryListFilter,
+	enabled = true
+) => {
 	return useQuery({
 		queryKey: queryKeys.diary.list(filter),
 		queryFn: () => fetchAllDiaries(filter),
-		enabled: true,
+		enabled,
 	});
 };
 

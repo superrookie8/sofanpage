@@ -54,9 +54,7 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 	const gameSchedules = useMemo(
 		() =>
 			allSchedules
-				.filter(
-					(s) => s.type === "game" || s.type === "specialGame"
-				)
+				.filter((s) => s.type === "game" || s.type === "specialGame")
 				.sort(
 					(a, b) =>
 						new Date(b.startDateTime).getTime() -
@@ -65,20 +63,24 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 		[allSchedules]
 	);
 
+	const clearGameSelection = () => {
+		onChange({
+			...base,
+			scheduleId: undefined,
+			gameId: undefined,
+			stadiumId: undefined,
+			location: "",
+			seatId: undefined,
+			seatZone: undefined,
+			seatBlock: undefined,
+			seatRow: undefined,
+			seatNumber: undefined,
+		});
+	};
+
 	const handleSelect = async (scheduleId: string) => {
 		if (!scheduleId) {
-			onChange({
-				...base,
-				scheduleId: undefined,
-				gameId: undefined,
-				stadiumId: undefined,
-				location: "",
-				seatId: undefined,
-				seatZone: undefined,
-				seatBlock: undefined,
-				seatRow: undefined,
-				seatNumber: undefined,
-			});
+			clearGameSelection();
 			return;
 		}
 
@@ -89,6 +91,7 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 				alert(
 					"이 경기는 직관일지 작성이 연결되지 않았습니다. 다른 경기를 선택해주세요."
 				);
+				clearGameSelection();
 				return;
 			}
 
@@ -123,6 +126,7 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 			});
 		} catch {
 			alert("경기 정보를 불러오지 못했습니다. 다시 시도해주세요.");
+			clearGameSelection();
 		} finally {
 			setIsResolving(false);
 		}
