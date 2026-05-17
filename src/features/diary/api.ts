@@ -1,4 +1,5 @@
 // src/features/diary/api.ts
+import { isAxiosError } from "axios";
 import clientAxiosService from "@/lib/client/http/axiosService";
 import type {
 	DiaryCheckResponse,
@@ -6,6 +7,13 @@ import type {
 	CreateDiaryRequest,
 	DiaryListFilter,
 } from "./types";
+
+/** 일지 없음 — 백엔드가 404를 반환하는 경우에도 동일하게 취급 */
+const NO_DIARY_CHECK: DiaryCheckResponse = {
+	exists: false,
+	diaryId: null,
+	diary: null,
+};
 
 // 전체 일지 목록 조회
 export const fetchAllDiaries = async (
@@ -67,22 +75,36 @@ export const fetchDiaryById = async (diaryId: string): Promise<DiaryEntry> => {
 export const checkDiaryByGameId = async (
 	gameId: string
 ): Promise<DiaryCheckResponse> => {
-	const response = await clientAxiosService.get<DiaryCheckResponse>(
-		`/api/diary/game/${encodeURIComponent(gameId)}`,
-		{ skipAuthRedirect: true }
-	);
-	return response.data;
+	try {
+		const response = await clientAxiosService.get<DiaryCheckResponse>(
+			`/api/diary/game/${encodeURIComponent(gameId)}`,
+			{ skipAuthRedirect: true }
+		);
+		return response.data;
+	} catch (error) {
+		if (isAxiosError(error) && error.response?.status === 404) {
+			return NO_DIARY_CHECK;
+		}
+		throw error;
+	}
 };
 
 // 날짜 기준 일지 존재 여부 확인 (yyyy-MM-dd)
 export const checkDiaryByDate = async (
 	date: string
 ): Promise<DiaryCheckResponse> => {
-	const response = await clientAxiosService.get<DiaryCheckResponse>(
-		`/api/diary/date/${encodeURIComponent(date)}`,
-		{ skipAuthRedirect: true }
-	);
-	return response.data;
+	try {
+		const response = await clientAxiosService.get<DiaryCheckResponse>(
+			`/api/diary/date/${encodeURIComponent(date)}`,
+			{ skipAuthRedirect: true }
+		);
+		return response.data;
+	} catch (error) {
+		if (isAxiosError(error) && error.response?.status === 404) {
+			return NO_DIARY_CHECK;
+		}
+		throw error;
+	}
 };
 
 /** @deprecated checkDiaryByGameId 사용 권장 */

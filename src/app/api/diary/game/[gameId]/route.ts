@@ -30,6 +30,13 @@ export async function GET(
 				{ status: 401 }
 			);
 		}
+		// 백엔드: 일지 없음을 404로 주는 경우 → 존재하지 않음으로 정규화
+		if (error.response?.status === 404) {
+			return NextResponse.json(
+				{ exists: false, diaryId: null, diary: null },
+				{ status: 200 }
+			);
+		}
 		return NextResponse.json(
 			{
 				message:

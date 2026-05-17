@@ -30,6 +30,12 @@ export async function GET(
 				{ status: 401 }
 			);
 		}
+		if (error.response?.status === 404) {
+			return NextResponse.json(
+				{ exists: false, diaryId: null, diary: null },
+				{ status: 200 }
+			);
+		}
 		return NextResponse.json(
 			{
 				message:
