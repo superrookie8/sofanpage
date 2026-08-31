@@ -2,8 +2,8 @@ name: Supersohee weekly article crawler
 
 on:
   schedule:
-    # Monday 09:10 Asia/Seoul (00:10 UTC)
-    - cron: "10 0 * * 1"
+    # Tuesday 09:10 Asia/Seoul (00:10 UTC)
+    - cron: "10 0 * * 2"
   workflow_dispatch:
 
 permissions:
