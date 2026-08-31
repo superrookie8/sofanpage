@@ -3,7 +3,6 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { GameLocation, ScheduleResponse } from "../types";
-import { locations } from "../constants";
 import {
 	format,
 	startOfMonth,
@@ -13,6 +12,12 @@ import {
 	parseISO,
 } from "date-fns";
 import { useSchedulesByDateRangeQuery } from "../queries";
+import { isGameSchedule } from "../nextGame";
+import {
+	isHomeGame,
+	matchupLabel,
+	resolveGameLocation,
+} from "../scheduleView";
 
 // 월 이름을 한글로 반환하는 함수
 const getKoreanMonth = (date: Date): string => {
@@ -153,10 +158,7 @@ const Calendar: React.FC<CalendarProps> = ({
 
 	// type이 "game" 또는 "specialGame"인 스케줄만 필터링
 	const schedules: ScheduleResponse[] = useMemo(() => {
-		return allSchedules.filter(
-			(schedule: ScheduleResponse) =>
-				schedule.type === "game" || schedule.type === "specialGame"
-		);
+		return allSchedules.filter(isGameSchedule);
 	}, [allSchedules]);
 
 	const weekDayHeader = weekDays.map((day) => (
@@ -178,17 +180,8 @@ const Calendar: React.FC<CalendarProps> = ({
 	};
 
 	const handleDateClick = (schedule: ScheduleResponse) => {
-		const isHome = schedule.location === "Home";
-
-		if (isHome) {
-			const location = locations["부산 사직실내체육관"];
-			onLocationSelect(location);
-		} else if (schedule.opponent) {
-			const location = locations[schedule.opponent.trim()];
-			if (location) {
-				onLocationSelect(location);
-			}
-		}
+		const location = resolveGameLocation(schedule);
+		if (location) onLocationSelect(location);
 
 		if (onGameClick) {
 			// scheduleId를 전달
@@ -213,7 +206,7 @@ const Calendar: React.FC<CalendarProps> = ({
 		return todaySchedules.map((schedule: ScheduleResponse, index: number) => {
 			// 시간 추출 (HH:mm 형식) - 백엔드 데이터를 그대로 파싱
 			const time = format(parseISO(schedule.startDateTime), "HH:mm");
-			const isHome = schedule.location === "Home";
+			const isHome = isHomeGame(schedule);
 
 			return (
 				<div
@@ -225,7 +218,7 @@ const Calendar: React.FC<CalendarProps> = ({
 				>
 					<div>
 						<span>
-							vs {schedule.title} {time}
+							{matchupLabel(schedule)} {time}
 						</span>
 					</div>
 				</div>

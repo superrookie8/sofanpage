@@ -1,0 +1,12 @@
+[build]
+  command = "pnpm build"
+  publish = ".next"
+
+[build.environment]
+  # Netlify 기본값이 Node 18이라 Agent Runner 경고가 발생한다.
+  # NODE_VERSION이 .nvmrc보다 우선하므로 명시적으로 고정한다.
+  # 로컬(.nvmrc)·Docker와 같은 메이저로 맞춰 버전 스큐를 없앤다.
+  NODE_VERSION = "22"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

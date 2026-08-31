@@ -2,107 +2,159 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-	font-family: "GmarketSansMedium";
-	src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff")
-		format("woff");
-	font-weight: normal;
-	font-style: normal;
-}
+/* ── 폰트 ────────────────────────────────────────────────
+   Pretendard Variable: 본문·숫자 (100~900 가변)
+   Anton: 워드마크·등번호 전용
+   ※ 이전의 `* { font-family: ... !important }`는 위계를 만들 수 없어 제거함.
+     이제 body에만 지정하고 Tailwind의 font-display로 Anton을 선택 적용한다. */
 
-body {
-	font-family: "GmarketSansMedium", sans-serif;
-}
+@layer base {
+	/*
+	 * ── 브랜드 팔레트 (단일 소스) ─────────────────────────────
+	 *
+	 * 색을 바꾸려면 이 블록의 값만 수정하면 전체 사이트에 일괄 반영된다.
+	 * 컴포넌트에는 hex를 직접 쓰지 않고 Tailwind 토큰(bg-brand-500,
+	 * text-ink-700 …)만 사용한다.
+	 *
+	 * 형식은 "R G B" 공백 구분 채널값이다. Tailwind가 이를
+	 * rgb(var(--brand-500) / <alpha-value>) 로 감싸므로 bg-brand-500/40
+	 * 같은 투명도 유틸리티가 그대로 동작한다. hex를 넣으면 투명도가 깨진다.
+	 *
+	 * 램프 교체 시 권장 순서:
+	 *   500(프라이머리) → 600(액티브, 500보다 어둡게)
+	 *   → 700(흰 배경 위 텍스트용, 대비 4.5:1 이상 확보)
+	 *   → 400(호버) → 200/100/50(배경 틴트, 밝은 순)
+	 */
+	:root {
+		/* 브랜드 — 리브랜딩 시 여기만 교체 */
+		--brand-50: 255 241 242;
+		--brand-100: 255 225 227;
+		--brand-200: 255 199 203;
+		--brand-400: 244 87 107;
+		--brand-500: 225 29 51;
+		--brand-600: 193 21 42;
+		--brand-700: 143 15 31;
 
-.hide-header header {
-	display: none;
-}
+		/* 중립 — 웜 그레이 */
+		--ink-50: 248 246 249;
+		--ink-100: 239 236 241;
+		--ink-200: 221 217 224;
+		--ink-300: 173 167 178;
+		--ink-500: 107 101 112;
+		--ink-700: 58 54 63;
+		--ink-900: 23 21 26;
 
-.wrap-text {
-	white-space: pre-wrap; /* 줄바꿈과 공백을 유지합니다. */
-	word-wrap: break-word; /* 긴 단어가 자동으로 줄바꿈됩니다. */
-}
+		/* 다크 셸 카드 서피스 */
+		--surface-dark: 38 35 43;
 
-@media (max-width: 768px) {
-	.fixed {
-		width: 100%;
-		height: 100%;
+		/* 시맨틱 — 승/패는 브랜드색과 충돌하지 않도록 별도로 둔다 */
+		--win: 14 159 110;
+		--lose: 107 101 112;
+		--info: 37 99 235;
+		--warn: 217 119 6;
+
+		/* 메달 */
+		--medal-gold: 245 197 66;
+		--medal-silver: 201 205 214;
+		--medal-bronze: 200 138 91;
+
+		color-scheme: light;
 	}
-	.responsive-image-container {
-		width: 100%;
-		height: auto;
+
+	html {
+		-webkit-text-size-adjust: 100%;
+		text-size-adjust: 100%;
+	}
+
+	body {
+		background-color: rgb(var(--ink-50));
+		color: rgb(var(--ink-700));
+		font-family: theme("fontFamily.sans");
+		font-size: 15px;
+		line-height: 1.65;
+		word-break: keep-all;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	/* 다크 셸(이벤트·아케이드)에서 페이지 바닥까지 어둡게 */
+	body[data-shell="dark"] {
+		background-color: rgb(var(--ink-900));
+	}
+
+	h1,
+	h2,
+	h3,
+	h4 {
+		line-height: 1.25;
+		color: rgb(var(--ink-900));
+	}
+
+	/* 숫자는 자릿수가 흔들리지 않도록 tabular */
+	table,
+	time,
+	[data-numeric] {
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* focus:outline-none 남용을 대체하는 공통 포커스 링 */
+	:focus-visible {
+		outline: 2px solid rgb(var(--brand-500));
+		outline-offset: 2px;
+		border-radius: 4px;
+	}
+
+	input::placeholder,
+	textarea::placeholder {
+		color: rgb(var(--ink-300));
 	}
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-	.responsive-image-container {
-		width: 80%;
-		height: auto;
+@layer utilities {
+	.wrap-text {
+		white-space: pre-wrap;
+		word-wrap: break-word;
+	}
+
+	.clamp-2 {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.clamp-3 {
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	/* 가로 스크롤 컨테이너의 스크롤바 숨김 (스크롤 자체는 유지) */
+	.no-scrollbar {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+	.no-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
+
+	.safe-bottom {
+		padding-bottom: env(safe-area-inset-bottom);
 	}
 }
 
-.ReactModal__Content {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	right: auto;
-	bottom: auto;
-	transform: translate(-50%, -50%);
-	width: 80%;
-	max-width: 300px;
-	height: auto;
-	padding: 20px;
-	background-color: #fff;
-	border-radius: 8px;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-@media (max-width: 768px) {
-	.ReactModal__Content {
-		top: 200% !important; /* 모바일에서 모달이 더 중앙에 위치하도록 조정 */
-		transform: translate(-50%, -30%) !important;
-		width: 90% !important;
+/* ── 로딩 스켈레톤 ──────────────────────────────────── */
+@keyframes shimmer {
+	0% {
+		background-position: -400px 0;
+	}
+	100% {
+		background-position: 400px 0;
 	}
 }
 
-.page-enter {
-	opacity: 0;
-	transform: translateX(100%);
-}
-
-.page-enter-active {
-	opacity: 1;
-	transform: translateX(0);
-	transition: opacity 300ms, transform 300ms;
-}
-
-.page-exit {
-	opacity: 1;
-	transform: translateX(0);
-}
-
-.page-exit-active {
-	opacity: 0;
-	transform: translateX(-100%);
-	transition: opacity 300ms, transform 300ms;
-}
-
-#unityContainer {
-	width: 960px;
-	height: 600px;
-	background-color: black;
-}
-
-.background {
-	background-attachment: fixed;
-}
-
-@media (max-width: 768px) {
-	.background {
-		background-attachment: fixed;
-	}
-}
-
+/* ── 사진 무한 스크롤 스트립 ────────────────────────── */
 @keyframes scroll-left {
 	0% {
 		transform: translateX(0%);
@@ -112,41 +164,13 @@ body {
 	}
 }
 
-@keyframes scroll-right {
-	0% {
-		transform: translateX(0%);
-	}
-	100% {
-		transform: translateX(100%);
-	}
-}
-
 .photo-row {
 	display: flex;
 	width: max-content;
 	animation: scroll-left 45s linear infinite;
 }
 
-/* .photo-row {
-	display: flex;
-	white-space: nowrap;
-	transition: transform 0.1s linear;
-  }
-   */
-* {
-	font-family: "GmarketSansMedium", -apple-system, BlinkMacSystemFont,
-		"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-	word-break: keep-all;
-}
-
-input::placeholder {
-	font-family: "GmarketSansMedium", -apple-system, BlinkMacSystemFont,
-		"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-	word-break: keep-all;
-	-webkit-text-size-adjust: 100%;
-	text-size-adjust: 100%;
-}
-
+/* ── 유틸 ──────────────────────────────────────────── */
 .video-container {
 	position: relative;
 	width: 100%;
@@ -159,4 +183,33 @@ input::placeholder {
 	left: 0;
 	width: 100%;
 	height: 100%;
+}
+
+/* react-modal 기본 위치. 기존의 `top: 200% !important` 모바일 하드코딩은 제거했다. */
+.ReactModal__Content {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: min(90%, 340px);
+	padding: 24px;
+	background-color: #fff;
+	border-radius: 20px;
+	box-shadow: 0 16px 48px rgb(var(--ink-900) / 0.18);
+}
+
+/* ── 접근성: 모션 최소화 ───────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+
+	.photo-row {
+		animation: none;
+	}
 }

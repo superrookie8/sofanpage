@@ -42,8 +42,12 @@ export interface ScheduleResponse {
 	isActive: boolean;
 	createdAt: string;
 	updatedAt: string;
-	opponent?: string; // 경기 상대팀 (type이 "game"인 경우)
-	isHome?: boolean; // 홈 경기 여부 (type이 "game"인 경우)
+	/** 관리자 일정 계약의 상대팀 이름. 구형 응답에서는 title만 올 수 있다. */
+	opponent?: string | null;
+	/** 관리자 일정 계약의 홈 경기 여부. 구형 응답에서는 location으로 판정한다. */
+	isHome?: boolean | null;
+	/** 특수 경기 여부. 구형 응답에서는 type === "specialGame"으로 판정한다. */
+	specialGame?: boolean | null;
 }
 
 // 스케줄 상세 정보 응답 타입

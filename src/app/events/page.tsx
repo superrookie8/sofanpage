@@ -1,74 +1,90 @@
 "use client";
-import { useState } from "react";
-import EventDetail from "@/features/events/components/eventDetail";
-import {
-	useEventListQuery,
-	useEventDetailQuery,
-} from "@/features/events/queries";
+import Image from "next/image";
+import Link from "next/link";
+import PageHeader from "@/shared/ui/primitives/pageHeader";
+import { Skeleton } from "@/shared/ui/primitives/skeleton";
+import { EmptyState, ErrorState } from "@/shared/ui/primitives/states";
+import { useEventListQuery } from "@/features/events/queries";
+import { cn } from "@/shared/ui/cn";
 
-const Events: React.FC = () => {
-	const [activeEvent, setActiveEvent] = useState<string | null>(null);
+/** 제목의 "N주년"으로 전용 상세 페이지 경로를 만든다. (/events/5th 등) */
+function eventHref(title: string) {
+	const match = title.match(/(\d+)주년/);
+	return match ? `/events/${match[1]}th` : null;
+}
 
-	// React Query를 사용하여 이벤트 목록 조회
-	const {
-		data: events = [],
-		isLoading: eventsLoading,
-		isError: eventsError,
-	} = useEventListQuery();
+/** 주년별 대표 이미지. 없으면 기본 포스터를 쓴다. */
+function eventImage(title: string) {
+	if (title.includes("6주년")) return "/images/soheeposter34.png";
+	if (title.includes("5주년")) return "/images/banner2.png";
+	return "/images/banner.png";
+}
 
-	// 활성 이벤트의 상세 정보 조회
-	const { data: eventDetails, isLoading: loadingDetails } = useEventDetailQuery(
-		activeEvent || "",
-		!!activeEvent
-	);
-
-	const toggleEvent = (eventId: string) => {
-		if (activeEvent === eventId) {
-			setActiveEvent(null);
-			return;
-		}
-		setActiveEvent(eventId);
-	};
+export default function EventsPage() {
+	const { data: events = [], isLoading, isError, refetch } = useEventListQuery();
 
 	return (
 		<div>
-			<div className="flex justify-center items-center bg-black bg-opacity-75">
-				<div className="min-h-screen w-full flex flex-col justify-center p-8 relative">
-					<div className="w-full max-w-[1200px] mx-auto">
-						{eventsLoading && (
-							<p className="text-center text-white">이벤트를 불러오는 중입니다.</p>
-						)}
-						{eventsError && (
-							<p className="text-center text-white">
-								이벤트 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.
-							</p>
-						)}
-						{!eventsLoading && !eventsError && events.length === 0 && (
-							<p className="text-center text-white">현재 공개된 이벤트가 없습니다.</p>
-						)}
-						{events.map((event) => (
-							<div key={event.id} className="mb-4">
-								<button
-									onClick={() => toggleEvent(event.id)}
-									className="w-full bg-red-500 text-white font-bold py-2 px-4 rounded mb-2"
-								>
-									{event.title}
-								</button>
-								{activeEvent === event.id && (
-									<div className="bg-white p-4 rounded shadow-md">
-										<EventDetail
-											eventDetails={eventDetails}
-											loadingDetails={loadingDetails}
-										/>
-									</div>
-								)}
-							</div>
-						))}
-					</div>
+			<PageHeader
+				dark
+				eyebrow="FAN EVENTS"
+				title="이벤트"
+				description="팬들이 함께 만든 기록"
+			/>
+
+			{isLoading ? (
+				<div className="grid gap-4 md:grid-cols-2">
+					{Array.from({ length: 2 }, (_, index) => (
+						<Skeleton key={index} className="h-[300px] rounded-lg" />
+					))}
 				</div>
-			</div>
+			) : isError ? (
+				<ErrorState dark onRetry={() => refetch()} />
+			) : events.length === 0 ? (
+				<EmptyState dark illustration="red" title="공개된 이벤트가 없어요" />
+			) : (
+				<div className="grid gap-4 md:grid-cols-2">
+					{events.map((event) => {
+						const href = eventHref(event.title);
+
+						const card = (
+							<article
+								className={cn(
+									"overflow-hidden rounded-lg border border-ink-700 bg-surface-dark transition-[transform,box-shadow] duration-150",
+									href &&
+										"hover:-translate-y-0.5 hover:shadow-raised motion-reduce:hover:translate-y-0"
+								)}
+							>
+								<div className="relative h-[200px] w-full bg-ink-900 lg:h-[220px]">
+									<Image
+										src={eventImage(event.title)}
+										alt=""
+										fill
+										sizes="(max-width: 768px) 100vw, 520px"
+										className="object-cover"
+									/>
+								</div>
+								<div className="p-4">
+									<h2 className="text-h3-lg text-white">{event.title}</h2>
+									{href && (
+										<p className="mt-1.5 text-[13px] text-ink-300">
+											이벤트 사이트 보기 →
+										</p>
+									)}
+								</div>
+							</article>
+						);
+
+						return href ? (
+							<Link key={event.id} href={href} className="block">
+								{card}
+							</Link>
+						) : (
+							<div key={event.id}>{card}</div>
+						);
+					})}
+				</div>
+			)}
 		</div>
 	);
-};
-
-export default Events;
+}
