@@ -10,8 +10,26 @@ export interface RankingData {
 	myRank: number | null;
 }
 
-function toNumber(value: unknown): number | null {
-	return typeof value === "number" && Number.isFinite(value) ? value : null;
+function toPositiveInteger(value: unknown): number | null {
+	return typeof value === "number" &&
+		Number.isInteger(value) &&
+		value > 0
+		? value
+		: null;
+}
+
+function toNonNegativeNumber(value: unknown): number | null {
+	return typeof value === "number" && Number.isFinite(value) && value >= 0
+		? value
+		: null;
+}
+
+function toNonNegativeInteger(value: unknown): number | null {
+	return typeof value === "number" &&
+		Number.isInteger(value) &&
+		value >= 0
+		? value
+		: null;
 }
 
 /**
@@ -27,32 +45,29 @@ export async function fetchRanking(limit = 10): Promise<RankingData> {
 	}
 
 	const data = await response.json();
-	const rows: unknown[] = Array.isArray(data)
+	const candidateRows: unknown = Array.isArray(data)
 		? data
-		: data?.rankings ?? data?.ranking ?? data?.items ?? [];
-	const myRank = Array.isArray(data) ? null : toNumber(data?.myRank);
-	const totalCount = Array.isArray(data)
-		? data.length
-		: toNumber(data?.totalCount) ?? rows.length;
+		: data?.rankings;
+	const rows: unknown[] = Array.isArray(candidateRows) ? candidateRows : [];
+	const myRank = Array.isArray(data)
+		? null
+		: toPositiveInteger(data?.myRank);
 
 	const rankings = rows
-		.map((row, index) => {
+		.map((row): RankingEntry | null => {
 			const record = (row ?? {}) as Record<string, unknown>;
-			const score =
-				toNumber(record.score) ?? toNumber(record.bestScore) ?? 0;
+			const rank = toPositiveInteger(record.rank);
 			const nickname =
-				typeof record.nickname === "string"
-					? record.nickname
-					: typeof record.userName === "string"
-					? record.userName
-					: "익명";
-			return {
-				rank: toNumber(record.rank) ?? index + 1,
-				nickname,
-				score,
-			};
+				typeof record.nickname === "string" ? record.nickname.trim() : "";
+			const score = toNonNegativeNumber(record.bestScore);
+			if (rank === null || !nickname || score === null) return null;
+			return { rank, nickname, score };
 		})
+		.filter((entry): entry is RankingEntry => entry !== null)
 		.sort((a, b) => a.rank - b.rank);
+	const totalCount = Array.isArray(data)
+		? rankings.length
+		: toNonNegativeInteger(data?.totalCount) ?? rankings.length;
 
 	return { rankings, totalCount, myRank };
 }

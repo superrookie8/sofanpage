@@ -5,20 +5,12 @@ export interface Event {
 }
 
 export interface EventDetails extends Event {
-	url: string;
-	description: string;
+	url: string | null;
+	description: string | null;
 	checkFields: {
-		check1: string;
-		check2: string;
-		check3: string;
+		check1: string | null;
+		check2: string | null;
+		check3: string | null;
 	};
 	photos: string[];
-	photoKeys: string[];
-}
-
-export interface PhotosResponse {
-	photos: string[];
-	total_pages: number;
-	page: number;
-	page_size: number;
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getRequestAccessToken } from "@/lib/server/http/getRequestAccessToken";
+import { resolveBackendApiUrl } from "@/lib/server/http/backendApi";
 
 export async function POST(request: NextRequest) {
 	const token = await getRequestAccessToken(request);
@@ -10,7 +11,7 @@ export async function POST(request: NextRequest) {
 	try {
 		const formData = await request.formData();
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/images/upload/multiple`,
+			`${resolveBackendApiUrl()}/api/images/upload/multiple`,
 			{
 				method: "POST",
 				headers: { Authorization: `Bearer ${token}` },

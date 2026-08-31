@@ -65,7 +65,11 @@ export async function proxyArcadeRequest({
 			try {
 				responseBody = JSON.stringify(sanitizeJson(JSON.parse(responseBody)));
 			} catch {
-				// JSON이 아니면 가공하지 않고 그대로 둔다.
+				// 공개 응답의 화이트리스트 처리가 실패하면 원문을 노출하지 않는다.
+				return NextResponse.json(
+					{ message: "Invalid backend response" },
+					{ status: 502 }
+				);
 			}
 		}
 

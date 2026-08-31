@@ -1,68 +1,74 @@
+interface SafeRankingEntry {
+	rank: number;
+	nickname: string;
+	bestScore: number;
+}
+
+function isPositiveInteger(value: unknown): value is number {
+	return typeof value === "number" && Number.isInteger(value) && value > 0;
+}
+
+function isNonNegativeNumber(value: unknown): value is number {
+	return typeof value === "number" && Number.isFinite(value) && value >= 0;
+}
+
+function isNonNegativeInteger(value: unknown): value is number {
+	return typeof value === "number" && Number.isInteger(value) && value >= 0;
+}
+
 /**
- * 공개 랭킹 응답을 클라이언트로 넘기기 전에 정리한다.
+ * 공개 랭킹 응답에는 화면에 필요한 필드만 남긴다.
  *
- * 이 엔드포인트는 비로그인에도 열려 있으므로 BFF에서 두 가지를 강제한다.
- *
- * 1. 개인정보 제거 — 백엔드는 항목마다 userId와 profileImageUrl(구글 계정
- *    사진 URL)까지 실어 보낸다. 화면은 순위·닉네임·점수만 쓰므로 나머지는
- *    응답 자체에서 떨어뜨린다.
- * 2. 닉네임 없는 항목 제외 — 로그인했더라도 닉네임을 정하지 않은 사용자는
- *    랭킹에 노출하지 않는다. 클라이언트에도 같은 필터가 있지만, 여기서
- *    걸러야 해당 사용자의 정보가 브라우저까지 가지 않는다.
+ * 백엔드 항목에는 userId와 profileImageUrl도 포함되므로 반드시 화이트리스트로
+ * 새 객체를 만든다. 화면에서 임의 순위·닉네임·점수를 합성하지 않도록 세 필드가
+ * 모두 유효한 행만 통과시킨다.
  */
-const ALLOWED_KEYS = ["rank", "nickname", "bestScore", "score"] as const;
-
-function hasNickname(entry: Record<string, unknown>): boolean {
-	return (
-		typeof entry.nickname === "string" && entry.nickname.trim().length > 0
-	);
-}
-
-function pickEntry(entry: unknown): Record<string, unknown> | null {
+function sanitizeEntry(entry: unknown): SafeRankingEntry | null {
 	if (typeof entry !== "object" || entry === null) return null;
-	const source = entry as Record<string, unknown>;
-	if (!hasNickname(source)) return null;
 
-	const result: Record<string, unknown> = {};
-	for (const key of ALLOWED_KEYS) {
-		if (key in source) result[key] = source[key];
+	const source = entry as Record<string, unknown>;
+	const nickname =
+		typeof source.nickname === "string" ? source.nickname.trim() : "";
+
+	if (
+		!isPositiveInteger(source.rank) ||
+		!nickname ||
+		!isNonNegativeNumber(source.bestScore)
+	) {
+		return null;
 	}
-	result.nickname = (source.nickname as string).trim();
-	return result;
+
+	return {
+		rank: source.rank,
+		nickname,
+		bestScore: source.bestScore,
+	};
 }
 
-function sanitizeList(value: unknown[]): Record<string, unknown>[] {
+function sanitizeList(value: unknown): SafeRankingEntry[] {
+	if (!Array.isArray(value)) return [];
+
 	return value
-		.map(pickEntry)
-		.filter((entry): entry is Record<string, unknown> => entry !== null);
+		.map(sanitizeEntry)
+		.filter((entry): entry is SafeRankingEntry => entry !== null);
 }
 
 export function sanitizeRankingResponse(data: unknown): unknown {
-	if (Array.isArray(data)) {
-		return sanitizeList(data);
+	if (Array.isArray(data)) return sanitizeList(data);
+
+	if (typeof data !== "object" || data === null) {
+		return { rankings: [], totalCount: 0, myRank: null };
 	}
-	if (typeof data !== "object" || data === null) return data;
 
 	const source = data as Record<string, unknown>;
-	const result: Record<string, unknown> = {};
-	let dropped = 0;
+	const rankings = sanitizeList(source.rankings);
+	const backendTotalCount = isNonNegativeInteger(source.totalCount)
+		? source.totalCount
+		: rankings.length;
 
-	for (const [key, value] of Object.entries(source)) {
-		if (Array.isArray(value)) {
-			const kept = sanitizeList(value);
-			dropped += value.length - kept.length;
-			result[key] = kept;
-		} else if (key === "myRank" && typeof value === "object" && value !== null) {
-			result[key] = pickEntry(value);
-		} else {
-			result[key] = value;
-		}
-	}
-
-	// 제외한 만큼 총계도 줄여 실제 노출 목록과 어긋나지 않게 한다.
-	if (dropped > 0 && typeof result.totalCount === "number") {
-		result.totalCount = Math.max(0, result.totalCount - dropped);
-	}
-
-	return result;
+	return {
+		rankings,
+		totalCount: Math.max(rankings.length, backendTotalCount),
+		myRank: isPositiveInteger(source.myRank) ? source.myRank : null,
+	};
 }

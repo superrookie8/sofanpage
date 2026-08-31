@@ -18,7 +18,7 @@ describe("proxyArcadeRequest", () => {
 			request,
 			path: "/api/arcade/ranking",
 			environment: {
-				NEXT_PUBLIC_BACKAPI_URL: "https://backend.example.test",
+				BACKEND_API_URL: "https://backend.example.test",
 			},
 			fetchImplementation,
 		});
@@ -56,5 +56,25 @@ describe("proxyArcadeRequest", () => {
 				},
 			})
 		);
+	});
+
+	it("공개 응답 정제가 실패하면 backend 원문을 노출하지 않는다", async () => {
+		const fetchImplementation: typeof fetch = vi.fn(async () =>
+			new Response("private raw response", {
+				status: 200,
+				headers: { "Content-Type": "application/json" },
+			})
+		);
+
+		const response = await proxyArcadeRequest({
+			request: new NextRequest("http://localhost:3000/api/arcade/ranking"),
+			path: "/api/arcade/ranking",
+			sanitizeJson: (data) => data,
+			environment: { BACKEND_API_URL: "https://backend.example.test" },
+			fetchImplementation,
+		});
+
+		expect(response.status).toBe(502);
+		expect(await response.text()).not.toContain("private raw response");
 	});
 });

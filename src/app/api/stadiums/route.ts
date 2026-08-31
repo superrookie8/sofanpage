@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { resolveBackendApiUrl } from "@/lib/server/http/backendApi";
 
 export async function GET(req: NextRequest) {
 	try {
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/stadiums`,
+			`${resolveBackendApiUrl()}/api/stadiums`,
 			{
 				method: "GET",
 				headers: {

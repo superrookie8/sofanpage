@@ -5,27 +5,28 @@ import {
 } from "./backendApi";
 
 describe("server backend API resolution", () => {
-	it("prefers the server-only URL before legacy and public compatibility values", () => {
+	it("prefers the server-only URL before the legacy compatibility value", () => {
 		expect(
 			resolveBackendApiUrl({
 				BACKEND_API_URL: "http://127.0.0.1:8080/",
 				BACKAPI_URL: "https://legacy.example.test",
-				NEXT_PUBLIC_BACKAPI_URL: "https://public.example.test",
 			})
 		).toBe("http://127.0.0.1:8080");
 
 		expect(
 			resolveBackendApiUrl({
 				BACKAPI_URL: "https://legacy.example.test/",
-				NEXT_PUBLIC_BACKAPI_URL: "https://public.example.test",
 			})
 		).toBe("https://legacy.example.test");
+	});
 
-		expect(
+	// NEXT_PUBLIC_ 값은 클라이언트 번들에 인라인되므로 서버 해석에서 제외한다.
+	it("rejects the browser-exposed NEXT_PUBLIC_BACKAPI_URL", () => {
+		expect(() =>
 			resolveBackendApiUrl({
-				NEXT_PUBLIC_BACKAPI_URL: "https://public.example.test/",
+				NEXT_PUBLIC_BACKAPI_URL: "https://public.example.test",
 			})
-		).toBe("https://public.example.test");
+		).toThrow(/Missing server backend API configuration/);
 	});
 });
 

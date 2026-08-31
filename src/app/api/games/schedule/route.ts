@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { resolveBackendApiUrl } from "@/lib/server/http/backendApi";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
 export async function GET(req: NextRequest) {
 	try {
 		const backendResponse = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/get_schedules`,
+			`${resolveBackendApiUrl()}/api/get_schedules`,
 			{
 				method: "GET",
 				headers: {

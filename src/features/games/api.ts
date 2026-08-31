@@ -5,6 +5,16 @@ import type {
 	ScheduleResponse,
 } from "./types";
 
+const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
+
+export function toScheduleDateTime(
+	value: string,
+	boundary: "start" | "end"
+): string {
+	if (!DATE_ONLY.test(value)) return value;
+	return `${value}T${boundary === "start" ? "00:00:00" : "23:59:59"}`;
+}
+
 // 경기 일정 조회
 export const fetchGameSchedule = async (): Promise<GameSchedule[]> => {
 	const response = await fetch("/api/games/schedule", {
@@ -46,8 +56,10 @@ export const fetchSchedulesByDateRange = async (
 	start: string,
 	end?: string
 ): Promise<ScheduleResponse[]> => {
-	const params = new URLSearchParams({ start });
-	if (end) params.set("end", end);
+	const params = new URLSearchParams({
+		start: toScheduleDateTime(start, "start"),
+	});
+	if (end) params.set("end", toScheduleDateTime(end, "end"));
 	const response = await fetch(`/api/schedules?${params.toString()}`, {
 		method: "GET",
 		cache: "no-store",
