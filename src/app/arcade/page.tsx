@@ -1,148 +1,87 @@
 "use client";
-import React, { useState } from "react";
 import dynamic from "next/dynamic";
+import { useState } from "react";
+import { useSession } from "next-auth/react";
+import PageHeader from "@/shared/ui/primitives/pageHeader";
+import Button from "@/shared/ui/primitives/button";
+import StatCard from "@/shared/ui/primitives/statCard";
+import Chip from "@/shared/ui/primitives/chip";
+import { Skeleton } from "@/shared/ui/primitives/skeleton";
+import RankingList from "@/features/arcade/components/rankingList";
+import { useMyArcadeScoreQuery } from "@/features/mypage/queries";
 
-// UnityGame을 dynamic import로 변경 (ssr: false 설정)
 const UnityGame = dynamic(() => import("@/components/arcade/unityGame"), {
 	ssr: false,
-	loading: () => <p>Loading Game...</p>,
+	loading: () => (
+		<div className="mx-auto w-full max-w-[340px] lg:max-w-[300px]">
+			<Skeleton className="aspect-[9/16] w-full rounded-md" />
+		</div>
+	),
 });
 
-interface Props {}
+export default function ArcadePage() {
+	const [playing, setPlaying] = useState(false);
+	const { status } = useSession();
+	const isAuthenticated = status === "authenticated";
+	const myScore = useMyArcadeScoreQuery(isAuthenticated);
 
-const Arcade: React.FC<Props> = (props) => {
-	const [showBrickBreaker, setShowBrickBreaker] = useState(false);
-	const [showUnity, setShowUnity] = useState(false);
-	const [brickBreakerGameOver, setBrickBreakerGameOver] = useState(false);
-	const [currentGame, setCurrentGame] = useState(0);
-	const [difficulty, setDifficulty] = useState<string>("normal");
-	const totalGames = 5;
-
-	// // 벽돌깨기 게임 종료 핸들러
-	// const handleBrickBreakerGameOver = (won: boolean) => {
-	// 	if (won) {
-	// 		if (currentGame + 1 === totalGames) {
-	// 			setCurrentGame(0);
-	// 			setBrickBreakerGameOver(false);
-	// 			setShowBrickBreaker(false);
-	// 		} else {
-	// 			setCurrentGame(currentGame + 1);
-	// 		}
-	// 	} else {
-	// 		setBrickBreakerGameOver(true);
-	// 		setShowBrickBreaker(false);
-	// 	}
-	// };
-
-	// // 벽돌깨기 게임 시작
-	// const startBrickBreaker = () => {
-	// 	setBrickBreakerGameOver(false);
-	// 	setShowBrickBreaker(true);
-	// };
-
-	// // 난이도 선택 후 벽돌깨기 게임 시작
-	// const selectDifficulty = (level: string) => {
-	// 	setDifficulty(level);
-	// 	startBrickBreaker();
-	// };
-
-	// 유니티 게임 시작
-	const startUnity = () => {
-		setShowUnity(true);
-	};
-
-	const closeTab = () => {
-		setShowUnity(false);
-	};
 	return (
-		<div className="flex flex-col md:flex-row  pt-16 pb-16 justify-center p-4 w-full max-w-screen-lg">
-			<div className="w-full flex flex-col md:flex-row justify-center items-center z-10">
-				<div className="w-full max-w-6xl flex flex-col justify-center items-center gap-4">
-					{/* 벽돌깨기 게임 섹션
-					<div className="w-full md:w-1/2 lg:w-1/2">
-						<div className="bg-white bg-opacity-75 text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
-							벽돌깨기 게임
-						</div>
-						<section className="w-full bg-white bg-opacity-75 p-4 mb-4 rounded text-center">
-							<div className="font-bold text-black">
-								<div>벽돌깨기</div>
-							</div>
-							{showBrickBreaker && (
-								<BrickBreakerGame
-									onGameOver={handleBrickBreakerGameOver}
-									currentGame={currentGame}
-									difficulty={difficulty}
-								/>
-							)}
-							{!showBrickBreaker && brickBreakerGameOver && (
-								<div className="text-center">
-									<p>다시 도전 하시겠습니까?</p>
-									<button
-										onClick={() => startBrickBreaker()}
-										className="px-4 py-2 bg-blue-500 text-white rounded m-2"
-									>
-										재시작
-									</button>
-								</div>
-							)}
-							{!showBrickBreaker && !brickBreakerGameOver && (
-								<div className="text-center">
-									<p>난이도를 선택하세요:</p>
-									<button
-										onClick={() => selectDifficulty("easy")}
-										className="px-4 py-2 bg-green-500 text-white rounded m-2"
-									>
-										쉬움
-									</button>
-									<button
-										onClick={() => selectDifficulty("hard")}
-										className="px-4 py-2 bg-red-500 text-white rounded m-2"
-									>
-										어려움
-									</button>
-								</div>
-							)}
-						</section>
-					</div> */}
+		<div>
+			<PageHeader
+				dark
+				eyebrow="ARCADE"
+				title="달려라 슈퍼소히"
+				description="100코인 모으면 천재.."
+				action={
+					<Chip className="border-ink-700 bg-surface-dark text-ink-300">
+						세로형 게임
+					</Chip>
+				}
+			/>
 
-					{/* 유니티 게임 섹션 */}
-					<div className="w-full md:w-1/2 lg:w-1/2">
-						<div className="bg-white bg-opacity-75 text-red-500 border-b-2 border-t-2 border-red-500 h-[50px] w-full flex justify-center items-center">
-							탄막슈팅 게임
+			<div className="lg:grid lg:grid-cols-[1fr_360px] lg:gap-8">
+				{/* 게임 스테이지 */}
+				<section className="rounded-lg border border-ink-700 bg-surface-dark p-4 lg:p-8">
+					{playing ? (
+						<>
+							<UnityGame />
+							<div className="mt-4 flex justify-center">
+								<Button variant="secondary" onClick={() => setPlaying(false)}>
+									게임 끄기
+								</Button>
+							</div>
+						</>
+					) : (
+						<div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+							<p className="text-h2 text-white">준비되셨나요?</p>
+							<p className="max-w-[36ch] text-sm-lg text-ink-300">
+								세로 화면에 맞춰 만든 러닝 게임입니다.
+								{!isAuthenticated && " 로그인하면 점수가 랭킹에 기록돼요."}
+							</p>
+							<Button size="lg" onClick={() => setPlaying(true)}>
+								시작하기
+							</Button>
 						</div>
-						<section className="w-full flex flex-col justify-center items-center bg-white bg-opacity-75 p-4 mb-4 rounded text-center">
-							<div className="font-bold text-black">
-								<div>달려라 슈퍼소히</div>
-							</div>
-							<div className="text-center">
-								<p>100코인 모으면 천재..</p>
-							</div>
-							{showUnity && (
-								<div className="flex flex-col justify-center items-center">
-									<button
-										onClick={() => closeTab()}
-										className="px-4 py-2 bg-red-500 text-white rounded m-2"
-									>
-										게임끄기
-									</button>
+					)}
+				</section>
 
-									<UnityGame />
-								</div>
-							)}
-							{!showUnity && (
-								<button
-									onClick={() => startUnity()}
-									className="px-4 py-2 bg-red-500 text-white rounded m-2"
-								>
-									시작하기
-								</button>
-							)}
-						</section>
-					</div>
-				</div>
+				{/* 점수 · 랭킹 */}
+				<aside className="mt-8 lg:mt-0">
+					{isAuthenticated && (
+						<div className="mb-6 grid grid-cols-2 gap-2.5">
+							<StatCard
+								dark
+								value={myScore.data?.bestScore ?? "-"}
+								label="내 최고점수"
+							/>
+							<StatCard dark value={myScore.data?.rank ?? "-"} label="내 순위" />
+						</div>
+					)}
+
+					<h2 className="mb-3 text-h2 text-white">랭킹 TOP 10</h2>
+					<RankingList />
+				</aside>
 			</div>
 		</div>
 	);
-};
-
-export default Arcade;
+}

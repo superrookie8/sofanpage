@@ -2,101 +2,111 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-	font-family: "GmarketSansMedium";
-	src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff")
-		format("woff");
-	font-weight: normal;
-	font-style: normal;
-}
+/* ── 폰트 ────────────────────────────────────────────────
+   Pretendard Variable: 본문·숫자 (100~900 가변)
+   Anton: 워드마크·등번호 전용
+   ※ 이전의 `* { font-family: ... !important }`는 위계를 만들 수 없어 제거함.
+     이제 body에만 지정하고 Tailwind의 font-display로 Anton을 선택 적용한다. */
 
-body {
-	font-family: "GmarketSansMedium", sans-serif;
-}
-
-.hide-header header {
-	display: none;
-}
-
-.wrap-text {
-	white-space: pre-wrap; /* 줄바꿈과 공백을 유지합니다. */
-	word-wrap: break-word; /* 긴 단어가 자동으로 줄바꿈됩니다. */
-}
-
-@media (max-width: 768px) {
-	.fixed {
-		width: 100%;
-		height: 100%;
+@layer base {
+	:root {
+		color-scheme: light;
 	}
-	.responsive-image-container {
-		width: 100%;
-		height: auto;
+
+	html {
+		-webkit-text-size-adjust: 100%;
+		text-size-adjust: 100%;
 	}
-}
 
-@media (min-width: 769px) and (max-width: 1024px) {
-	.responsive-image-container {
-		width: 80%;
-		height: auto;
+	body {
+		background-color: theme("colors.ink.50");
+		color: theme("colors.ink.700");
+		font-family: theme("fontFamily.sans");
+		font-size: 15px;
+		line-height: 1.65;
+		word-break: keep-all;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
 	}
-}
 
-.ReactModal__Content {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	right: auto;
-	bottom: auto;
-	transform: translate(-50%, -50%);
-	width: 80%;
-	max-width: 300px;
-	height: auto;
-	padding: 20px;
-	background-color: #fff;
-	border-radius: 8px;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+	/* 다크 셸(이벤트·아케이드)에서 페이지 바닥까지 어둡게 */
+	body[data-shell="dark"] {
+		background-color: theme("colors.ink.900");
+	}
 
-@media (max-width: 768px) {
-	.ReactModal__Content {
-		top: 200% !important; /* 모바일에서 모달이 더 중앙에 위치하도록 조정 */
-		transform: translate(-50%, -30%) !important;
-		width: 90% !important;
+	h1,
+	h2,
+	h3,
+	h4 {
+		line-height: 1.25;
+		color: theme("colors.ink.900");
+	}
+
+	/* 숫자는 자릿수가 흔들리지 않도록 tabular */
+	table,
+	time,
+	[data-numeric] {
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* focus:outline-none 남용을 대체하는 공통 포커스 링 */
+	:focus-visible {
+		outline: 2px solid theme("colors.brand.500");
+		outline-offset: 2px;
+		border-radius: 4px;
+	}
+
+	input::placeholder,
+	textarea::placeholder {
+		color: theme("colors.ink.300");
 	}
 }
 
-.page-enter {
-	opacity: 0;
-	transform: translateX(100%);
-}
+@layer utilities {
+	.wrap-text {
+		white-space: pre-wrap;
+		word-wrap: break-word;
+	}
 
-.page-enter-active {
-	opacity: 1;
-	transform: translateX(0);
-	transition: opacity 300ms, transform 300ms;
-}
+	.clamp-2 {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
 
-.page-exit {
-	opacity: 1;
-	transform: translateX(0);
-}
+	.clamp-3 {
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
 
-.page-exit-active {
-	opacity: 0;
-	transform: translateX(-100%);
-	transition: opacity 300ms, transform 300ms;
-}
+	/* 가로 스크롤 컨테이너의 스크롤바 숨김 (스크롤 자체는 유지) */
+	.no-scrollbar {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+	.no-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
 
-.background {
-	background-attachment: fixed;
-}
-
-@media (max-width: 768px) {
-	.background {
-		background-attachment: fixed;
+	.safe-bottom {
+		padding-bottom: env(safe-area-inset-bottom);
 	}
 }
 
+/* ── 로딩 스켈레톤 ──────────────────────────────────── */
+@keyframes shimmer {
+	0% {
+		background-position: -400px 0;
+	}
+	100% {
+		background-position: 400px 0;
+	}
+}
+
+/* ── 사진 무한 스크롤 스트립 ────────────────────────── */
 @keyframes scroll-left {
 	0% {
 		transform: translateX(0%);
@@ -106,41 +116,13 @@ body {
 	}
 }
 
-@keyframes scroll-right {
-	0% {
-		transform: translateX(0%);
-	}
-	100% {
-		transform: translateX(100%);
-	}
-}
-
 .photo-row {
 	display: flex;
 	width: max-content;
 	animation: scroll-left 45s linear infinite;
 }
 
-/* .photo-row {
-	display: flex;
-	white-space: nowrap;
-	transition: transform 0.1s linear;
-  }
-   */
-* {
-	font-family: "GmarketSansMedium", -apple-system, BlinkMacSystemFont,
-		"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-	word-break: keep-all;
-}
-
-input::placeholder {
-	font-family: "GmarketSansMedium", -apple-system, BlinkMacSystemFont,
-		"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-	word-break: keep-all;
-	-webkit-text-size-adjust: 100%;
-	text-size-adjust: 100%;
-}
-
+/* ── 유틸 ──────────────────────────────────────────── */
 .video-container {
 	position: relative;
 	width: 100%;
@@ -153,4 +135,33 @@ input::placeholder {
 	left: 0;
 	width: 100%;
 	height: 100%;
+}
+
+/* react-modal 기본 위치. 기존의 `top: 200% !important` 모바일 하드코딩은 제거했다. */
+.ReactModal__Content {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: min(90%, 340px);
+	padding: 24px;
+	background-color: #fff;
+	border-radius: 20px;
+	box-shadow: 0 16px 48px rgba(23, 21, 26, 0.18);
+}
+
+/* ── 접근성: 모션 최소화 ───────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+
+	.photo-row {
+		animation: none;
+	}
 }

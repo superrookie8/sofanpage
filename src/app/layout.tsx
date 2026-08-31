@@ -6,9 +6,9 @@ import Providers from "@/components/providers/sessionProvider";
 import { getServerSession } from "next-auth";
 import { getMissingAuthEnvironmentKeys } from "@/features/auth/server/authEnvironment";
 import ScriptProvider from "@/utils/scriptProvider";
-import ClientWrapper from "@/shared/ui/clientWrapper";
-import Header from "@/shared/ui/header";
-import Background from "@/components/opening/background";
+import AppShell from "@/shared/ui/shell/appShell";
+import Header from "@/shared/ui/shell/header";
+import BottomNav from "@/shared/ui/shell/bottomNav";
 import { LoadingProvider } from "@/context/LoadingContext";
 import LoadingSpinner from "@/shared/ui/loadingSpinner";
 
@@ -92,6 +92,22 @@ export default async function RootLayout({
 
 	return (
 		<html lang="ko">
+			<head>
+				<link
+					rel="stylesheet"
+					href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+				/>
+				<link rel="preconnect" href="https://fonts.googleapis.com" />
+				<link
+					rel="preconnect"
+					href="https://fonts.gstatic.com"
+					crossOrigin="anonymous"
+				/>
+				<link
+					href="https://fonts.googleapis.com/css2?family=Anton&display=swap"
+					rel="stylesheet"
+				/>
+			</head>
 			{/* Google Tag Manager Script */}
 			<Script
 				async
@@ -111,9 +127,9 @@ export default async function RootLayout({
 				<Providers session={session}>
 					<LoadingProvider>
 						<LoadingSpinner />
-						<Background />
 						<Header />
-						<ClientWrapper>{children}</ClientWrapper>
+						<AppShell>{children}</AppShell>
+						<BottomNav />
 					</LoadingProvider>
 				</Providers>
 			</body>

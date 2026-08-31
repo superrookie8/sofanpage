@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect } from "react";
+import Image from "next/image";
 import { Unity, useUnityContext } from "react-unity-webgl";
 import clientAxiosService from "@/lib/client/http/axiosService";
 import { useSession } from "next-auth/react";
@@ -218,41 +219,61 @@ const UnityGame: React.FC = () => {
 		loadInitialBestScore();
 	}, [getMyBestScore, isLoaded, sendMessage]);
 
+	const progressPercent = Math.round(loadingProgression * 100);
+
 	return (
-		<div>
+		<div className="w-full">
 			{/* 로그인하지 않은 사용자를 위한 안내 문구 */}
 			{!isAuthenticated && isLoaded && (
-				<div
-					style={{
-						backgroundColor: "#fef3c7",
-						borderLeft: "4px solid #f59e0b",
-						color: "#92400e",
-						padding: "8px",
-						marginBottom: "8px",
-						fontSize: "12px",
-						textAlign: "left",
-					}}
-				>
+				<p className="mb-3 rounded-md border-l-4 border-warn bg-[rgba(217,119,6,.12)] px-3 py-2 text-left text-[12px] text-[#F6C177]">
 					로그인하지 않은 상태입니다. 게스트 플레이 시 점수가 저장되지 않습니다.
-				</div>
+				</p>
 			)}
 
-			{/* 로딩 중일 때 진행률을 표시 */}
-			{!isLoaded && <p>Loading... {Math.round(loadingProgression * 100)}%</p>}
+			{/*
+			  현재 게임은 세로(9:16) 화면에 맞춰 제작되어 있다.
+			  모바일은 풀폭, 데스크톱은 스테이지 패널 안에서 300px 폭으로 중앙 정렬한다.
+			  가로형 게임이 추가되면 이 스테이지의 aspect-ratio만 바꾸면 된다.
+			*/}
+			<div className="mx-auto w-full max-w-[340px] lg:max-w-[300px]">
+				<div
+					id="unityContainer"
+					className="relative w-full overflow-hidden rounded-md bg-black"
+					style={{ aspectRatio: "9 / 16" }}
+				>
+					<Unity
+						unityProvider={unityProvider}
+						style={{ width: "100%", height: "100%" }}
+					/>
 
-			{/* Unity WebGL이 렌더링될 캔버스 */}
-			<div
-				id="unityContainer"
-				style={{
-					width: "min(340px, 100%)",
-					aspectRatio: "340 / 600",
-					background: "black",
-				}}
-			>
-				<Unity
-					unityProvider={unityProvider}
-					style={{ width: "100%", height: "100%" }}
-				/>
+					{!isLoaded && (
+						<div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-ink-900 px-6">
+							<Image
+								src="/images/leesohee.png"
+								alt=""
+								width={96}
+								height={96}
+								className="h-24 w-auto"
+							/>
+							<div
+								className="h-1.5 w-full max-w-[200px] overflow-hidden rounded-full bg-ink-700"
+								role="progressbar"
+								aria-valuenow={progressPercent}
+								aria-valuemin={0}
+								aria-valuemax={100}
+								aria-label="게임 불러오는 중"
+							>
+								<div
+									className="h-full rounded-full bg-brand-500 transition-[width] duration-200"
+									style={{ width: `${progressPercent}%` }}
+								/>
+							</div>
+							<p data-numeric className="text-[13px] text-ink-300">
+								게임 불러오는 중 · {progressPercent}%
+							</p>
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	);

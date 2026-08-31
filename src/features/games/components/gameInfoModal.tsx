@@ -9,6 +9,9 @@ import { locations } from "../constants";
 import { useDiaryCheckByGameIdQuery } from "@/features/diary/queries";
 import { useSession } from "next-auth/react";
 import { ExistingDiaryDialog } from "@/features/diary/editor/components/ExistingDiaryDialog";
+import Sheet from "@/shared/ui/primitives/sheet";
+import Button from "@/shared/ui/primitives/button";
+import { isMvpDisabledPage } from "@/features/mvp/accessPolicy";
 
 // 타임존 정보가 없는 ISO 문자열을 한국 시간대(KST)로 정규화하는 헬퍼 함수
 const normalizeToKST = (isoString: string): string => {
@@ -144,31 +147,8 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 				onConfirm={handleConfirmEdit}
 				onCancel={handleCancelEdit}
 			/>
-			<div
-			className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 md:p-4 z-50"
-			onClick={handleOutsideClick}
-		>
-			<div
-				className="relative bg-white rounded-lg shadow-xl overflow-y-auto box-border"
-				style={{
-					width: "500px",
-					height: "650px",
-					maxWidth: "95vw",
-					maxHeight: "90vh",
-				}}
-				onClick={(e) => e.stopPropagation()}
-			>
-				{/* 닫기 버튼 */}
-				<button
-					className="absolute top-2 right-2 md:top-4 md:right-4 text-gray-500 hover:text-gray-700 text-3xl md:text-2xl font-bold z-10 w-10 h-10 md:w-auto md:h-auto flex items-center justify-center"
-					onClick={onClose}
-					aria-label="닫기"
-				>
-					&times;
-				</button>
-
-				{/* 모달 내용 */}
-				<div className="p-4 md:p-6 box-border overflow-hidden">
+			<Sheet open={isOpen} onClose={onClose} title="경기 정보">
+				<div>
 					{isLoading ? (
 						<div className="flex items-center justify-center h-full min-h-[300px] md:min-h-[500px]">
 							<div className="text-base md:text-lg">로딩 중...</div>
@@ -293,28 +273,24 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 								</>
 							)}
 
-							{/* 직관일지 버튼 (gameId가 있으면 보러가기, 없으면 작성하기) */}
-							<div className="mt-4 md:mt-6">
-								<button
-									onClick={handleCreateDiary}
-									className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 md:py-3 px-4 rounded-lg transition-colors text-sm md:text-base"
-								>
-									{!gameId
-										? "직관일지 작성하기"
-										: !session
-										? "직관일지 작성하기"
-										: isDiaryLoading
-										? "직관일지 확인 중..."
-										: diaryCheck?.exists
-										? "직관일지 수정하기"
-										: "직관일지 작성하기"}
-								</button>
-							</div>
+							{/* 직관일지 CTA — 아직 공개 전이면 노출하지 않는다. */}
+							{!isMvpDisabledPage("/diary") && (
+								<div className="mt-6">
+									<Button size="lg" fullWidth onClick={handleCreateDiary}>
+										{!gameId || !session
+											? "직관일지 작성하기"
+											: isDiaryLoading
+											? "직관일지 확인 중..."
+											: diaryCheck?.exists
+											? "직관일지 수정하기"
+											: "직관일지 작성하기"}
+									</Button>
+								</div>
+							)}
 						</>
 					) : null}
 				</div>
-			</div>
-		</div>
+			</Sheet>
 		</>
 	);
 };
