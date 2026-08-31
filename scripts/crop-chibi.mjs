@@ -2,7 +2,8 @@ import sharp from "sharp";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 
-const SRC_DIR = "public/images";
+// 원본은 배포 대상인 public/ 밖에 둔다. 크롭 결과만 public/images/chibi로 나간다.
+const SRC_DIR = "assets/chibi-src";
 const OUT_DIR = "public/images/chibi";
 const TARGET_LONG_EDGE = 640;
 const BG_TOLERANCE = 26;   // 배경으로 간주할 색 거리
