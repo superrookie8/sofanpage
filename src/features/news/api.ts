@@ -1,12 +1,23 @@
 // src/features/news/api.ts
 import type { Article, NewsData, SectionData } from "./types";
 
-// 백엔드 기사 응답에는 매체명(source)이 없다. 어느 엔드포인트에서 왔는지로
-// 출처를 채워야 카드의 출처 칩과 필터가 의미를 갖는다.
-function withSource(articles: Article[], source: string): Article[] {
+// 백엔드는 출처를 "jumpball" / "rookie" 같은 영문 슬러그로 준다.
+// 화면에는 매체명을 한글로 보여주므로 여기서 표시용 라벨로 정규화한다.
+const SOURCE_LABELS: Record<string, string> = {
+	jumpball: "점프볼",
+	rookie: "루키",
+};
+
+export function sourceLabel(source: string | undefined, fallback = "뉴스") {
+	const key = source?.trim().toLowerCase();
+	if (!key) return fallback;
+	return SOURCE_LABELS[key] ?? source!.trim();
+}
+
+function withSource(articles: Article[], fallback: string): Article[] {
 	return articles.map((article) => ({
 		...article,
-		source: article.source?.trim() || source,
+		source: sourceLabel(article.source, fallback),
 	}));
 }
 
@@ -21,7 +32,16 @@ export const fetchLatestNews = async (): Promise<NewsData> => {
 	const data = await res.json();
 	// 백엔드가 단일 Article 객체를 반환하는 경우
 	if (data.id || data.title) {
-		return { main_article: data };
+		return { main_article: { ...data, source: sourceLabel(data.source) } };
+	}
+	if (data.main_article) {
+		return {
+			...data,
+			main_article: {
+				...data.main_article,
+				source: sourceLabel(data.main_article.source),
+			},
+		};
 	}
 	return data;
 };
