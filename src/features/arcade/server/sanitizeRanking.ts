@@ -61,14 +61,20 @@ export function sanitizeRankingResponse(data: unknown): unknown {
 	}
 
 	const source = data as Record<string, unknown>;
+	const received = Array.isArray(source.rankings) ? source.rankings.length : 0;
 	const rankings = sanitizeList(source.rankings);
 	const backendTotalCount = isNonNegativeInteger(source.totalCount)
 		? source.totalCount
 		: rankings.length;
 
+	// totalCount는 이 페이지가 아니라 전체 인원이므로 페이지 길이로 덮지 않는다.
+	// 다만 이번 페이지에서 걸러낸 만큼은 빼야 "N명 중"과 실제 목록이 어긋나지 않는다.
+	// 다른 페이지에서 걸러질 항목까지는 알 수 없어 근사값이다.
+	const dropped = received - rankings.length;
+
 	return {
 		rankings,
-		totalCount: Math.max(rankings.length, backendTotalCount),
+		totalCount: Math.max(rankings.length, backendTotalCount - dropped),
 		myRank: isPositiveInteger(source.myRank) ? source.myRank : null,
 	};
 }
