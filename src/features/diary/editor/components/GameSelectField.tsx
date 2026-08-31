@@ -10,6 +10,11 @@ import {
 } from "@/features/games/api";
 import type { ScheduleResponse } from "@/features/games/types";
 import { locations } from "@/features/games/constants";
+import { isGameSchedule } from "@/features/games/nextGame";
+import {
+	isHomeGame,
+	opponentName,
+} from "@/features/games/scheduleView";
 import { findExistingDiary } from "@/features/diary/utils/findExistingDiary";
 import { getApiErrorMessage } from "@/lib/http/getApiErrorMessage";
 import type { BaseInfo } from "../types";
@@ -24,10 +29,10 @@ interface GameSelectFieldProps {
 const formatScheduleLabel = (schedule: ScheduleResponse) => {
 	try {
 		const date = format(parseISO(schedule.startDateTime), "yyyy.MM.dd HH:mm");
-		const homeAway = schedule.location === "Home" ? "홈" : "원정";
-		return `${date} vs ${schedule.title} (${homeAway})`;
+		const homeAway = isHomeGame(schedule) ? "홈" : "원정";
+		return `${date} vs ${opponentName(schedule)} (${homeAway})`;
 	} catch {
-		return schedule.title;
+		return opponentName(schedule);
 	}
 };
 
@@ -67,7 +72,7 @@ export const GameSelectField: React.FC<GameSelectFieldProps> = ({
 	const gameSchedules = useMemo(
 		() =>
 			allSchedules
-				.filter((s) => s.type === "game" || s.type === "specialGame")
+				.filter(isGameSchedule)
 				.sort(
 					(a, b) =>
 						new Date(b.startDateTime).getTime() -

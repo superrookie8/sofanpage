@@ -60,7 +60,7 @@ export default function MyPage() {
 	const nickname =
 		userInfo.data?.nickname || session?.user?.name || "팬";
 	const joined = joinedLabel(userInfo.data?.createdAt);
-	const photoUrl = userInfo.data?.photoUrl;
+	const profileImageUrl = userInfo.data?.profileImageUrl;
 
 	// 아직 공개하지 않은 섹션은 accessPolicy를 따른다.
 	const diaryEnabled = !isMvpDisabledPage("/diary/read");
@@ -82,9 +82,9 @@ export default function MyPage() {
 
 			<Card className="flex items-center gap-4 p-4">
 				<div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-full bg-brand-100">
-					{photoUrl ? (
+					{profileImageUrl ? (
 						<Image
-							src={photoUrl}
+							src={profileImageUrl}
 							alt=""
 							fill
 							sizes="64px"

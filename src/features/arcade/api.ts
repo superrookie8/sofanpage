@@ -2,7 +2,12 @@ export interface RankingEntry {
 	rank: number;
 	nickname: string;
 	score: number;
-	isMe?: boolean;
+}
+
+export interface RankingData {
+	rankings: RankingEntry[];
+	totalCount: number;
+	myRank: number | null;
 }
 
 function toNumber(value: unknown): number | null {
@@ -13,7 +18,7 @@ function toNumber(value: unknown): number | null {
  * 랭킹 조회. 백엔드 응답이 배열일 수도 { rankings: [...] } 형태일 수도 있어
  * 두 경우를 모두 받아들이고, 키 이름도 방어적으로 읽는다.
  */
-export async function fetchRanking(limit = 10): Promise<RankingEntry[]> {
+export async function fetchRanking(limit = 10): Promise<RankingData> {
 	const response = await fetch(`/api/arcade/ranking?limit=${limit}`, {
 		cache: "no-store",
 	});
@@ -25,8 +30,12 @@ export async function fetchRanking(limit = 10): Promise<RankingEntry[]> {
 	const rows: unknown[] = Array.isArray(data)
 		? data
 		: data?.rankings ?? data?.ranking ?? data?.items ?? [];
+	const myRank = Array.isArray(data) ? null : toNumber(data?.myRank);
+	const totalCount = Array.isArray(data)
+		? data.length
+		: toNumber(data?.totalCount) ?? rows.length;
 
-	return rows
+	const rankings = rows
 		.map((row, index) => {
 			const record = (row ?? {}) as Record<string, unknown>;
 			const score =
@@ -41,8 +50,9 @@ export async function fetchRanking(limit = 10): Promise<RankingEntry[]> {
 				rank: toNumber(record.rank) ?? index + 1,
 				nickname,
 				score,
-				isMe: record.isMe === true || record.isMine === true,
 			};
 		})
 		.sort((a, b) => a.rank - b.rank);
+
+	return { rankings, totalCount, myRank };
 }

@@ -1,7 +1,6 @@
 export interface UserInfo {
 	nickname: string;
-	description?: string;
-	photoUrl?: string;
+	profileImageUrl?: string | null;
 	createdAt?: string;
 }
 

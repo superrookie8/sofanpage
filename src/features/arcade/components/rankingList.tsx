@@ -24,7 +24,7 @@ export default function RankingList() {
 		return <ErrorState dark onRetry={() => refetch()} />;
 	}
 
-	if (!data || data.length === 0) {
+	if (!data || data.rankings.length === 0) {
 		return (
 			<EmptyState
 				dark
@@ -35,19 +35,23 @@ export default function RankingList() {
 		);
 	}
 
-	const myEntry = data.find((entry) => entry.isMe);
+	const myEntry =
+		data.myRank === null
+			? undefined
+			: data.rankings.find((entry) => entry.rank === data.myRank);
 
 	return (
 		<div className="relative">
 			<ol className="flex flex-col gap-1.5">
-				{data.map((entry) => {
+				{data.rankings.map((entry) => {
 					const medal = entry.rank <= 3 ? MEDAL[entry.rank - 1] : null;
+					const isMe = entry.rank === data.myRank;
 					return (
 						<li
 							key={`${entry.rank}-${entry.nickname}`}
 							className={cn(
 								"flex items-center gap-3 rounded-md border border-ink-700 bg-surface-dark px-3 py-2.5",
-								entry.isMe && "border-brand-500"
+								isMe && "border-brand-500"
 							)}
 						>
 							{medal ? (

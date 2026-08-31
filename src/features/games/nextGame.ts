@@ -1,8 +1,12 @@
 import type { ScheduleResponse } from "./types";
-import { parseDate } from "@/shared/lib/datetime";
+import { parseDate } from "../../shared/lib/datetime";
 
 export function isGameSchedule(schedule: ScheduleResponse) {
-	return schedule.type === "game";
+	return (
+		schedule.type === "game" ||
+		schedule.type === "specialGame" ||
+		schedule.specialGame === true
+	);
 }
 
 /** 오늘 이후의 가장 가까운 경기. 없으면 null. */
