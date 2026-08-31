@@ -339,7 +339,7 @@ Python의 실행 내 dedupe 기준은 URL 단독이고, 백엔드의 영속 dedu
 
 ### 주 1회 GitHub Actions 자동 실행
 
-`sofanpage` 저장소의 기본 `main` 브랜치에는 `.github/workflows/supersohee-weekly-crawler.yml`을 둔다. 예약 workflow는 매주 월요일 09:10 KST(월요일 00:10 UTC)에 실행되며, 같은 저장소의 `admin` 브랜치를 체크아웃해 이 크롤러를 사용한다. `workflow_dispatch`로 수동 실행할 수도 있다.
+`sofanpage` 저장소의 기본 `main` 브랜치에는 `.github/workflows/supersohee-weekly-crawler.yml`을 둔다. 예약 workflow는 매주 화요일 09:10 KST(화요일 00:10 UTC)에 실행되며, 같은 저장소의 `admin` 브랜치를 체크아웃해 이 크롤러를 사용한다. `workflow_dispatch`로 수동 실행할 수도 있다.
 
 저장소 Actions secrets에는 다음 두 값을 설정한다.
 
