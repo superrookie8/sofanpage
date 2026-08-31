@@ -1,33 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { adminBackendFetch } from "@/lib/admin/backend";
+import { toLegacySchedule } from "@/lib/admin/adapters";
 
-const isDevelopment = process.env.NODE_ENV === "development";
-
-export async function GET(req: NextRequest) {
-	try {
-		const { searchParams } = new URL(req.url);
-		const season = searchParams.get("season");
-
-		const backendResponse = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get/schedule?season=${season}`,
-			{
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				cache: isDevelopment ? "no-store" : "default",
-			}
-		);
-
-		const backendData = await backendResponse.json();
-		console.log("backendData", backendData);
-
-		if (!backendResponse.ok) {
-			throw new Error(backendData.message || "Failed to get profile.");
-		}
-
-		return NextResponse.json(backendData, { status: 200 });
-	} catch (error: any) {
-		console.error("Error:", error);
-		return NextResponse.json({ message: error.message }, { status: 500 });
-	}
+export async function GET(request: NextRequest) {
+	const season = request.nextUrl.searchParams.get("season");
+	const response = await adminBackendFetch(`/api/admin/schedules${season ? `?season=${encodeURIComponent(season)}` : ""}`);
+	if (!response.ok) return response;
+	const body = await response.json();
+	return NextResponse.json(body.map(toLegacySchedule));
 }

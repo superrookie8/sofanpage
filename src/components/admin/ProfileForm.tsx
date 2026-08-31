@@ -10,6 +10,7 @@ interface ProfileData {
 	height: string;
 	nickname: string;
 	features: string;
+	profileImageUrl?: string | null;
 }
 
 const ProfileForm: React.FC = () => {
@@ -20,28 +21,18 @@ const ProfileForm: React.FC = () => {
 	useEffect(() => {
 		const fetchProfile = async () => {
 			try {
-				const token = sessionStorage.getItem("admin-token");
-
-				if (!token) {
-					setError("You are not authorized to perform this action.");
-					return;
-				}
-
 				const response = await fetch("/api/admin/getprofile", {
 					method: "GET",
-					headers: {
-						"Content-Type": "application/json",
-						Authorization: `Bearer ${token}`,
-					},
+					cache: "no-store",
 				});
 
 				if (!response.ok) {
-					throw new Error("Failed to fetch profile data");
+					const body = await response.json().catch(() => ({}));
+					throw new Error(body.message || body.error || "Failed to fetch profile data");
 				}
 
 				const data = await response.json();
 				setProfile(data);
-				console.log("Profile data:", data);
 			} catch (error) {
 				console.error("Error fetching profile:", error);
 				setError("An error occurred while fetching the profile.");
@@ -55,31 +46,24 @@ const ProfileForm: React.FC = () => {
 		e.preventDefault();
 
 		try {
-			const token = sessionStorage.getItem("admin-token");
-
-			if (!token) {
-				setError("You are not authorized to perform this action.");
-				return;
-			}
-
 			const response = await fetch("/api/admin/profile", {
-				method: "POST",
+				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
 				},
 				body: JSON.stringify(profile),
 			});
 
 			if (!response.ok) {
-				throw new Error("Failed to save profile data");
+				const body = await response.json().catch(() => ({}));
+				throw new Error(body.message || body.error || "Failed to save profile data");
 			}
 
 			const data = await response.json();
+			setProfile(data);
 			setMessage("Profile saved successfully!");
 		} catch (error) {
-			console.error("Error saving profile:", error);
-			setMessage("An error occurred while saving the profile.");
+			setMessage(error instanceof Error ? error.message : "An error occurred while saving the profile.");
 		}
 	};
 
@@ -117,7 +101,7 @@ const ProfileForm: React.FC = () => {
 			</div>
 			<div>
 				<label>Number:</label>
-				<input name="number" value={profile.number} onChange={handleChange} />
+				<input type="number" min="6" max="6" name="number" value={profile.number} onChange={handleChange} />
 			</div>
 			<div>
 				<label>Height:</label>

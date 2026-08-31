@@ -26,10 +26,13 @@ const AdminPhotoUpload: React.FC = () => {
 		useRecoilState<PhotoData[]>(photoPreviewState);
 	const [error, setError] = useState<string | null>(null);
 	const [message, setMessage] = useState<string | null>(null);
+	const [uploading, setUploading] = useState(false);
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+		setError(null);
+		setMessage(null);
 		const files = event.target.files;
 		if (files) {
 			const newPhotos: PhotoData[] = [];
@@ -79,43 +82,38 @@ const AdminPhotoUpload: React.FC = () => {
 
 	const handleUploadSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+		setError(null);
+		setMessage(null);
+		setUploading(true);
 
 		try {
-			const token = sessionStorage.getItem("admin-token");
-			if (!token) {
-				setError("You are not authorized to perform this action.");
-				return;
-			}
-
 			const formData = new FormData();
-			photoPreviews.forEach((photo, index) => {
+			photoPreviews.forEach((photo) => {
 				formData.append(
 					`photos`,
 					photo.compressedFile,
 					photo.originalFile.name
 				);
-				formData.append("photo_ids", photo.id);
-				formData.append("upload_times", photo.uploadTime);
 			});
 
-			const response = await fetch("/api/admin/uploadphoto", {
+			const response = await fetch("/api/admin/photos", {
 				method: "POST",
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
 				body: formData,
 			});
 
 			if (response.ok) {
-				setMessage("Photos uploaded successfully!");
+				setMessage("사진을 업로드했습니다.");
+				photoPreviews.forEach((photo) => URL.revokeObjectURL(photo.preview));
 				setPhotoPreviews([]); // Clear previews after successful upload
 			} else {
-				const data = await response.json();
-				setError(data.message || "Failed to upload photos.");
+				const data = await response.json().catch(() => null) as { message?: string } | null;
+				setError(data?.message || "사진 업로드에 실패했습니다.");
 			}
 		} catch (error) {
 			console.error("Error uploading photos:", error);
-			setError("An error occurred while uploading the photos.");
+			setError("사진을 업로드하는 중 오류가 발생했습니다.");
+		} finally {
+			setUploading(false);
 		}
 	};
 
@@ -137,7 +135,7 @@ const AdminPhotoUpload: React.FC = () => {
 					<div className="grid grid-cols-3 gap-4">
 						{photoPreviews.map((photo, index) => (
 							<div
-								key={index}
+								key={photo.id}
 								className="w-[100px] h-[100px] relative rounded-lg overflow-hidden"
 							>
 								<Image
@@ -160,9 +158,10 @@ const AdminPhotoUpload: React.FC = () => {
 			{photoPreviews && photoPreviews.length > 0 && (
 				<button
 					onClick={handleUploadSubmit}
+					disabled={uploading}
 					className="mt-4 py-2 px-4 bg-blue-500 text-white rounded"
 				>
-					Upload Photos
+					{uploading ? "업로드 중..." : "Upload Photos"}
 				</button>
 			)}
 			{message && <p className="mt-2 text-green-500">{message}</p>}

@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
-import Header from "@/components/Header";
+import Header from "@/components/header";
 import useAuth from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
-import VerticalCarousel from "@/components/VertialCarousel";
+import VerticalCarousel from "@/components/vertialCarousel";
 
 interface Event {
 	_id: string;

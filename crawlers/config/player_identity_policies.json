@@ -1,0 +1,301 @@
+{
+  "version": 1,
+  "playerName": "이소희",
+  "relevance": {
+    "indirectTitlePhrases": [
+      "롤 모델",
+      "롤모델",
+      "닮고 싶은 선수",
+      "기대",
+      "평가",
+      "조언"
+    ],
+    "irrelevantTitlePhrases": [
+      "승리",
+      "제압",
+      "꺾고",
+      "꺾은",
+      "연승",
+      "연패",
+      "우승",
+      "패배",
+      "마침표",
+      "탈출",
+      "추격",
+      "잡아낸",
+      "격파",
+      "경기 결과",
+      "팝업",
+      "중계",
+      "시상식"
+    ],
+    "bodySelectionPhrases": [
+      "최종 명단",
+      "최종명단",
+      "최종 엔트리",
+      "최종엔트리",
+      "엔트리",
+      "발탁",
+      "소집 명단",
+      "명단에 포함"
+    ],
+    "bodyQuoteVerbs": [
+      "말했다",
+      "밝혔다",
+      "전했다",
+      "강조했다"
+    ],
+    "bodyRecordUnits": [
+      "P",
+      "점",
+      "득점",
+      "리바운드",
+      "어시스트",
+      "스틸",
+      "블록"
+    ],
+    "bodyRecordQualifiers": [
+      "개인 최다",
+      "팀 내 최다",
+      "팀내 최다",
+      "커리어 하이",
+      "통산",
+      "폭발",
+      "맹활약",
+      "분전",
+      "존재감",
+      "결승골",
+      "쐐기"
+    ]
+  },
+  "policies": [
+    {
+      "id": "2025-26-bnk",
+      "season": "2025-2026",
+      "effectiveFrom": "2025-07-01",
+      "effectiveTo": "2026-06-30",
+      "allowBasketballDocumentFallback": false,
+      "target": {
+        "teamAliases": [
+          "BNK",
+          "BNK SUM",
+          "BNK 썸",
+          "부산 BNK",
+          "부산 BNK 썸"
+        ],
+        "identityPhrases": [
+          "여자농구 국가대표",
+          "여자 농구 국가대표",
+          "여자대표팀",
+          "여자 대표팀",
+          "女대표팀",
+          "女 대표팀"
+        ],
+        "documentIdentityPhrases": [],
+        "titleDocumentIdentityPhrases": [],
+        "allowTitleTeamContext": false,
+        "titleOpponentPrefixes": [],
+        "titleObjectPredicates": []
+      },
+      "knownNamesakes": [
+        {
+          "label": "숙명여고 동명이인",
+          "teamAliases": [],
+          "schoolAliases": [
+            "숙명여고"
+          ],
+          "identityPhrases": [
+            "U18",
+            "U-18",
+            "18세 이하",
+            "청소년 국가대표",
+            "청소년 대표"
+          ],
+          "titleIdentityPhrases": [
+            "U18",
+            "U-18",
+            "18세 이하",
+            "청소년 국가대표",
+            "청소년 대표"
+          ],
+          "eventIdentityPhrases": [
+            "숙명여고",
+            "여고부",
+            "[63춘계]"
+          ],
+          "heightCm": [
+            180,
+            181
+          ],
+          "draftPicks": []
+        },
+        {
+          "label": "원조 머슬녀 동명이인",
+          "teamAliases": [],
+          "schoolAliases": [],
+          "identityPhrases": [
+            "원조 머슬녀"
+          ],
+          "titleIdentityPhrases": [],
+          "eventIdentityPhrases": [],
+          "heightCm": [],
+          "draftPicks": []
+        }
+      ],
+      "auxiliarySignals": {
+        "heightCm": [
+          170,
+          171
+        ],
+        "ages": [
+          26
+        ],
+        "jerseyNumbers": [
+          6,
+          9
+        ]
+      },
+      "basketballTerms": [
+        "여자농구",
+        "여자 농구",
+        "농구",
+        "WKBL"
+      ],
+      "nonBasketballTerms": [
+        "배드민턴",
+        "셔틀콕",
+        "BWF",
+        "축구",
+        "여자축구",
+        "여자 축구",
+        "배구",
+        "여자배구",
+        "여자 배구",
+        "탁구",
+        "핸드볼"
+      ]
+    },
+    {
+      "id": "2026-27-bnk",
+      "season": "2026-2027",
+      "effectiveFrom": "2026-07-01",
+      "effectiveTo": "2027-06-30",
+      "allowBasketballDocumentFallback": false,
+      "target": {
+        "teamAliases": [
+          "BNK",
+          "BNK SUM",
+          "BNK 썸",
+          "부산 BNK",
+          "부산 BNK 썸"
+        ],
+        "identityPhrases": [
+          "여자농구 국가대표",
+          "여자 농구 국가대표",
+          "여자대표팀",
+          "여자 대표팀",
+          "女대표팀",
+          "女 대표팀"
+        ],
+        "documentIdentityPhrases": [],
+        "titleDocumentIdentityPhrases": [],
+        "allowTitleTeamContext": false,
+        "titleOpponentPrefixes": [],
+        "titleObjectPredicates": []
+      },
+      "knownNamesakes": [
+        {
+          "label": "삼성생명 동명이인",
+          "teamAliases": [
+            "삼성생명",
+            "용인 삼성생명",
+            "삼성생명 블루밍스",
+            "용인 삼성생명 블루밍스"
+          ],
+          "schoolAliases": [
+            "숙명여고"
+          ],
+          "identityPhrases": [
+            "U18",
+            "U-18",
+            "18세 이하",
+            "청소년 국가대표",
+            "청소년 대표"
+          ],
+          "titleIdentityPhrases": [
+            "U18",
+            "U-18",
+            "18세 이하",
+            "청소년 국가대표",
+            "청소년 대표"
+          ],
+          "eventIdentityPhrases": [
+            "숙명여고",
+            "여고부",
+            "WKBL 신인드래프트",
+            "WKBL 신인 드래프트",
+            "여자프로농구 신인드래프트",
+            "여자프로농구 신인 드래프트",
+            "WKBL 드래프트",
+            "W드래프트",
+            "트라이아웃"
+          ],
+          "heightCm": [
+            180,
+            181
+          ],
+          "draftPicks": [
+            {
+              "year": 2026,
+              "overall": 6
+            }
+          ]
+        },
+        {
+          "label": "원조 머슬녀 동명이인",
+          "teamAliases": [],
+          "schoolAliases": [],
+          "identityPhrases": [
+            "원조 머슬녀"
+          ],
+          "titleIdentityPhrases": [],
+          "eventIdentityPhrases": [],
+          "heightCm": [],
+          "draftPicks": []
+        }
+      ],
+      "auxiliarySignals": {
+        "heightCm": [
+          170,
+          171
+        ],
+        "ages": [
+          26
+        ],
+        "jerseyNumbers": [
+          6,
+          9
+        ]
+      },
+      "basketballTerms": [
+        "여자농구",
+        "여자 농구",
+        "농구",
+        "WKBL"
+      ],
+      "nonBasketballTerms": [
+        "배드민턴",
+        "셔틀콕",
+        "BWF",
+        "축구",
+        "여자축구",
+        "여자 축구",
+        "배구",
+        "여자배구",
+        "여자 배구",
+        "탁구",
+        "핸드볼"
+      ]
+    }
+  ]
+}

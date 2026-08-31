@@ -1,37 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
+import { adminBackendFetch } from "@/lib/admin/backend";
+import {
+	DUPLICATE_STATS_SEASON_MESSAGE,
+	legacyStatsRequest,
+	StatsValidationError,
+} from "@/lib/admin/adapters";
+import { rejectCrossOriginMutation } from "@/lib/admin/request";
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
+	const rejected = rejectCrossOriginMutation(request);
+	if (rejected) return rejected;
+	const body = await request.json();
+	const id = typeof body?._id === "string" ? body._id : "";
+	let payload: Record<string, unknown>;
 	try {
-		const token = req.headers.get("authorization");
-
-		if (!token) {
-			throw new Error("Authorization header missing");
+		payload = legacyStatsRequest(body);
+	} catch (error) {
+		if (error instanceof StatsValidationError) {
+			return NextResponse.json({ message: error.message }, { status: 400 });
 		}
-
-		const backendResponse = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/create_update_stats`,
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: token,
-				},
-				body: JSON.stringify(await req.json()),
-			}
-		);
-
-		const backendData = await backendResponse.json();
-
-		if (!backendResponse.ok) {
-			throw new Error(backendData.error || "Failed to save stats data.");
-		}
-
-		return NextResponse.json(
-			{ message: "Stats saved successfully!" },
-			{ status: 200 }
-		);
-	} catch (error: any) {
-		console.error("Error:", error);
-		return NextResponse.json({ message: error.message }, { status: 500 });
+		throw error;
 	}
+	if (!id) {
+		const listResponse = await adminBackendFetch("/api/admin/playerstat");
+		if (!listResponse.ok) return listResponse;
+		const existing = await listResponse.json() as Array<{ season?: unknown }>;
+		const season = String(payload.season ?? "").trim();
+		if (existing.some((stat) => String(stat.season ?? "").trim() === season)) {
+			return NextResponse.json(
+				{ message: DUPLICATE_STATS_SEASON_MESSAGE },
+				{ status: 409 }
+			);
+		}
+	}
+	return adminBackendFetch(`/api/admin/playerstat${id ? `/${encodeURIComponent(id)}` : ""}`, {
+		method: id ? "PUT" : "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(payload),
+	});
+}
+
+export async function DELETE(request: NextRequest) {
+	const rejected = rejectCrossOriginMutation(request);
+	if (rejected) return rejected;
+	const { id } = await request.json() as { id?: string };
+	if (!id) return NextResponse.json({ message: "id가 필요합니다." }, { status: 400 });
+	return adminBackendFetch(`/api/admin/playerstat/${encodeURIComponent(id)}`, { method: "DELETE" });
 }

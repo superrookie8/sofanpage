@@ -1,37 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { adminBackendFetch } from "@/lib/admin/backend";
 
-const isDevelopment = process.env.NODE_ENV === "development";
-
-export async function GET(req: NextRequest) {
-	try {
-		const token = req.headers.get("authorization");
-		if (!token) {
-			throw new Error("Authorization header missing");
-		}
-
-		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get/events`,
-			{
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: token,
-					Pragma: "no-cache",
-					"Cache-Control": "no-cache, no-store, must-revalidate",
-				},
-				cache: isDevelopment ? "no-store" : "default",
-			}
-		);
-
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.message || "Failed to fetch events.");
-		}
-
-		const data = await response.json();
-		return NextResponse.json(data, { status: 200 });
-	} catch (error: any) {
-		console.error("Error fetching events:", error.message);
-		return NextResponse.json({ message: error.message }, { status: 500 });
-	}
+export async function GET() {
+	const response = await adminBackendFetch("/api/admin/events");
+	if (!response.ok) return response;
+	const events = await response.json() as Array<Record<string, unknown>>;
+	return NextResponse.json({
+		events: events.map((event) => ({
+			...event,
+			_id: event.id,
+			checkFields: event.checkFields && typeof event.checkFields === "object"
+				? Object.fromEntries(Object.entries(event.checkFields).map(([key, value]) => [key.replace(/^check(\d+)$/, "check_$1"), value]))
+				: {},
+		})),
+	});
 }

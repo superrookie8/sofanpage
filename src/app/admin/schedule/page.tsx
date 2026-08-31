@@ -32,10 +32,6 @@ const AdminSchedule: React.FC = () => {
 			try {
 				const response = await fetch("/api/admin/getseasons", {
 					method: "GET",
-					headers: {
-						"Content-Type": "application/json",
-						Authorization: `Bearer ${sessionStorage.getItem("admin-token")}`,
-					},
 				});
 
 				if (!response.ok) {
@@ -64,10 +60,6 @@ const AdminSchedule: React.FC = () => {
 					`/api/admin/getschedule?season=${selectedSeason}`,
 					{
 						method: "GET",
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${sessionStorage.getItem("admin-token")}`,
-						},
 					}
 				);
 
@@ -138,7 +130,11 @@ const AdminSchedule: React.FC = () => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		const updatedForm = { ...form, season: selectedSeason };
+		const updatedForm = {
+			...form,
+			season: selectedSeason,
+			time: showCustomTimeInput ? customTime : form.time,
+		};
 
 		if (!showExtraHomeSelect) {
 			delete updatedForm.extraHome;
@@ -149,7 +145,6 @@ const AdminSchedule: React.FC = () => {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${sessionStorage.getItem("admin-token")}`,
 				},
 				body: JSON.stringify(updatedForm),
 			});
@@ -168,7 +163,7 @@ const AdminSchedule: React.FC = () => {
 							? { ...form, _id: schedule._id }
 							: schedule
 				  )
-				: [...scheduleList, { ...form, _id: data._id }];
+				: [...scheduleList, data];
 
 			updatedList.sort(
 				(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
@@ -218,7 +213,6 @@ const AdminSchedule: React.FC = () => {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${sessionStorage.getItem("admin-token")}`,
 				},
 				body: JSON.stringify({ _id: scheduleId }),
 			});
@@ -257,7 +251,6 @@ const AdminSchedule: React.FC = () => {
 
 	return (
 		<div className="container mx-auto p-4">
-			<h1 className="text-2xl font-bold mb-4">Manage Game Schedules</h1>
 			<div className="mb-4">
 				{seasons.map((season) => (
 					<button

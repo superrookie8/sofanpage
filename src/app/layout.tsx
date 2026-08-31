@@ -4,8 +4,8 @@ import RecoilRootProvider from "@/utils/recoilRootProvider";
 import ScriptProvider from "@/utils/scriptProvider";
 
 export const metadata: Metadata = {
-	title: { default: "BNK NO36.Lee Sohee", template: "%s | Lee Sohee" },
-	description: "Welcome to the fan page of BNK NO36. Lee Sohee.",
+	title: { default: "BNK No.6 이소희", template: "%s | Super Sohee" },
+	description: "BNK SUM No.6 이소희 선수 팬페이지 관리자.",
 	keywords: [
 		"WKBL",
 		"BNK SUM",
@@ -27,7 +27,7 @@ export default async function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<html lang="en">
+		<html lang="ko">
 			<ScriptProvider />
 			<body>
 				<RecoilRootProvider>{children}</RecoilRootProvider>

@@ -1,47 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { POST as postPhotos } from "../photos/route";
 
-export const config = {
-	api: {
-		bodyParser: false,
-	},
-};
-
-export async function POST(req: NextRequest) {
-	try {
-		const contentType = req.headers.get("content-type") || "";
-		if (!contentType.startsWith("multipart/form-data")) {
-			return NextResponse.json(
-				{ message: "Unsupported content type" },
-				{ status: 400 }
-			);
-		}
-
-		const formData = await req.formData();
-		const token = req.headers.get("authorization") || "";
-
-		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/postphoto`,
-			{
-				method: "POST",
-				headers: {
-					Authorization: token,
-				},
-				body: formData,
-			}
-		);
-
-		const data = await response.json();
-
-		if (!response.ok) {
-			throw new Error(data.message || "Failed to upload photos to backend");
-		}
-
-		return NextResponse.json({ message: "Photos uploaded successfully", data });
-	} catch (error: any) {
-		console.error("Error uploading photos:", error);
-		return NextResponse.json(
-			{ message: error.message || "Failed to upload photos" },
-			{ status: 500 }
-		);
-	}
+export async function POST(request: NextRequest) {
+	return postPhotos(request);
 }

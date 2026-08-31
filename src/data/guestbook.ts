@@ -4,4 +4,6 @@ export interface GuestBookEntry {
 	message: string;
 	date: string;
 	photo_data?: string;
+	photo_id?: string;
+	hasPhoto?: boolean;
 }

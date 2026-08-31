@@ -1,35 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { adminBackendFetch } from "@/lib/admin/backend";
+import { legacyScheduleRequest, toLegacySchedule } from "@/lib/admin/adapters";
+import { rejectCrossOriginMutation } from "@/lib/admin/request";
 
-export async function POST(req: NextRequest) {
-	try {
-		const token = req.headers.get("authorization");
-
-		if (!token) {
-			throw new Error("Authorization header missing");
-		}
-
-		const backendResponse = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/create_update/schedule`,
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: token,
-				},
-				body: JSON.stringify(await req.json()),
-			}
-		);
-
-		const backendData = await backendResponse.json();
-		if (!backendResponse.ok) {
-			throw new Error(backendData.error || "Failed to save schedule data.");
-		}
-		return NextResponse.json(
-			{ message: "Schadule saved successfully" },
-			{ status: 200 }
-		);
-	} catch (error: any) {
-		console.error("Error:", error);
-		return NextResponse.json({ message: error.message }, { status: 500 });
-	}
+export async function POST(request: NextRequest) {
+	const rejected = rejectCrossOriginMutation(request);
+	if (rejected) return rejected;
+	const body = await request.json();
+	const id = typeof body?._id === "string" ? body._id : "";
+	const response = await adminBackendFetch(`/api/admin/schedules${id ? `/${encodeURIComponent(id)}` : ""}`, {
+		method: id ? "PUT" : "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(legacyScheduleRequest(body)),
+	});
+	if (!response.ok) return response;
+	return NextResponse.json(toLegacySchedule(await response.json()), { status: response.status });
 }

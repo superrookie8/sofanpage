@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { format } from "date-fns";
 import { GuestBookEntry } from "@/data/guestbook";
 import useAdminAuth from "@/hooks/useAdminAuth";
@@ -11,27 +11,16 @@ const fetchGuestbookLists = async (
 	pageSize: number,
 	name?: string
 ): Promise<{ entries: GuestBookEntry[]; total_entries: number }> => {
-	const token = sessionStorage.getItem("admin-token");
-
-	if (!token) {
-		throw new Error("You are not authorized to perform this action.");
-	}
-
-	const url = new URL(
-		`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/admin/get_guestbook_entries`
-	);
-	url.searchParams.append("page", page.toString());
-	url.searchParams.append("page_size", pageSize.toString());
+	const query = new URLSearchParams();
+	query.set("page", page.toString());
+	query.set("page_size", pageSize.toString());
 	if (name) {
-		url.searchParams.append("name", name);
+		query.set("name", name);
 	}
 
-	const response = await fetch(url.toString(), {
+	const response = await fetch(`/api/admin/getguestbooklist?${query}`, {
 		method: "GET",
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
-		},
+		cache: "no-store",
 	});
 
 	if (!response.ok) {
@@ -46,20 +35,10 @@ const fetchGuestbookLists = async (
 };
 
 const deleteGuestbookEntry = async (entryId: string): Promise<void> => {
-	const token = sessionStorage.getItem("admin-token");
-
-	if (!token) {
-		throw new Error("You are not authorized to perform this action.");
-	}
-
 	const response = await fetch(
 		`/api/admin/deleteguestbooks?entry_id=${entryId}`,
 		{
 			method: "DELETE",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${token}`,
-			},
 		}
 	);
 
@@ -70,7 +49,7 @@ const deleteGuestbookEntry = async (entryId: string): Promise<void> => {
 
 const formatDate = (dateString: string): string => {
 	const date = new Date(dateString);
-	return format(date, "yyyy.MM.dd HH:mm");
+	return Number.isNaN(date.getTime()) ? "날짜 없음" : format(date, "yyyy.MM.dd HH:mm");
 };
 
 const GuestBookLists: React.FC = () => {
@@ -84,8 +63,9 @@ const GuestBookLists: React.FC = () => {
 	const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 	const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
 	const [searchName, setSearchName] = useState<string>("");
+	const [appliedSearch, setAppliedSearch] = useState<string>("");
 
-	const fetchData = async (name?: string) => {
+	const fetchData = useCallback(async (name?: string) => {
 		try {
 			const { entries, total_entries } = await fetchGuestbookLists(
 				page,
@@ -94,16 +74,15 @@ const GuestBookLists: React.FC = () => {
 			);
 			setGuestBookLists(entries || []);
 			setTotalEntries(total_entries || 0);
-			console.log(entries);
 		} catch (error: any) {
 			setError(error.message);
 			console.error("Failed to fetch guestbook entries:", error);
 		}
-	};
+	}, [page, pageSize]);
 
 	useEffect(() => {
-		fetchData(searchName);
-	}, [page, pageSize, searchName]);
+		fetchData(appliedSearch);
+	}, [fetchData, appliedSearch]);
 
 	const handleDelete = async (entryId: string) => {
 		try {
@@ -111,7 +90,7 @@ const GuestBookLists: React.FC = () => {
 			setGuestBookLists((prev) =>
 				prev.filter((entry) => entry._id !== entryId)
 			);
-			setTotalEntries((prev) => prev - 1);
+			setTotalEntries((prev) => Math.max(0, prev - 1));
 		} catch (error: any) {
 			setError(error.message);
 			console.error("Failed to delete guestbook entry:", error);
@@ -151,7 +130,7 @@ const GuestBookLists: React.FC = () => {
 	const handleSearch = (event: React.FormEvent) => {
 		event.preventDefault();
 		setPage(1);
-		fetchData(searchName);
+		setAppliedSearch(searchName.trim());
 	};
 
 	return (
@@ -187,10 +166,12 @@ const GuestBookLists: React.FC = () => {
 								<div>
 									{guestbook.photo_data ? (
 										<img
-											src={`data:image/jpeg;base64,${guestbook.photo_data}`}
+												src={guestbook.photo_data.startsWith("/") || guestbook.photo_data.startsWith("data:") ? guestbook.photo_data : `data:image/jpeg;base64,${guestbook.photo_data}`}
 											alt="Guestbook entry"
 											className="w-12"
 										/>
+									) : guestbook.hasPhoto ? (
+										"사진 있음"
 									) : (
 										"사진없음"
 									)}
@@ -214,7 +195,7 @@ const GuestBookLists: React.FC = () => {
 				>
 					Previous
 				</button>
-				<span>{`Page ${page} of ${Math.ceil(totalEntries / pageSize)}`}</span>
+				<span>{`Page ${page} of ${Math.max(1, Math.ceil(totalEntries / pageSize))}`}</span>
 				<button
 					onClick={() => router.push("/admin")}
 					className="px-4 py-2 bg-green-500 text-white rounded"
