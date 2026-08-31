@@ -155,14 +155,18 @@ Tailwind 커스텀 컬러로 정의하고 CSS 변수로 노출합니다. 다크 
 
 **폰트 전략을 바꿉니다.** GmarketSansMedium 단일 웨이트로는 위계를 만들 수 없습니다.
 
+**결정: Pretendard Variable 전면 전환** (2026-09-01 확정)
+
 ```
-표제 / 숫자 : Pretendard Variable (100~900 가변)  ← 신규 도입
-             또는 GmarketSansBold 병행 도입
-본문        : Pretendard Variable
-숫자 전용   : Pretendard + font-variant-numeric: tabular-nums
-영문 디스플레이(선택) : 스포츠 저지 느낌의 콘덴스드 산세리프
-             (예: Archivo Expanded / Anton) — "SUPER SOHEE", "#6" 같은 워드마크에만
+표제 / 본문 / 숫자 : Pretendard Variable (100~900 가변)
+숫자 전용          : Pretendard + font-variant-numeric: tabular-nums
+영문 디스플레이(선택): 스포츠 저지 느낌의 콘덴스드 산세리프
+                     (예: Archivo Expanded / Anton)
+                     — "SUPER SOHEE", "#6" 같은 워드마크에만
 ```
+
+기존 GmarketSansMedium은 단일 웨이트라 위계를 만들 수 없어 교체합니다.
+브랜드 인상 변화는 감수하되, 워드마크에서 디스플레이 서체로 개성을 확보합니다.
 
 `globals.css`의 `* { font-family: ... !important }`는 **삭제**하고 `body`에만 지정합니다.
 
@@ -378,7 +382,7 @@ screens: {
 
 ### 5.7 아케이드 `/arcade`
 
-- 전면 다크. `#unityContainer`의 고정 `960×600px`을 `aspect-ratio: 16/10` + `max-width: 100%`로 반응형 전환 (현재 모바일에서 잘림)
+- 전면 다크. 캔버스는 세로형 340×600 고정이었고 반응형(`min(340px,100%)` + `aspect-ratio`)으로 이미 수정 완료 — 디자인 시 세로 비율 유지 전제
 - 캔버스 아래: `내 최고점수` / `랭킹 TOP 10` 2블록
 - 랭킹은 1~3위 강조(메달 컬러) + 내 순위 sticky 행
 - 게임 로딩 중 진행률 바 + 브랜드 스피너
@@ -523,13 +527,24 @@ Phase 0~2가 끝나면 나머지는 병렬 진행 가능합니다.
 
 ---
 
-## 10. 함께 정리하면 좋을 기술 부채
+## 10. 기술 부채 — 처리 현황
 
-디자인 작업과 맞물리는 항목입니다.
+리디자인 착수 전 정리 작업입니다. **아래 항목은 2026-09-01 완료** (`chore/cleanup-and-node-upgrade`):
 
-- `src/components/*`와 `src/features/*/components/*`, `src/shared/ui/*`에 **동일 컴포넌트가 중복** 존재 (`header.tsx`, `carousel.tsx`, `alertModal.tsx`, `calender.tsx` 등). 리디자인 전에 정본을 한 곳으로 통합해야 두 번 고치지 않습니다.
-- `src/hooks/*`와 `src/shared/hooks/*` 중복도 동일.
-- `globals.css`의 `.ReactModal__Content { top: 200% !important }` — 모바일 모달 위치 하드코딩 버그. 공통 `Modal` 도입 시 제거.
-- `tailwind.config.ts`의 `content`에 `src/features/**`, `src/shared/**`가 빠져 있어 **해당 경로의 Tailwind 클래스가 퍼지될 위험**이 있습니다. 토큰 작업 시 함께 수정.
-- styled-components와 Tailwind 혼용 — 신규 컴포넌트는 Tailwind로 통일 권장.
+- ✅ `src/components/{shared,news,schedule,events}`, `src/hooks` — 미사용 중복 사본 39개 파일 삭제.
+  정본은 `src/features/*` 와 `src/shared/*`. 이제 컴포넌트당 파일이 하나뿐이라
+  리디자인을 두 번 적용할 일이 없습니다.
+- ✅ `tailwind.config.ts`의 `content`에 `src/features/**`, `src/shared/**` 추가.
+  누락 상태에서는 해당 경로에 새로 쓴 클래스가 퍼지될 수 있었습니다.
+- ✅ Unity 캔버스 반응형 + `globals.css`의 죽은 `#unityContainer` 규칙 제거.
+- ✅ Node 20(EOL) → 24 LTS, `.nvmrc` / `engines` 추가.
+- ✅ 빌드가 인증 시크릿을 요구하던 문제 해결 (`config/auth.ts` 지연 평가).
 
+**남은 항목:**
+
+- ⬜ `globals.css`의 `.ReactModal__Content { top: 200% !important }` — 모바일 모달 위치
+  하드코딩. §4의 공통 `Modal` 도입 시 제거.
+- ⬜ `globals.css`의 `* { font-family: ... !important }` — Pretendard 전환과 함께 제거.
+- ⬜ 브레이크포인트 표준화 — 기존 `sm`/`md`/`lg`를 두고 표준 규격의 새 이름을 추가한 뒤,
+  리디자인된 페이지부터 옮기고 마지막에 옛것을 제거하는 점진 방식으로 진행.
+- ⬜ styled-components와 Tailwind 혼용 — 신규 컴포넌트는 Tailwind로 통일.
