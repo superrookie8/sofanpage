@@ -7,6 +7,11 @@ import {
 import { readFetchResponseAsText } from "../../../lib/server/http/readFetchResponse";
 
 interface ArcadeProxyOptions {
+	/**
+	 * 성공 응답(2xx)의 JSON 본문을 클라이언트로 넘기기 전에 가공한다.
+	 * 백엔드가 내려주는 필드를 그대로 흘리지 않기 위한 화이트리스트 용도.
+	 */
+	sanitizeJson?: (data: unknown) => unknown;
 	request: NextRequest;
 	path: string;
 	method?: "GET" | "POST";
@@ -22,6 +27,7 @@ export async function proxyArcadeRequest({
 	method = "GET",
 	accessToken,
 	body,
+	sanitizeJson,
 	environment = process.env,
 	fetchImplementation = fetch,
 }: ArcadeProxyOptions) {
@@ -52,7 +58,16 @@ export async function proxyArcadeRequest({
 			body: body === undefined ? undefined : JSON.stringify(body),
 			cache: "no-store",
 		});
-		const responseBody = await readFetchResponseAsText(response);
+		let responseBody = await readFetchResponseAsText(response);
+
+		// 성공 응답만 가공한다. 에러 본문은 그대로 통과시켜 진단 정보를 잃지 않는다.
+		if (sanitizeJson && response.ok && responseBody) {
+			try {
+				responseBody = JSON.stringify(sanitizeJson(JSON.parse(responseBody)));
+			} catch {
+				// JSON이 아니면 가공하지 않고 그대로 둔다.
+			}
+		}
 
 		return new NextResponse(responseBody || null, {
 			status: response.status,
