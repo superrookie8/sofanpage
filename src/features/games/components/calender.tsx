@@ -9,15 +9,17 @@ import {
 	endOfMonth,
 	eachDayOfInterval,
 	getDay,
+	isSameDay,
 	parseISO,
 } from "date-fns";
 import { useSchedulesByDateRangeQuery } from "../queries";
 import { isGameSchedule } from "../nextGame";
 import {
 	isHomeGame,
-	matchupLabel,
+	opponentName,
 	resolveGameLocation,
 } from "../scheduleView";
+import { cn } from "@/shared/ui/cn";
 
 // 월 이름을 한글로 반환하는 함수
 const getKoreanMonth = (date: Date): string => {
@@ -161,8 +163,14 @@ const Calendar: React.FC<CalendarProps> = ({
 		return allSchedules.filter(isGameSchedule);
 	}, [allSchedules]);
 
-	const weekDayHeader = weekDays.map((day) => (
-		<div key={day} className="text-center font-bold text-xs md:text-sm">
+	const weekDayHeader = weekDays.map((day, index) => (
+		<div
+			key={day}
+			className={cn(
+				"pb-2 text-center text-stat-label",
+				index === 0 ? "text-brand-700" : "text-ink-500"
+			)}
+		>
 			{day}
 		</div>
 	));
@@ -209,61 +217,116 @@ const Calendar: React.FC<CalendarProps> = ({
 			const isHome = isHomeGame(schedule);
 
 			return (
-				<div
+				<button
 					key={schedule.id || index}
-					className={`mt-1 text-[10px] ${
-						isHome ? "bg-red-200" : "bg-blue-200"
-					} rounded p-1 overflow-y-auto cursor-pointer`}
+					type="button"
 					onClick={() => handleDateClick(schedule)}
+					title={`${opponentName(schedule)} ${time} ${isHome ? "홈" : "원정"}`}
+					className={cn(
+						"mt-1 w-full rounded-sm border px-1 py-0.5 text-left transition-colors",
+						isHome
+							? "border-brand-200 bg-brand-50 hover:bg-brand-100"
+							: "border-ink-200 bg-ink-50 hover:bg-ink-100"
+					)}
 				>
-					<div>
-						<span>
-							{matchupLabel(schedule)} {time}
-						</span>
-					</div>
-				</div>
+					<span
+						className={cn(
+							"block truncate text-[10px] font-bold leading-tight lg:text-[11px]",
+							isHome ? "text-brand-700" : "text-ink-700"
+						)}
+					>
+						{opponentName(schedule)}
+					</span>
+					<span
+						data-numeric
+						className="block text-[9px] leading-tight text-ink-500 lg:text-[10px]"
+					>
+						{time} · {isHome ? "홈" : "원정"}
+					</span>
+				</button>
 			);
 		});
 	};
 
+	const today = new Date();
+
 	return (
-		<div className="w-full flex justify-center items-start overflow-hidden ">
-			<div className="w-full max-w-[1600px] flex flex-col justify-center items-start p-5 rounded-lg">
-				<div className="flex justify-between items-center w-full mb-5 h-12">
-					<button
-						onClick={prevMonth}
-						className="w-[80px] md:w-[100px] h-12 bg-transparent border border-gray-200 rounded-lg p-2 text-xl font-semibold cursor-pointer hover:bg-gray-200"
-					>
-						{"<"}
-					</button>
-					<span className="text-xl font-semibold h-12 flex items-center justify-center">
-						{formatYearMonth(currentMonth)}
-					</span>
-					<button
-						onClick={nextMonth}
-						className="w-[80px] md:w-[100px] h-12 bg-transparent border border-gray-200 rounded-lg p-2 text-xl font-semibold cursor-pointer hover:bg-gray-200"
-					>
-						{">"}
-					</button>
-				</div>
-				<div className="grid gap-1 w-fit min-h-[500px] md:min-h-[600px] lg:min-h-[700px] grid-cols-7">
-					{weekDayHeader}
-					{emptyDays.map((_, index) => (
-						<div
-							key={`empty-${index}`}
-							className="bg-white min-w-[40px] w-[220px] border border-gray-200 rounded-lg h-20 md:h-24 lg:h-28"
-						></div>
-					))}
-					{daysInCurrentMonth.map((day) => (
+		<div className="w-full">
+			{/* 월 네비게이션 */}
+			<div className="mb-4 flex items-center justify-between gap-2">
+				<button
+					onClick={prevMonth}
+					aria-label="이전 달"
+					className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-ink-200 bg-white text-ink-700 transition-colors hover:bg-ink-50"
+				>
+					‹
+				</button>
+				<h3 className="text-h2 lg:text-h2-lg" aria-live="polite">
+					{formatYearMonth(currentMonth)}
+				</h3>
+				<button
+					onClick={nextMonth}
+					aria-label="다음 달"
+					className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-ink-200 bg-white text-ink-700 transition-colors hover:bg-ink-50"
+				>
+					›
+				</button>
+			</div>
+
+			{/* 7열 그리드. 이전에는 셀이 220px 고정이라 컨테이너를 넘쳐 잘렸다. */}
+			<div className="grid grid-cols-7 gap-1 lg:gap-1.5">
+				{weekDayHeader}
+
+				{emptyDays.map((_, index) => (
+					<div key={`empty-${index}`} aria-hidden />
+				))}
+
+				{daysInCurrentMonth.map((day) => {
+					const isToday = isSameDay(day, today);
+					const isSunday = getDay(day) === 0;
+
+					return (
 						<div
 							key={day.toString()}
-							className="bg-white min-w-[40px] w-[220px] border border-gray-200 rounded-lg flex flex-col p-1 h-20 md:h-24 lg:h-28"
+							className={cn(
+								"flex min-h-[68px] flex-col rounded-[10px] border bg-white p-1 sm:min-h-[84px] lg:min-h-[104px] lg:p-1.5",
+								isToday ? "border-brand-500" : "border-ink-200"
+							)}
 						>
-							<span className="text-xs md:text-sm">{format(day, "d")}</span>
-							{renderGameSchedule(day)}
+							<span
+								className={cn(
+									"mb-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold lg:text-[12px]",
+									isToday
+										? "bg-brand-500 text-white"
+										: isSunday
+										? "text-brand-700"
+										: "text-ink-700"
+								)}
+							>
+								{format(day, "d")}
+							</span>
+							<div className="min-h-0 flex-1 overflow-y-auto no-scrollbar">
+								{renderGameSchedule(day)}
+							</div>
 						</div>
-					))}
-				</div>
+					);
+				})}
+			</div>
+
+			{/* 범례 — 색만으로 구분하지 않도록 라벨을 함께 둔다 */}
+			<div className="mt-4 flex items-center gap-4 text-caption text-ink-500">
+				<span className="flex items-center gap-1.5">
+					<span className="h-3 w-3 rounded-sm border border-brand-200 bg-brand-50" />
+					홈 경기
+				</span>
+				<span className="flex items-center gap-1.5">
+					<span className="h-3 w-3 rounded-sm border border-ink-200 bg-ink-50" />
+					원정 경기
+				</span>
+				<span className="flex items-center gap-1.5">
+					<span className="h-3 w-3 rounded-full bg-brand-500" />
+					오늘
+				</span>
 			</div>
 		</div>
 	);
