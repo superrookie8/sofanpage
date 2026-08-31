@@ -12,8 +12,8 @@ let configuredHandler: ReturnType<typeof NextAuth> | null = null;
 
 async function getConfiguredHandler() {
 	if (!configuredHandler) {
-		const { authOptions } = await import("@/config/auth");
-		configuredHandler = NextAuth(authOptions);
+		const { getAuthOptions } = await import("@/config/auth");
+		configuredHandler = NextAuth(getAuthOptions());
 	}
 	return configuredHandler;
 }

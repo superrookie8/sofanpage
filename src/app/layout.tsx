@@ -75,8 +75,8 @@ export default async function RootLayout({
 		}
 	} else {
 		try {
-			const { authOptions } = await import("@/config/auth");
-			session = await getServerSession(authOptions);
+			const { getAuthOptions } = await import("@/config/auth");
+			session = await getServerSession(getAuthOptions());
 		} catch (error: any) {
 			// JWT 복호화 실패 시 세션을 null로 처리
 			// Next-Auth가 내부적으로 에러를 로깅하지만, 앱은 계속 작동하도록 함

@@ -87,12 +87,6 @@ body {
 	transition: opacity 300ms, transform 300ms;
 }
 
-#unityContainer {
-	width: 960px;
-	height: 600px;
-	background-color: black;
-}
-
 .background {
 	background-attachment: fixed;
 }

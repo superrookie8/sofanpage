@@ -243,11 +243,15 @@ const UnityGame: React.FC = () => {
 			{/* Unity WebGL이 렌더링될 캔버스 */}
 			<div
 				id="unityContainer"
-				style={{ width: "340px", height: "600px", background: "black" }}
+				style={{
+					width: "min(340px, 100%)",
+					aspectRatio: "340 / 600",
+					background: "black",
+				}}
 			>
 				<Unity
 					unityProvider={unityProvider}
-					style={{ width: "340px", height: "600px" }}
+					style={{ width: "100%", height: "100%" }}
 				/>
 			</div>
 		</div>

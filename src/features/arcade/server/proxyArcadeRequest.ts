@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { authEnvironment } from "@/config/auth";
+import { getAuthEnvironment } from "@/config/auth";
 import { readFetchResponseAsText } from "@/lib/server/http/readFetchResponse";
 
 interface ArcadeProxyOptions {
@@ -18,7 +18,7 @@ export async function proxyArcadeRequest({
 	accessToken,
 	body,
 }: ArcadeProxyOptions) {
-	const backendUrl = new URL(path, `${authEnvironment.backendApiUrl}/`);
+	const backendUrl = new URL(path, `${getAuthEnvironment().backendApiUrl}/`);
 	backendUrl.search = request.nextUrl.search;
 
 	try {
