@@ -1,6 +1,6 @@
 "use client";
 import type { ScheduleResponse } from "../types";
-import { matchupLabel } from "../nextGame";
+import { isHomeGame, matchupLabel, venueName } from "../scheduleView";
 import Button from "@/shared/ui/primitives/button";
 import {
 	formatCountdown,
@@ -19,7 +19,7 @@ export default function NextGameHighlight({
 }) {
 	const date = parseDate(game.startDateTime);
 	const countdown = formatCountdown(game.startDateTime);
-	const isHome = game.isHome !== false;
+	const isHome = isHomeGame(game);
 
 	return (
 		<section className="relative overflow-hidden rounded-lg bg-ink-900 p-6 lg:p-8">
@@ -42,7 +42,7 @@ export default function NextGameHighlight({
 							game.startDateTime
 					  )}) ${formatTime(game.startDateTime)}`
 					: ""}
-				{game.location ? ` · ${game.location}` : ""}
+				{venueName(game) ? ` · ${venueName(game)}` : ""}
 			</p>
 
 			<div className="mt-4 flex items-center gap-3">

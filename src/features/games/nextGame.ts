@@ -22,10 +22,5 @@ export function findNextGame(
 	return upcoming[0]?.schedule ?? null;
 }
 
-/** "vs 우리은행" 형태의 매치업 라벨 */
-export function matchupLabel(schedule: ScheduleResponse) {
-	if (schedule.opponent) {
-		return `${schedule.isHome ? "vs" : "@"} ${schedule.opponent}`;
-	}
-	return schedule.title;
-}
+// 매치업/홈·원정/경기장 표시는 scheduleView가 단일 소스다.
+export { matchupLabel, isHomeGame, venueName } from "./scheduleView";

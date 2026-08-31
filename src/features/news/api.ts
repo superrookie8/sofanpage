@@ -1,6 +1,15 @@
 // src/features/news/api.ts
 import type { Article, NewsData, SectionData } from "./types";
 
+// 백엔드 기사 응답에는 매체명(source)이 없다. 어느 엔드포인트에서 왔는지로
+// 출처를 채워야 카드의 출처 칩과 필터가 의미를 갖는다.
+function withSource(articles: Article[], source: string): Article[] {
+	return articles.map((article) => ({
+		...article,
+		source: article.source?.trim() || source,
+	}));
+}
+
 // 최신 기사 조회
 export const fetchLatestNews = async (): Promise<NewsData> => {
 	const res = await fetch("/api/news/latest");
@@ -35,7 +44,7 @@ export const fetchJumpballNews = async (
 	// 백엔드 응답 형식: { articles: [...], total: 1000, totalPages: 200, ... }
 	if (data.articles && Array.isArray(data.articles)) {
 		return {
-			articles: data.articles,
+			articles: withSource(data.articles, "점프볼"),
 			total: data.total || 0,
 			totalPages: data.totalPages || 0,
 			hasNext: data.hasNext || false,
@@ -61,7 +70,7 @@ export const fetchRookieNews = async (
 	// 백엔드 응답 형식: { articles: [...], total: 1000, totalPages: 200, ... }
 	if (data.articles && Array.isArray(data.articles)) {
 		return {
-			articles: data.articles,
+			articles: withSource(data.articles, "루키"),
 			total: data.total || 0,
 			totalPages: data.totalPages || 0,
 			hasNext: data.hasNext || false,

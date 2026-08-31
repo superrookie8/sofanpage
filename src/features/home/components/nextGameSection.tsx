@@ -2,7 +2,12 @@
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { useSchedulesByDateRangeQuery } from "@/features/games/queries";
-import { findNextGame, matchupLabel } from "@/features/games/nextGame";
+import { findNextGame } from "@/features/games/nextGame";
+import {
+	isHomeGame,
+	matchupLabel,
+	venueName,
+} from "@/features/games/scheduleView";
 import GameCard from "@/shared/ui/primitives/gameCard";
 import { Skeleton } from "@/shared/ui/primitives/skeleton";
 import { EmptyState, ErrorState } from "@/shared/ui/primitives/states";
@@ -57,10 +62,10 @@ export default function NextGameSection() {
 			weekdayLabel={formatWeekday(nextGame.startDateTime)}
 			countdownLabel={formatCountdown(nextGame.startDateTime)}
 			opponent={matchupLabel(nextGame)}
-			detail={[formatTime(nextGame.startDateTime), nextGame.location]
+			detail={[formatTime(nextGame.startDateTime), venueName(nextGame)]
 				.filter(Boolean)
 				.join(" · ")}
-			isHome={nextGame.isHome !== false}
+			isHome={isHomeGame(nextGame)}
 			onClick={() => router.push("/schedule")}
 		/>
 	);

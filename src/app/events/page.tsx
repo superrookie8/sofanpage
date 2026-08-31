@@ -46,7 +46,6 @@ export default function EventsPage() {
 				<div className="grid gap-4 md:grid-cols-2">
 					{events.map((event) => {
 						const href = eventHref(event.title);
-						const ongoing = event.title.includes("진행");
 
 						const card = (
 							<article
@@ -62,21 +61,8 @@ export default function EventsPage() {
 										alt=""
 										fill
 										sizes="(max-width: 768px) 100vw, 520px"
-										className={cn(
-											"object-cover",
-											!ongoing && "grayscale-[35%]"
-										)}
+										className="object-cover"
 									/>
-									<span
-										className={cn(
-											"absolute left-4 top-4 inline-flex h-7 items-center rounded-full px-3 text-[12px] font-bold",
-											ongoing
-												? "bg-brand-500 text-white"
-												: "bg-white/[.16] text-white"
-										)}
-									>
-										{ongoing ? "진행중" : "종료"}
-									</span>
 								</div>
 								<div className="p-4">
 									<h2 className="text-h3-lg text-white">{event.title}</h2>

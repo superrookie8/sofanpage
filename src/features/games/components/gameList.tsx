@@ -1,7 +1,8 @@
 "use client";
 import { useMemo } from "react";
 import type { ScheduleResponse } from "../types";
-import { isGameSchedule, matchupLabel } from "../nextGame";
+import { isGameSchedule } from "../nextGame";
+import { isHomeGame, matchupLabel, venueName } from "../scheduleView";
 import GameCard from "@/shared/ui/primitives/gameCard";
 import { EmptyState } from "@/shared/ui/primitives/states";
 import {
@@ -57,10 +58,10 @@ export default function GameList({
 								weekdayLabel={formatWeekday(game.startDateTime)}
 								countdownLabel={formatCountdown(game.startDateTime)}
 								opponent={matchupLabel(game)}
-								detail={[formatTime(game.startDateTime), game.location]
+								detail={[formatTime(game.startDateTime), venueName(game)]
 									.filter(Boolean)
 									.join(" · ")}
-								isHome={game.isHome !== false}
+								isHome={isHomeGame(game)}
 								onClick={() => onSelect(game.id)}
 							/>
 						))}
