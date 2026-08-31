@@ -92,7 +92,7 @@ export default function Sheet({
 						exit={{ opacity: 0 }}
 						transition={{ duration: 0.2 }}
 						onClick={onClose}
-						className="absolute inset-0 bg-[rgba(23,21,26,.55)]"
+						className="absolute inset-0 bg-ink-900/55"
 					/>
 					<motion.div
 						ref={panelRef}

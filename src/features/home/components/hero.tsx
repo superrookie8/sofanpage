@@ -57,7 +57,7 @@ export default function Hero() {
 				/>
 				<span
 					aria-hidden
-					className="absolute right-4 top-4 font-display text-[88px] leading-none text-[rgba(225,29,51,.85)]"
+					className="absolute right-4 top-4 font-display text-[88px] leading-none text-brand-500/85"
 				>
 					{meta.jerseyNumber}
 				</span>
@@ -85,7 +85,7 @@ export default function Hero() {
 						className="object-cover"
 						style={{ objectPosition: "center 20%" }}
 					/>
-					<div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[rgba(23,21,26,.85)]" />
+					<div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-ink-900/85" />
 					<p className="absolute bottom-5 left-6 font-display text-[20px] tracking-[.08em] text-white">
 						LEE SOHEE <span className="text-brand-400">#{meta.jerseyNumber}</span>
 					</p>

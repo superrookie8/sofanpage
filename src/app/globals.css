@@ -9,7 +9,55 @@
      이제 body에만 지정하고 Tailwind의 font-display로 Anton을 선택 적용한다. */
 
 @layer base {
+	/*
+	 * ── 브랜드 팔레트 (단일 소스) ─────────────────────────────
+	 *
+	 * 색을 바꾸려면 이 블록의 값만 수정하면 전체 사이트에 일괄 반영된다.
+	 * 컴포넌트에는 hex를 직접 쓰지 않고 Tailwind 토큰(bg-brand-500,
+	 * text-ink-700 …)만 사용한다.
+	 *
+	 * 형식은 "R G B" 공백 구분 채널값이다. Tailwind가 이를
+	 * rgb(var(--brand-500) / <alpha-value>) 로 감싸므로 bg-brand-500/40
+	 * 같은 투명도 유틸리티가 그대로 동작한다. hex를 넣으면 투명도가 깨진다.
+	 *
+	 * 램프 교체 시 권장 순서:
+	 *   500(프라이머리) → 600(액티브, 500보다 어둡게)
+	 *   → 700(흰 배경 위 텍스트용, 대비 4.5:1 이상 확보)
+	 *   → 400(호버) → 200/100/50(배경 틴트, 밝은 순)
+	 */
 	:root {
+		/* 브랜드 — 리브랜딩 시 여기만 교체 */
+		--brand-50: 255 241 242;
+		--brand-100: 255 225 227;
+		--brand-200: 255 199 203;
+		--brand-400: 244 87 107;
+		--brand-500: 225 29 51;
+		--brand-600: 193 21 42;
+		--brand-700: 143 15 31;
+
+		/* 중립 — 웜 그레이 */
+		--ink-50: 248 246 249;
+		--ink-100: 239 236 241;
+		--ink-200: 221 217 224;
+		--ink-300: 173 167 178;
+		--ink-500: 107 101 112;
+		--ink-700: 58 54 63;
+		--ink-900: 23 21 26;
+
+		/* 다크 셸 카드 서피스 */
+		--surface-dark: 38 35 43;
+
+		/* 시맨틱 — 승/패는 브랜드색과 충돌하지 않도록 별도로 둔다 */
+		--win: 14 159 110;
+		--lose: 107 101 112;
+		--info: 37 99 235;
+		--warn: 217 119 6;
+
+		/* 메달 */
+		--medal-gold: 245 197 66;
+		--medal-silver: 201 205 214;
+		--medal-bronze: 200 138 91;
+
 		color-scheme: light;
 	}
 
@@ -19,8 +67,8 @@
 	}
 
 	body {
-		background-color: theme("colors.ink.50");
-		color: theme("colors.ink.700");
+		background-color: rgb(var(--ink-50));
+		color: rgb(var(--ink-700));
 		font-family: theme("fontFamily.sans");
 		font-size: 15px;
 		line-height: 1.65;
@@ -31,7 +79,7 @@
 
 	/* 다크 셸(이벤트·아케이드)에서 페이지 바닥까지 어둡게 */
 	body[data-shell="dark"] {
-		background-color: theme("colors.ink.900");
+		background-color: rgb(var(--ink-900));
 	}
 
 	h1,
@@ -39,7 +87,7 @@
 	h3,
 	h4 {
 		line-height: 1.25;
-		color: theme("colors.ink.900");
+		color: rgb(var(--ink-900));
 	}
 
 	/* 숫자는 자릿수가 흔들리지 않도록 tabular */
@@ -51,14 +99,14 @@
 
 	/* focus:outline-none 남용을 대체하는 공통 포커스 링 */
 	:focus-visible {
-		outline: 2px solid theme("colors.brand.500");
+		outline: 2px solid rgb(var(--brand-500));
 		outline-offset: 2px;
 		border-radius: 4px;
 	}
 
 	input::placeholder,
 	textarea::placeholder {
-		color: theme("colors.ink.300");
+		color: rgb(var(--ink-300));
 	}
 }
 
@@ -147,7 +195,7 @@
 	padding: 24px;
 	background-color: #fff;
 	border-radius: 20px;
-	box-shadow: 0 16px 48px rgba(23, 21, 26, 0.18);
+	box-shadow: 0 16px 48px rgb(var(--ink-900) / 0.18);
 }
 
 /* ── 접근성: 모션 최소화 ───────────────────────────── */

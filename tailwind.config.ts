@@ -1,5 +1,9 @@
 import type { Config } from "tailwindcss";
 
+/** CSS 변수(공백 구분 RGB 채널)를 Tailwind 색상으로 감싼다. */
+const withOpacity = (variable: string) =>
+	`rgb(var(${variable}) / <alpha-value>)`;
+
 const config: Config = {
 	content: [
 		"./src/app/**/*.{js,ts,jsx,tsx,mdx}",
@@ -16,40 +20,62 @@ const config: Config = {
 			xl: "1280px",
 		},
 		extend: {
+			// 실제 색값은 src/app/globals.css의 :root 팔레트 한 곳에서 정의한다.
+			// 여기서는 그 변수를 참조만 하므로, 리브랜딩 시 이 파일은 건드릴 필요가 없다.
+			// rgb(... / <alpha-value>) 형태라 bg-brand-500/40 같은 투명도 유틸도 동작한다.
 			colors: {
 				brand: {
-					50: "#FFF1F2",
-					100: "#FFE1E3",
-					200: "#FFC7CB",
-					400: "#F4576B",
-					500: "#E11D33",
-					600: "#C1152A",
-					700: "#8F0F1F",
+					50: withOpacity("--brand-50"),
+					100: withOpacity("--brand-100"),
+					200: withOpacity("--brand-200"),
+					400: withOpacity("--brand-400"),
+					500: withOpacity("--brand-500"),
+					600: withOpacity("--brand-600"),
+					700: withOpacity("--brand-700"),
 				},
 				ink: {
-					50: "#F8F6F9",
-					100: "#EFECF1",
-					200: "#DDD9E0",
-					300: "#ADA7B2",
-					500: "#6B6570",
-					700: "#3A363F",
-					900: "#17151A",
+					50: withOpacity("--ink-50"),
+					100: withOpacity("--ink-100"),
+					200: withOpacity("--ink-200"),
+					300: withOpacity("--ink-300"),
+					500: withOpacity("--ink-500"),
+					700: withOpacity("--ink-700"),
+					900: withOpacity("--ink-900"),
 				},
 				// ink-900 배경 위에 얹는 다크 카드 서피스
 				surface: {
-					dark: "#26232B",
+					dark: withOpacity("--surface-dark"),
 				},
-				win: "#0E9F6E",
-				lose: "#6B6570",
-				info: "#2563EB",
-				warn: "#D97706",
+				win: withOpacity("--win"),
+				lose: withOpacity("--lose"),
+				info: withOpacity("--info"),
+				warn: withOpacity("--warn"),
 				medal: {
-					gold: "#F5C542",
-					silver: "#C9CDD6",
-					bronze: "#C88A5B",
+					gold: withOpacity("--medal-gold"),
+					silver: withOpacity("--medal-silver"),
+					bronze: withOpacity("--medal-bronze"),
 				},
+				// 외부 서비스 고유색이라 리브랜딩 대상이 아니다. 변수화하지 않는다.
 				kakao: "#FEE500",
 				naver: "#03C75A",
+
+				// 리디자인 이전 화면들이 아직 기본 red-* 를 쓴다.
+				// 이 프로젝트에서 red는 곧 브랜드색이므로 팔레트를 브랜드로 덮어
+				// 남은 화면들도 리브랜딩에 함께 따라오게 한다.
+				// (브랜드 램프에 없는 단계는 가장 가까운 값으로 매핑)
+				red: {
+					50: withOpacity("--brand-50"),
+					100: withOpacity("--brand-100"),
+					200: withOpacity("--brand-200"),
+					300: withOpacity("--brand-200"),
+					400: withOpacity("--brand-400"),
+					500: withOpacity("--brand-500"),
+					600: withOpacity("--brand-600"),
+					700: withOpacity("--brand-700"),
+					800: withOpacity("--brand-700"),
+					900: withOpacity("--brand-700"),
+					950: withOpacity("--brand-700"),
+				},
 			},
 			fontFamily: {
 				sans: [
@@ -91,9 +117,9 @@ const config: Config = {
 				lg: "20px",
 			},
 			boxShadow: {
-				soft: "0 1px 2px rgba(23,21,26,.06), 0 2px 8px rgba(23,21,26,.04)",
-				raised: "0 4px 16px rgba(23,21,26,.08)",
-				modal: "0 16px 48px rgba(23,21,26,.18)",
+				soft: "0 1px 2px rgb(var(--ink-900) / .06), 0 2px 8px rgb(var(--ink-900) / .04)",
+				raised: "0 4px 16px rgb(var(--ink-900) / .08)",
+				modal: "0 16px 48px rgb(var(--ink-900) / .18)",
 			},
 			maxWidth: {
 				container: "1120px",
@@ -114,7 +140,7 @@ const config: Config = {
 			},
 			backgroundImage: {
 				shimmer:
-					"linear-gradient(90deg,#EFECF1 25%,#F8F6F9 50%,#EFECF1 75%)",
+					"linear-gradient(90deg, rgb(var(--ink-100)) 25%, rgb(var(--ink-50)) 50%, rgb(var(--ink-100)) 75%)",
 				"gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
 			},
 		},

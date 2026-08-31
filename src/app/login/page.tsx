@@ -110,7 +110,7 @@ function LoginContent() {
 					style={{ objectPosition: "center 20%" }}
 					priority
 				/>
-				<div className="absolute inset-0 bg-gradient-to-t from-[rgba(23,21,26,.9)] via-[rgba(23,21,26,.25)] to-transparent" />
+				<div className="absolute inset-0 bg-gradient-to-t from-ink-900/90 via-ink-900/25 to-transparent" />
 				<div className="absolute bottom-8 left-8">
 					<p className="font-display text-[40px] leading-none text-white">
 						SUPER SOHEE

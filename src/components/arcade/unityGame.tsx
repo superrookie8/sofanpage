@@ -225,7 +225,7 @@ const UnityGame: React.FC = () => {
 		<div className="w-full">
 			{/* 로그인하지 않은 사용자를 위한 안내 문구 */}
 			{!isAuthenticated && isLoaded && (
-				<p className="mb-3 rounded-md border-l-4 border-warn bg-[rgba(217,119,6,.12)] px-3 py-2 text-left text-[12px] text-[#F6C177]">
+				<p className="mb-3 rounded-md border-l-4 border-warn bg-warn/[.12] px-3 py-2 text-left text-[12px] text-ink-300">
 					로그인하지 않은 상태입니다. 게스트 플레이 시 점수가 저장되지 않습니다.
 				</p>
 			)}

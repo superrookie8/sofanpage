@@ -25,7 +25,7 @@ export default function NextGameHighlight({
 		<section className="relative overflow-hidden rounded-lg bg-ink-900 p-6 lg:p-8">
 			<span
 				aria-hidden
-				className="pointer-events-none absolute -top-2 right-4 font-display text-[100px] leading-none text-[rgba(225,29,51,.35)] lg:text-[110px]"
+				className="pointer-events-none absolute -top-2 right-4 font-display text-[100px] leading-none text-brand-500/35 lg:text-[110px]"
 			>
 				6
 			</span>

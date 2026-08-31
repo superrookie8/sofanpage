@@ -82,7 +82,7 @@ export default function RankingList() {
 			</ol>
 
 			{myEntry && (
-				<div className="sticky bottom-0 mt-2 flex items-center gap-3 rounded-md border-t border-brand-500 bg-[rgba(225,29,51,.14)] px-3 py-2.5 backdrop-blur">
+				<div className="sticky bottom-0 mt-2 flex items-center gap-3 rounded-md border-t border-brand-500 bg-brand-500/[.14] px-3 py-2.5 backdrop-blur">
 					<span data-numeric className="w-7 flex-shrink-0 text-center text-[13px] font-bold text-brand-400">
 						{myEntry.rank}
 					</span>
