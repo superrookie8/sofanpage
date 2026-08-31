@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 import { useProfileQuery } from "../queries";
 
 const Profile: React.FC = () => {
@@ -21,9 +22,12 @@ const Profile: React.FC = () => {
 		<div className="p-4 w-[500px]">
 			{profile.profileImageUrl && (
 				<div className="flex justify-center mb-4">
-					<img
+					<Image
 						src={profile.profileImageUrl}
 						alt={profile.name}
+						width={128}
+						height={128}
+						unoptimized
 						className="w-32 h-32 rounded-full object-cover"
 					/>
 				</div>
@@ -31,7 +35,7 @@ const Profile: React.FC = () => {
 			<p className="ml-8 mt-4 text-gray-500">Name : {profile.name}</p>
 			<p className="ml-8 mt-4 text-gray-500">Team : {profile.team}</p>
 			<p className="ml-8 mt-4 text-gray-500">Position : {profile.position}</p>
-			<p className="ml-8 mt-4 text-gray-500">Number : {profile.jerseyNumber}</p>
+			<p className="ml-8 mt-4 text-gray-500">Number : 6</p>
 			<p className="ml-8 mt-4 text-gray-500">Height : {profile.height}</p>
 			<p className="ml-8 mt-4 text-gray-500">
 				Nickname :{" "}

@@ -30,8 +30,9 @@ pnpm-debug.log*
 package-lock.json
 yarn.lock
 
-# local env files
-.env*.local
+# environment files (examples remain committable)
+.env*
+!.env.example
 
 # vercel
 .vercel

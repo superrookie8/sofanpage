@@ -15,9 +15,6 @@ export const fetchUserInfo = async (): Promise<{
 	photoUrl?: string;
 }> => {
 	const response = await fetch("/api/users/me", {
-		headers: {
-			Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-		},
 		cache: "no-store", // 캐시 방지
 	});
 	if (!response.ok) {
@@ -34,11 +31,7 @@ export const fetchGuestbookEntries = async (filter: {
 }): Promise<{ entries: GuestBookEntry[]; total_entries: number }> => {
 	const response = await fetch(
 		`/api/guestbooks?user=${filter.user}&page=${filter.page}&page_size=${filter.pageSize}`,
-		{
-			headers: {
-				Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-			},
-		}
+		{ cache: "no-store" }
 	);
 	if (!response.ok) {
 		throw new Error("Failed to fetch guestbook entries");
@@ -50,9 +43,6 @@ export const fetchGuestbookEntries = async (filter: {
 export const deleteGuestbookEntry = async (entryId: string): Promise<void> => {
 	const response = await fetch(`/api/guestbooks/${entryId}`, {
 		method: "DELETE",
-		headers: {
-			Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-		},
 	});
 	if (!response.ok) {
 		const errorData = await response.json();
@@ -154,15 +144,9 @@ const MyPageComp: React.FC = () => {
 			formData.append("photo", newProfile.photo);
 		}
 
-		// 디버깅을 위한 콘솔 로그 추가
-		console.log("FormData to be sent:", Array.from(formData.entries()));
-
 		try {
 			const response = await fetch("/api/users/me", {
 				method: "PUT",
-				headers: {
-					Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-				},
 				body: formData,
 			});
 

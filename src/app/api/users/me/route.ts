@@ -1,65 +1,58 @@
 import { NextRequest, NextResponse } from "next/server";
 import serverAxiosService from "@/lib/server/http/axiosService";
+import { getRequestAccessToken } from "@/lib/server/http/getRequestAccessToken";
 
-// GET: 현재 사용자 정보 조회
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
+	const token = await getRequestAccessToken(request);
+	if (!token) {
+		return NextResponse.json({ message: "인증이 필요합니다" }, { status: 401 });
+	}
+
 	try {
-		const response = await serverAxiosService.get("/api/users/me");
+		const response = await serverAxiosService.get(
+			"/api/users/me",
+			undefined,
+			token
+		);
 		return NextResponse.json(response.data, { status: 200 });
 	} catch (error: any) {
-		if (error.response?.status === 401) {
-			return NextResponse.json(
-				{ message: "인증이 필요합니다" },
-				{ status: 401 }
-			);
-		}
 		return NextResponse.json(
-			{
-				message:
-					error.response?.data?.message ||
-					error.message ||
-					"사용자 정보 조회 실패",
-			},
+			{ message: error.response?.data?.message || "사용자 정보 조회 실패" },
 			{ status: error.response?.status || 500 }
 		);
 	}
 }
 
-// PUT: 현재 사용자 정보 수정
-export async function PUT(req: NextRequest) {
+export async function PUT(request: NextRequest) {
+	const token = await getRequestAccessToken(request);
+	if (!token) {
+		return NextResponse.json({ message: "인증이 필요합니다" }, { status: 401 });
+	}
+
 	try {
-		const formData = await req.formData();
+		const formData = await request.formData();
 		const response = await fetch(
 			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/put/userinfo`,
 			{
 				method: "PUT",
-				headers: {
-					Authorization: req.headers.get("Authorization") || "",
-				},
+				headers: { Authorization: `Bearer ${token}` },
 				body: formData,
 				cache: "no-store",
 			}
 		);
 
 		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.message || "사용자 정보 수정 실패");
-		}
-
-		const data = await response.json();
-		return NextResponse.json(data, { status: 200 });
-	} catch (error: any) {
-		if (error.message.includes("Unauthorized")) {
 			return NextResponse.json(
-				{ message: "인증이 필요합니다" },
-				{ status: 401 }
+				{ message: "사용자 정보 수정 실패" },
+				{ status: response.status }
 			);
 		}
+
+		return NextResponse.json(await response.json(), { status: 200 });
+	} catch {
 		return NextResponse.json(
-			{
-				message: error.message || "사용자 정보 수정 실패",
-			},
-			{ status: 500 }
+			{ message: "사용자 정보 수정 실패" },
+			{ status: 502 }
 		);
 	}
 }

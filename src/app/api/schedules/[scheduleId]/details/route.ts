@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/config/auth";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -18,20 +16,11 @@ export async function GET(
 			);
 		}
 
-		// 세션에서 토큰 가져오기 (있으면 포함, 없으면 null)
-		const session = await getServerSession(authOptions);
-		const token = session?.accessToken;
-
 		const backendUrl = `${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/schedules/${scheduleId}/details`;
 
 		const headers: HeadersInit = {
 			"Content-Type": "application/json",
 		};
-
-		// 토큰이 있으면 Authorization 헤더 추가
-		if (token) {
-			headers.Authorization = `Bearer ${token}`;
-		}
 
 		const backendResponse = await fetch(backendUrl, {
 			method: "GET",

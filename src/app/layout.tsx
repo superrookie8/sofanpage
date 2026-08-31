@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import Script from "next/script"; // Import Script from next
 import "./globals.css";
 import Providers from "@/components/providers/sessionProvider";
-import { authOptions } from "@/config/auth";
 import { getServerSession } from "next-auth";
+import { getMissingAuthEnvironmentKeys } from "@/features/auth/server/authEnvironment";
 import ScriptProvider from "@/utils/scriptProvider";
 import ClientWrapper from "@/shared/ui/clientWrapper";
 import Header from "@/shared/ui/header";
@@ -51,6 +51,8 @@ export const metadata: Metadata = {
 	},
 };
 
+let hasReportedMissingAuthConfiguration = false;
+
 export default async function RootLayout({
 	children,
 }: {
@@ -58,12 +60,22 @@ export default async function RootLayout({
 }) {
 	// 세션 에러 처리 추가 - JWT 복호화 실패 시에도 앱이 계속 작동하도록
 	let session = null;
+	const missingAuthKeys = getMissingAuthEnvironmentKeys(process.env);
 
-	// NEXTAUTH_SECRET이 없으면 세션을 가져오지 않음
-	if (!process.env.NEXTAUTH_SECRET && process.env.NODE_ENV === "production") {
-		console.warn("NEXTAUTH_SECRET is not set. Session will not be available.");
+	// 인증 설정 오류가 공개 페이지 전체를 500으로 만들지 않도록 세션만 비활성화한다.
+	// NextAuth API route는 동일한 설정을 엄격하게 검증하므로 로그인은 fail closed다.
+	if (missingAuthKeys.length > 0) {
+		if (!hasReportedMissingAuthConfiguration) {
+			console.error(
+				`Authentication is unavailable. Missing configuration: ${missingAuthKeys.join(
+					", "
+				)}`
+			);
+			hasReportedMissingAuthConfiguration = true;
+		}
 	} else {
 		try {
+			const { authOptions } = await import("@/config/auth");
 			session = await getServerSession(authOptions);
 		} catch (error: any) {
 			// JWT 복호화 실패 시 세션을 null로 처리
@@ -79,7 +91,7 @@ export default async function RootLayout({
 	}
 
 	return (
-		<html lang="en">
+		<html lang="ko">
 			{/* Google Tag Manager Script */}
 			<Script
 				async

@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { useSession, signOut } from "next-auth/react";
+import { ARCADE_NAV_ITEM } from "@/features/arcade/config";
 
 const Header: React.FC = () => {
 	const pathname = usePathname();
@@ -93,43 +94,29 @@ const Header: React.FC = () => {
 						<Link href="/events" className={linkStyle("/events")}>
 							이벤트
 						</Link>
-						<Link href="/arcade" className={linkStyle("/arcade")}>
-							아케이드
+						<Link
+							href={ARCADE_NAV_ITEM.href}
+							className={linkStyle(ARCADE_NAV_ITEM.href)}
+						>
+							{ARCADE_NAV_ITEM.label}
 						</Link>
 						<Link href="/schedule" className={linkStyle("/schedule")}>
 							경기스케줄
 						</Link>
 
 						{!isLoggedIn && (
-							<>
-								<Link href="/diary/read" className={linkStyle("/diary")}>
-									직관일지
-								</Link>
-								<Link href="/login" className={linkStyle("/login")}>
-									로그인
-								</Link>
-								<Link href="/signup" className={linkStyle("/signup")}>
-									회원가입
-								</Link>
-							</>
+							<Link href="/login" className={linkStyle("/login")}>
+								로그인
+							</Link>
 						)}
 
 						{isLoggedIn && (
-							<>
-								<Link href="/diary/read" className={linkStyle("/diary")}>
-									직관일지
-								</Link>
-								{/* <Link href="/mypage" className={linkStyle("/mypage")}>
-									마이페이지
-								</Link> */}
-
-								<button
-									onClick={handleLogout}
-									className="px-2 py-1 rounded hover:bg-red-200 active:bg-red-600 focus:outline-none"
-								>
-									로그아웃
-								</button>
-							</>
+							<button
+								onClick={handleLogout}
+								className="px-2 py-1 rounded hover:bg-red-200 active:bg-red-600 focus:outline-none"
+							>
+								로그아웃
+							</button>
 						)}
 					</div>
 					<div className="lg:hidden static ml-auto ">
@@ -179,13 +166,13 @@ const Header: React.FC = () => {
 							이벤트
 						</Link>
 						<Link
-							href="/arcade"
+							href={ARCADE_NAV_ITEM.href}
 							className={`${mobileLinkStyle(
-								"/arcade"
+								ARCADE_NAV_ITEM.href
 							)} hover:bg-red-200 active:bg-red-600`}
 							onClick={toggleMenu}
 						>
-							아케이드
+							{ARCADE_NAV_ITEM.label}
 						</Link>
 						<Link
 							href="/schedule"
@@ -198,66 +185,26 @@ const Header: React.FC = () => {
 						</Link>
 
 						{!isLoggedIn && (
-							<>
-								<Link
-									href="/diary/read"
-									className={`${mobileLinkStyle(
-										"/diary"
-									)} hover:bg-red-200 active:bg-red-600`}
-									onClick={toggleMenu}
-								>
-									직관일지
-								</Link>
-								<Link
-									href="/login"
-									className={`${mobileLinkStyle(
-										"/login"
-									)} hover:bg-red-200 active:bg-red-600`}
-									onClick={toggleMenu}
-								>
-									로그인
-								</Link>
-								<Link
-									href="/signup"
-									className={`${mobileLinkStyle(
-										"/signup"
-									)} hover:bg-red-200 active:bg-red-600`}
-									onClick={toggleMenu}
-								>
-									회원가입
-								</Link>
-							</>
+							<Link
+								href="/login"
+								className={`${mobileLinkStyle(
+									"/login"
+								)} hover:bg-red-200 active:bg-red-600`}
+								onClick={toggleMenu}
+							>
+								로그인
+							</Link>
 						)}
 						{isLoggedIn && (
-							<>
-								<Link
-									href="/diary/read"
-									className={`${mobileLinkStyle(
-										"/diary"
-									)} hover:bg-red-200 active:bg-red-600`}
-									onClick={toggleMenu}
-								>
-									직관일지
-								</Link>
-								<Link
-									href="/mypage"
-									className={`${mobileLinkStyle(
-										"/mypage"
-									)} hover:bg-red-200 active:bg-red-600`}
-									onClick={toggleMenu}
-								>
-									마이페이지
-								</Link>
-								<button
-									onClick={() => {
-										handleLogout();
-										toggleMenu();
-									}}
-									className="py-1 rounded hover:bg-red-200 active:bg-red-600 focus:outline-none w-full "
-								>
-									로그아웃
-								</button>
-							</>
+							<button
+								onClick={() => {
+									handleLogout();
+									toggleMenu();
+								}}
+								className="py-1 rounded hover:bg-red-200 active:bg-red-600 focus:outline-none w-full "
+							>
+								로그아웃
+							</button>
 						)}
 					</div>
 				</div>

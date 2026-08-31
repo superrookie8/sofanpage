@@ -1,15 +1,35 @@
-FROM node:20.11.1
+FROM node:20-alpine AS base
 
-WORKDIR /
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+ENV NEXT_TELEMETRY_DISABLED=1
 
-COPY package.json package-lock.json ./
+RUN corepack enable
 
-RUN npm ci
+FROM base AS dependencies
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
-COPY . . 
+FROM base AS builder
+WORKDIR /app
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY . .
+RUN pnpm build
 
-RUN npm run build 
+FROM base AS runner
+WORKDIR /app
+ENV NODE_ENV=production
 
+RUN addgroup --system --gid 1001 nodejs \
+	&& adduser --system --uid 1001 nextjs
+
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+
+USER nextjs
 EXPOSE 3000
-
-CMD [ "npm", "start" ]
+ENV PORT=3000
+CMD ["pnpm", "start"]

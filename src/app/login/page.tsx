@@ -1,19 +1,22 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { signIn, useSession } from "next-auth/react";
-import EyeIcon from "@/icons/eyeicon";
+import { useRouter, useSearchParams } from "next/navigation";
+import { getSafeCallbackUrl } from "@/features/auth/safeCallbackUrl";
 
-interface ValidationState {
-	message: string;
-	color: string;
-}
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+	OAuthSignin: "Google 로그인을 시작하지 못했습니다.",
+	OAuthCallback: "Google 로그인 응답을 확인하지 못했습니다.",
+	OAuthAccountNotLinked: "이미 다른 로그인 방식으로 등록된 계정입니다.",
+	AccessDenied: "Google 로그인이 취소되었거나 승인되지 않았습니다.",
+	Configuration: "로그인 설정을 확인하고 있습니다. 잠시 후 다시 시도해주세요.",
+};
 
 const Spinner = () => (
 	<svg
-		className="animate-spin h-5 w-5 text-white"
-		xmlns="http://www.w3.org/2000/svg"
+		aria-hidden="true"
+		className="h-5 w-5 animate-spin"
 		fill="none"
 		viewBox="0 0 24 24"
 	>
@@ -24,274 +27,100 @@ const Spinner = () => (
 			r="10"
 			stroke="currentColor"
 			strokeWidth="4"
-		></circle>
+		/>
 		<path
 			className="opacity-75"
 			fill="currentColor"
-			d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-		></path>
+			d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4zm2 5.29A7.96 7.96 0 014 12H0c0 3.04 1.14 5.82 3 7.94l3-2.65z"
+		/>
 	</svg>
 );
 
-const Login: React.FC = () => {
+export default function LoginPage() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const callbackUrl = searchParams.get("callbackUrl");
-	const { data: session } = useSession();
-	const [message, setMessage] = useState("");
-	const [emailMessage, setEmailMessage] = useState<ValidationState>({
-		message: "",
-		color: "red",
-	});
-	const [showPassword, setShowPassword] = useState<boolean>(false);
-	const [email, setEmail] = useState<string>("");
-	const [password, setPassword] = useState<string>("");
-	const [passwordValid, setPasswordValid] = useState<ValidationState>({
-		message: "",
-		color: "black",
-	});
-	const [formValid, setFormValid] = useState(false);
+	const { data: session, status } = useSession();
 	const [isLoading, setIsLoading] = useState(false);
-
-	// 로그인 상태 체크 및 리다이렉트
-	useEffect(() => {
-		if (session) {
-			// callbackUrl이 있으면 해당 경로로, 없으면 홈으로
-			const redirectUrl = callbackUrl || "/home";
-			router.push(redirectUrl);
-		}
-	}, [session, router, callbackUrl]);
-
-	const checkFormValid = useCallback(() => {
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		return emailRegex.test(email) && password.trim() !== "";
-	}, [email, password]);
+	const callbackUrl = getSafeCallbackUrl(searchParams.get("callbackUrl"));
+	const authError = searchParams.get("error");
 
 	useEffect(() => {
-		setFormValid(checkFormValid());
-	}, [email, password, checkFormValid]);
-
-	const togglePasswordVisibility = () => {
-		setShowPassword(!showPassword);
-	};
-
-	const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const { value } = event.target;
-		setEmail(value);
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (!value.trim()) {
-			setEmailMessage({ message: "이메일을 입력해주세요", color: "red" });
-		} else if (!emailRegex.test(value)) {
-			setEmailMessage({
-				message: "올바른 이메일 형식이 아닙니다",
-				color: "red",
-			});
-		} else {
-			setEmailMessage({ message: "", color: "red" });
+		if (status === "authenticated" && session) {
+			router.replace(callbackUrl);
 		}
-		setFormValid(checkFormValid());
-	};
+	}, [callbackUrl, router, session, status]);
 
-	const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const { value } = event.target;
-		setPassword(value);
-		setFormValid(checkFormValid());
-		if (!value.trim()) {
-			setPasswordValid({
-				message: "비밀번호를 입력해주세요",
-				color: "red",
-			});
-		} else {
-			setPasswordValid({ message: "", color: "black" });
-		}
-	};
-
-	const LoginHandler = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		if (!formValid) return;
+	const handleGoogleLogin = async () => {
 		setIsLoading(true);
-		setMessage("");
-
 		try {
-			const result = await signIn("credentials", {
-				email,
-				password,
-				redirect: false,
-			});
-
-			if (result?.error) {
-				setMessage("이메일 또는 비밀번호가 올바르지 않습니다.");
-			} else if (result?.ok) {
-				// 모바일 사파리에서 세션 쿠키가 제대로 설정되도록
-				// router.refresh()로 세션을 강제로 새로고침한 후 리다이렉트
-				router.refresh();
-				// callbackUrl이 있으면 해당 경로로, 없으면 홈으로
-				const redirectUrl = callbackUrl || "/home";
-				// 모바일 사파리 호환성을 위해 window.location.href 사용
-				window.location.href = redirectUrl;
-			}
-		} catch (error) {
-			console.error("Login error:", error);
-			setMessage("로그인 중 오류가 발생했습니다.");
-		} finally {
+			await signIn("google", { callbackUrl });
+		} catch {
 			setIsLoading(false);
 		}
 	};
 
-	const handleGoogleLogin = () => {
-		// callbackUrl이 있으면 해당 경로로, 없으면 홈으로
-		const redirectUrl = callbackUrl || "/home";
-		signIn("google", { callbackUrl: redirectUrl });
-	};
-
 	return (
-		<div className="w-full h-screen flex flex-col justify-center items-center p-4 overflow-y-hidden">
-			<div className="w-full max-w-[500px] h-[60px] bg-red-500 flex justify-center items-center relative rounded-tl-md rounded-tr-md text-xl font-bold text-white z-10">
-				SUPER SOHEE
-			</div>
-
-			<form
-				onSubmit={LoginHandler}
-				className="relative w-full max-w-[500px] bg-red-200 flex flex-col justify-center items-center rounded-bl-md rounded-br-md p-4"
-			>
-				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
-					<div className="relative w-full max-w-[400px]">
-						<input
-							className="pl-3 pr-20 w-full h-[40px] bg-white border border-gray-300 focus:outline-none focus:border-transparent rounded-md"
-							type="email"
-							name="email"
-							value={email || ""}
-							onChange={handleEmailChange}
-							placeholder="이메일"
-							autoComplete="email"
-							style={{
-								fontFamily:
-									'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-								wordBreak: "keep-all",
-								WebkitTextSizeAdjust: "100%",
-								textSizeAdjust: "100%",
-								fontSize: "16px",
-								touchAction: "manipulation",
-							}}
-						></input>
-						<div
-							className="w-full mt-2"
-							style={{
-								fontSize: "10px",
-								color: emailMessage.color,
-								fontFamily:
-									'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-								wordBreak: "keep-all",
-								WebkitTextSizeAdjust: "100%",
-								textSizeAdjust: "100%",
-							}}
-						>
-							{emailMessage.message}
-						</div>
-					</div>
+		<main className="flex min-h-[calc(100vh-72px)] w-full items-center justify-center p-4">
+			<section className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-xl">
+				<div className="bg-red-500 px-6 py-5 text-center text-xl font-bold text-white">
+					SUPER SOHEE
 				</div>
-				<div className="w-full h-auto flex flex-col justify-center items-center p-4">
-					<div className="relative w-full max-w-[400px] flex justify-center items-center">
-						<input
-							className="pl-3 pr-20 w-full h-[40px] bg-white border border-gray-300 focus:outline-none focus:border-transparent rounded-md"
-							type={showPassword ? "text" : "password"}
-							name="password"
-							value={password || ""}
-							onChange={handlePasswordChange}
-							autoComplete="current-password"
-							placeholder="비밀번호"
-							style={{
-								fontFamily:
-									'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-								wordBreak: "keep-all",
-								WebkitTextSizeAdjust: "100%",
-								textSizeAdjust: "100%",
-								fontSize: "16px",
-								touchAction: "manipulation",
-							}}
-						/>
+				<div className="flex flex-col items-center gap-6 px-6 py-10">
+					<div className="text-center">
+						<h1 className="text-xl font-semibold text-gray-900">소셜 로그인</h1>
+					</div>
+
+					{authError && (
+						<p role="alert" className="text-center text-sm text-red-600">
+							{AUTH_ERROR_MESSAGES[authError] ||
+								"로그인을 완료하지 못했습니다. 다시 시도해주세요."}
+						</p>
+					)}
+
+					<div className="w-full max-w-sm space-y-3">
 						<button
-							onClick={togglePasswordVisibility}
-							className="absolute right-0 top-0 bottom-0 px-3 flex items-center"
-							aria-label="password visibility"
 							type="button"
+							onClick={handleGoogleLogin}
+							disabled={isLoading || status === "loading"}
+							className="flex h-12 w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
 						>
-							<EyeIcon visible={showPassword} size="24" color="black" />
+							{isLoading ? (
+								<Spinner />
+							) : (
+								<svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24">
+									<path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+									<path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+									<path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+									<path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+								</svg>
+							)}
+							<span>{isLoading ? "Google로 이동 중..." : "Google로 로그인"}</span>
+						</button>
+
+						<button
+							type="button"
+							disabled
+							aria-disabled="true"
+							className="flex h-12 w-full cursor-not-allowed items-center justify-between rounded-lg bg-[#03C75A] px-4 text-sm font-medium text-white opacity-60"
+						>
+							<span aria-hidden="true" className="text-lg font-black">N</span>
+							<span>네이버로 로그인</span>
+							<span className="rounded-full bg-white/25 px-2 py-1 text-xs">준비 중</span>
+						</button>
+
+						<button
+							type="button"
+							disabled
+							aria-disabled="true"
+							className="flex h-12 w-full cursor-not-allowed items-center justify-between rounded-lg bg-[#FEE500] px-4 text-sm font-medium text-[#191919] opacity-60"
+						>
+							<span aria-hidden="true" className="text-lg">●</span>
+							<span>카카오로 로그인</span>
+							<span className="rounded-full bg-black/10 px-2 py-1 text-xs">준비 중</span>
 						</button>
 					</div>
-					<div
-						className="w-full mt-2 ml-10"
-						style={{
-							fontSize: "10px",
-							color: passwordValid.color,
-							fontFamily:
-								'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-							wordBreak: "keep-all",
-							WebkitTextSizeAdjust: "100%",
-							textSizeAdjust: "100%",
-						}}
-					>
-						{passwordValid.message}
-					</div>
-					{message && (
-						<div
-							className="w-full mt-2 text-red-600 ml-[36px]"
-							style={{
-								fontSize: "12px",
-								fontFamily:
-									'GmarketSansMedium, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-							}}
-						>
-							{message}
-						</div>
-					)}
 				</div>
-				<div className="relative w-full h-[50px] flex justify-center items-center mt-4 ">
-					<button
-						type="submit"
-						className={`w-[100px] h-[40px] flex justify-center items-center mr-4 rounded-md text-sm hover:cursor-pointer ${
-							formValid ? "bg-red-500 text-white " : "bg-gray-300 text-gray-500"
-						}`}
-						disabled={!formValid || isLoading}
-					>
-						{isLoading ? <Spinner /> : "로그인하기"}
-					</button>
-					<button
-						onClick={() => {
-							router.push("/signup");
-						}}
-						className="w-[100px] h-[40px] bg-red-300 flex justify-center items-center ml-4 rounded-md text-sm text-white hover:cursor-pointer"
-					>
-						회원가입하기
-					</button>
-				</div>
-				<button
-					onClick={handleGoogleLogin}
-					className="mt-4 px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2 text-sm"
-				>
-					<svg className="w-5 h-5" viewBox="0 0 24 24">
-						<path
-							fill="#4285F4"
-							d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-						/>
-						<path
-							fill="#34A853"
-							d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-						/>
-						<path
-							fill="#FBBC05"
-							d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-						/>
-						<path
-							fill="#EA4335"
-							d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-						/>
-					</svg>
-					Google로 로그인
-				</button>
-			</form>
-		</div>
+			</section>
+		</main>
 	);
-};
-
-export default Login;
+}

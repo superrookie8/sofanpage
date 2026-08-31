@@ -47,7 +47,7 @@ const DiaryPhotoUpload: React.FC<DiaryPhotoUploadProps> = ({
 				const formData = new FormData();
 				formData.append("file", file);
 
-				if (!session?.accessToken) {
+				if (!session) {
 					alert("로그인이 필요합니다.");
 					setUploading(false);
 					return;
@@ -58,7 +58,7 @@ const DiaryPhotoUpload: React.FC<DiaryPhotoUploadProps> = ({
 				console.log("File size:", file.size, "bytes");
 				console.log("File type:", file.type);
 
-				// clientAxiosService를 사용하면 인터셉터가 자동으로 토큰 추가
+				// 인증은 브라우저 Authorization이 아니라 HttpOnly session cookie로 처리
 				const response = await clientAxiosService.upload("/api/images/upload", formData);
 
 				// 디버깅: 응답 상태 확인

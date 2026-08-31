@@ -8,19 +8,9 @@ import {
 
 // 클라이언트 사이드 인터셉터 설정
 export const setupClientInterceptors = (instance: AxiosInstance) => {
-	// Request 인터셉터 - Next-Auth 세션에서 토큰 가져오기
+	// Backend token은 HttpOnly NextAuth cookie 안에만 두며 브라우저에 노출하지 않는다.
 	instance.interceptors.request.use(
-		async (config: InternalAxiosRequestConfig) => {
-			if (typeof window !== "undefined") {
-				const { getSession } = await import("next-auth/react");
-				const session = await getSession();
-
-				if (session?.accessToken && config.headers) {
-					config.headers.Authorization = `Bearer ${session.accessToken}`;
-				}
-			}
-			return config;
-		},
+		(config: InternalAxiosRequestConfig) => config,
 		(error: AxiosError) => {
 			return Promise.reject(error);
 		},
@@ -45,18 +35,8 @@ export const setupClientInterceptors = (instance: AxiosInstance) => {
 				originalRequest._retry = true;
 
 				if (typeof window !== "undefined") {
-					const { getSession, signOut } = await import("next-auth/react");
-					const session = await getSession();
-
-					// 401 에러는 토큰 만료 또는 인증 실패를 의미하므로 로그아웃 처리
-					if (!session || !session.accessToken) {
-						console.warn("401 error: No valid session, signing out");
-						await signOut({ redirect: true, callbackUrl: "/login" });
-					} else {
-						// 세션이 있어도 401이면 백엔드 토큰이 만료된 것으로 간주하고 로그아웃
-						console.warn("401 error: Token expired, signing out");
-						await signOut({ redirect: true, callbackUrl: "/login" });
-					}
+					const { signOut } = await import("next-auth/react");
+					await signOut({ redirect: true, callbackUrl: "/login" });
 				}
 			}
 

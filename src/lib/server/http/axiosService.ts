@@ -2,8 +2,6 @@
 
 // src/lib/server/http/axiosService.ts
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/config/auth";
 import axiosFactory from "@/lib/infra/http/axiosFactory";
 
 class ServerAxiosService {
@@ -11,15 +9,14 @@ class ServerAxiosService {
 
 	private async getInstance(): Promise<AxiosInstance> {
 		if (!this.instance) {
-			this.instance = axiosFactory.createServerInstance(async () => {
-				const session = await getServerSession(authOptions);
-				return session?.accessToken || null;
-			});
+			// 공개 BFF는 인증정보를 전달하지 않는다. 보호 BFF는 NextRequest로
+			// 검증한 backend token을 명시적으로 전달해야 한다.
+			this.instance = axiosFactory.createServerInstance(async () => null);
 		}
 		return this.instance;
 	}
 
-	/** 요청마다 토큰 지정 (BFF에서 클라이언트 Authorization 전달 시) */
+	/** 보호 BFF가 암호화된 NextAuth cookie에서 복호화한 token만 지정한다. */
 	private async getInstanceWithToken(
 		token: string
 	): Promise<AxiosInstance> {

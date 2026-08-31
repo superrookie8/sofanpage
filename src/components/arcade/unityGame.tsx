@@ -1,7 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Unity, useUnityContext } from "react-unity-webgl";
 import clientAxiosService from "@/lib/client/http/axiosService";
 import { useSession } from "next-auth/react";
+import {
+	ARCADE_API_BASE_PATH,
+	ARCADE_UNITY_BUILD,
+} from "@/features/arcade/config";
 
 // API 응답 타입 정의
 interface ScoreResponse {
@@ -32,10 +36,7 @@ const UnityGame: React.FC = () => {
 
 	// Unity WebGL 빌드를 불러오는 useUnityContext 훅 사용
 	const unityContext = useUnityContext({
-		loaderUrl: "/Build/sohee_run_2nd.loader.js",
-		dataUrl: "/Build/sohee_run_2nd.data",
-		frameworkUrl: "/Build/sohee_run_2nd.framework.js", // '.br' 확장자 없이 사용
-		codeUrl: "/Build/sohee_run_2nd.wasm", // '.br' 확장자 없이 사용
+		...ARCADE_UNITY_BUILD,
 		streamingAssetsUrl: "StreamingAssets",
 		companyName: "MyCompany",
 		productName: "MyProduct",
@@ -49,11 +50,8 @@ const UnityGame: React.FC = () => {
 		value?: string | number,
 	) => void;
 
-	// API Base URL
-	const API_BASE_URL = `/api/arcade`;
-
 	// 백엔드 API 호출: 점수 제출
-	const submitScoreToBackend = async (
+	const submitScoreToBackend = useCallback(async (
 		score: number,
 	): Promise<ScoreResponse | null> => {
 		if (!isAuthenticated) {
@@ -63,7 +61,7 @@ const UnityGame: React.FC = () => {
 
 		try {
 			const response = await clientAxiosService.post<ScoreResponse>(
-				`${API_BASE_URL}/score`,
+				`${ARCADE_API_BASE_PATH}/score`,
 				{ score },
 			);
 
@@ -83,17 +81,17 @@ const UnityGame: React.FC = () => {
 			}
 			return null;
 		}
-	};
+	}, [isAuthenticated, sendMessage]);
 
 	// 백엔드 API 호출: 내 최고 점수 조회
-	const getMyBestScore = async (): Promise<ScoreResponse | null> => {
+	const getMyBestScore = useCallback(async (): Promise<ScoreResponse | null> => {
 		if (!isAuthenticated) {
 			return null;
 		}
 
 		try {
 			const response = await clientAxiosService.get<ScoreResponse>(
-				`${API_BASE_URL}/my-score`,
+				`${ARCADE_API_BASE_PATH}/my-score`,
 			);
 			return response.data;
 		} catch (error: any) {
@@ -105,16 +103,16 @@ const UnityGame: React.FC = () => {
 			}
 			return null;
 		}
-	};
+	}, [isAuthenticated]);
 
 	// 백엔드 API 호출: 랭킹 조회
-	const getRanking = async (
+	const getRanking = useCallback(async (
 		limit?: number,
 	): Promise<RankingResponse | null> => {
 		try {
 			const url = limit
-				? `${API_BASE_URL}/ranking?limit=${limit}`
-				: `${API_BASE_URL}/ranking`;
+				? `${ARCADE_API_BASE_PATH}/ranking?limit=${limit}`
+				: `${ARCADE_API_BASE_PATH}/ranking`;
 
 			const response = await clientAxiosService.get<RankingResponse>(url);
 			return response.data;
@@ -122,7 +120,7 @@ const UnityGame: React.FC = () => {
 			console.error("랭킹 조회 중 오류:", error);
 			return null;
 		}
-	};
+	}, []);
 
 	// Unity에서 호출할 함수들 (전역으로 등록)
 	useEffect(() => {
@@ -196,7 +194,7 @@ const UnityGame: React.FC = () => {
 			delete (window as any).requestMyBestScore;
 			delete (window as any).requestRanking;
 		};
-	}, [isLoaded, sendMessage]);
+	}, [getMyBestScore, getRanking, isLoaded, sendMessage, submitScoreToBackend]);
 
 	// 게임 로드 시 최고 점수 자동 불러오기
 	useEffect(() => {
@@ -218,7 +216,7 @@ const UnityGame: React.FC = () => {
 		};
 
 		loadInitialBestScore();
-	}, [isLoaded, sendMessage]);
+	}, [getMyBestScore, isLoaded, sendMessage]);
 
 	return (
 		<div>

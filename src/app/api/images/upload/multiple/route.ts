@@ -1,34 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getRequestAccessToken } from "@/lib/server/http/getRequestAccessToken";
 
-export async function POST(req: NextRequest) {
-	const token = req.headers.get("Authorization")?.split(" ")[1];
-
+export async function POST(request: NextRequest) {
+	const token = await getRequestAccessToken(request);
 	if (!token) {
 		return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 	}
 
 	try {
-		const formData = await req.formData();
+		const formData = await request.formData();
 		const response = await fetch(
 			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/images/upload/multiple`,
 			{
 				method: "POST",
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
+				headers: { Authorization: `Bearer ${token}` },
 				body: formData,
+				cache: "no-store",
 			}
 		);
 
 		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.message || "Failed to upload images");
+			return NextResponse.json(
+				{ message: "Failed to upload images" },
+				{ status: response.status }
+			);
 		}
 
-		const data = await response.json();
-		return NextResponse.json(data, { status: 200 });
-	} catch (error: any) {
-		return NextResponse.json({ message: error.message }, { status: 500 });
+		return NextResponse.json(await response.json(), { status: 200 });
+	} catch {
+		return NextResponse.json(
+			{ message: "Failed to upload images" },
+			{ status: 502 }
+		);
 	}
 }
-
