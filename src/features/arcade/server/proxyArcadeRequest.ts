@@ -1,7 +1,10 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { getAuthEnvironment } from "@/config/auth";
-import { readFetchResponseAsText } from "@/lib/server/http/readFetchResponse";
+import {
+	BackendApiConfigurationError,
+	resolveBackendApiUrl,
+} from "../../../lib/server/http/backendApi";
+import { readFetchResponseAsText } from "../../../lib/server/http/readFetchResponse";
 
 interface ArcadeProxyOptions {
 	request: NextRequest;
@@ -9,6 +12,8 @@ interface ArcadeProxyOptions {
 	method?: "GET" | "POST";
 	accessToken?: string | null;
 	body?: unknown;
+	environment?: Record<string, string | undefined>;
+	fetchImplementation?: typeof fetch;
 }
 
 export async function proxyArcadeRequest({
@@ -17,12 +22,25 @@ export async function proxyArcadeRequest({
 	method = "GET",
 	accessToken,
 	body,
+	environment = process.env,
+	fetchImplementation = fetch,
 }: ArcadeProxyOptions) {
-	const backendUrl = new URL(path, `${getAuthEnvironment().backendApiUrl}/`);
-	backendUrl.search = request.nextUrl.search;
+	let backendUrl: URL;
+	try {
+		backendUrl = new URL(path, `${resolveBackendApiUrl(environment)}/`);
+		backendUrl.search = request.nextUrl.search;
+	} catch (error) {
+		if (error instanceof BackendApiConfigurationError) {
+			return NextResponse.json(
+				{ message: "Backend API is not configured" },
+				{ status: 500 }
+			);
+		}
+		throw error;
+	}
 
 	try {
-		const response = await fetch(backendUrl, {
+		const response = await fetchImplementation(backendUrl, {
 			method,
 			headers: {
 				Accept: "application/json",
@@ -39,6 +57,7 @@ export async function proxyArcadeRequest({
 		return new NextResponse(responseBody || null, {
 			status: response.status,
 			headers: {
+				"Cache-Control": "no-store",
 				"Content-Type":
 					response.headers.get("content-type") || "application/json; charset=utf-8",
 			},
