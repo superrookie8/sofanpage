@@ -49,7 +49,7 @@ export default function LatestNewsSection() {
 	}
 
 	if (articles.length === 0) {
-		return <EmptyState title="표시할 기사가 없어요" />;
+		return <EmptyState illustration="white" title="표시할 기사가 없어요" />;
 	}
 
 	return (

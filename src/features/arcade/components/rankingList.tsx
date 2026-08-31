@@ -28,6 +28,7 @@ export default function RankingList() {
 		return (
 			<EmptyState
 				dark
+				illustration="red"
 				title="아직 기록이 없어요"
 				description="첫 번째 랭커가 되어보세요"
 			/>

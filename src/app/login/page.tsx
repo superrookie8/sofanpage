@@ -6,6 +6,7 @@ import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getSafeCallbackUrl } from "@/features/auth/safeCallbackUrl";
 import { cn } from "@/shared/ui/cn";
+import { CHIBI } from "@/shared/ui/chibi";
 
 const AUTH_ERROR_MESSAGES: Record<string, string> = {
 	OAuthSignin: "로그인을 시작하지 못했습니다.",
@@ -125,11 +126,11 @@ function LoginContent() {
 			<div className="flex flex-col justify-center px-6 py-10 lg:px-10">
 				<div className="text-center lg:text-left">
 					<Image
-						src="/images/leesohee.png"
+						src={CHIBI.no6}
 						alt=""
-						width={88}
-						height={88}
-						className="mx-auto h-[88px] w-auto lg:hidden"
+						width={112}
+						height={112}
+						className="mx-auto h-28 w-auto lg:hidden"
 					/>
 					<p className="mt-3 font-display text-[22px] text-ink-900 lg:hidden">
 						SUPER SOHEE

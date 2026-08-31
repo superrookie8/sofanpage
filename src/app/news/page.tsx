@@ -114,6 +114,7 @@ export default function NewsPage() {
 				<CardSkeletonList count={5} />
 			) : stream.length === 0 ? (
 				<EmptyState
+					illustration="white"
 					title="기사가 없어요"
 					description="다른 출처를 선택해보세요"
 				/>

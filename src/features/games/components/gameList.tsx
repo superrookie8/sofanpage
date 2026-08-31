@@ -41,7 +41,7 @@ export default function GameList({
 	}, [schedules]);
 
 	if (grouped.length === 0) {
-		return <EmptyState title="표시할 경기가 없어요" />;
+		return <EmptyState illustration="black" title="표시할 경기가 없어요" />;
 	}
 
 	return (

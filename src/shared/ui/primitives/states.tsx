@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Button from "./button";
+import { CHIBI, type ChibiKey } from "../chibi";
 import { cn } from "../cn";
 
 export interface EmptyStateProps {
@@ -8,6 +9,8 @@ export interface EmptyStateProps {
 	actionLabel?: string;
 	onAction?: () => void;
 	dark?: boolean;
+	/** 상황에 맞는 치비 일러스트. 기본값은 홈 유니폼 정면. */
+	illustration?: ChibiKey;
 	className?: string;
 }
 
@@ -18,6 +21,7 @@ export function EmptyState({
 	actionLabel,
 	onAction,
 	dark,
+	illustration = "red",
 	className,
 }: EmptyStateProps) {
 	return (
@@ -29,11 +33,11 @@ export function EmptyState({
 			)}
 		>
 			<Image
-				src="/images/leesohee.png"
+				src={CHIBI[illustration]}
 				alt=""
-				width={72}
-				height={72}
-				className="mx-auto h-[72px] w-auto"
+				width={96}
+				height={96}
+				className="mx-auto h-24 w-auto"
 			/>
 			<p
 				className={cn(
@@ -60,6 +64,8 @@ export interface ErrorStateProps {
 	description?: string;
 	onRetry?: () => void;
 	dark?: boolean;
+	/** 기본은 눈물 일러스트. */
+	illustration?: ChibiKey;
 	className?: string;
 }
 
@@ -68,6 +74,7 @@ export function ErrorState({
 	description = "잠시 후 다시 시도해주세요",
 	onRetry,
 	dark,
+	illustration = "tears",
 	className,
 }: ErrorStateProps) {
 	return (
@@ -79,9 +86,13 @@ export function ErrorState({
 				className
 			)}
 		>
-			<div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-brand-50 text-[20px] font-extrabold text-brand-700">
-				!
-			</div>
+			<Image
+				src={CHIBI[illustration]}
+				alt=""
+				width={96}
+				height={96}
+				className="mx-auto h-24 w-auto"
+			/>
 			<p
 				className={cn(
 					"mt-2.5 text-[14px] font-semibold",

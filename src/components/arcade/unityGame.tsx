@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect } from "react";
 import Image from "next/image";
+import { CHIBI } from "@/shared/ui/chibi";
 import { Unity, useUnityContext } from "react-unity-webgl";
 import clientAxiosService from "@/lib/client/http/axiosService";
 import { useSession } from "next-auth/react";
@@ -249,11 +250,11 @@ const UnityGame: React.FC = () => {
 					{!isLoaded && (
 						<div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-ink-900 px-6">
 							<Image
-								src="/images/leesohee.png"
+								src={CHIBI.shotWhite}
 								alt=""
-								width={96}
-								height={96}
-								className="h-24 w-auto"
+								width={120}
+								height={120}
+								className="h-28 w-auto"
 							/>
 							<div
 								className="h-1.5 w-full max-w-[200px] overflow-hidden rounded-full bg-ink-700"

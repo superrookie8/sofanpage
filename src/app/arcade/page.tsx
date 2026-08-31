@@ -1,5 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import PageHeader from "@/shared/ui/primitives/pageHeader";
@@ -9,6 +10,7 @@ import Chip from "@/shared/ui/primitives/chip";
 import { Skeleton } from "@/shared/ui/primitives/skeleton";
 import RankingList from "@/features/arcade/components/rankingList";
 import { useMyArcadeScoreQuery } from "@/features/mypage/queries";
+import { CHIBI } from "@/shared/ui/chibi";
 
 const UnityGame = dynamic(() => import("@/components/arcade/unityGame"), {
 	ssr: false,
@@ -52,7 +54,15 @@ export default function ArcadePage() {
 							</div>
 						</>
 					) : (
-						<div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+						<div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
+							<Image
+								src={CHIBI.shotBlack}
+								alt=""
+								width={160}
+								height={160}
+								className="h-40 w-auto"
+								priority
+							/>
 							<p className="text-h2 text-white">준비되셨나요?</p>
 							<p className="max-w-[36ch] text-sm-lg text-ink-300">
 								세로 화면에 맞춰 만든 러닝 게임입니다.

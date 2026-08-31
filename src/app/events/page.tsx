@@ -41,7 +41,7 @@ export default function EventsPage() {
 			) : isError ? (
 				<ErrorState dark onRetry={() => refetch()} />
 			) : events.length === 0 ? (
-				<EmptyState dark title="공개된 이벤트가 없어요" />
+				<EmptyState dark illustration="red" title="공개된 이벤트가 없어요" />
 			) : (
 				<div className="grid gap-4 md:grid-cols-2">
 					{events.map((event) => {

@@ -11,6 +11,7 @@ import Button from "@/shared/ui/primitives/button";
 import { Skeleton } from "@/shared/ui/primitives/skeleton";
 import { ErrorState } from "@/shared/ui/primitives/states";
 import { isMvpDisabledPage } from "@/features/mvp/accessPolicy";
+import { CHIBI } from "@/shared/ui/chibi";
 import {
 	useMyArcadeScoreQuery,
 	useUserInfoQuery,
@@ -92,7 +93,7 @@ export default function MyPage() {
 						/>
 					) : (
 						<Image
-							src="/images/leesohee.png"
+							src={CHIBI.red}
 							alt=""
 							fill
 							sizes="64px"

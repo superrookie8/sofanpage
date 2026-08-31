@@ -44,6 +44,7 @@ export default function NextGameSection() {
 	if (!nextGame) {
 		return (
 			<EmptyState
+				illustration="black"
 				title="예정된 경기가 없어요"
 				description="다음 일정이 공개되면 여기에 표시됩니다"
 			/>
