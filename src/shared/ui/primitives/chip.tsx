@@ -1,10 +1,22 @@
 import { cn } from "../cn";
 
-type ChipTone = "default" | "selected" | "win" | "lose" | "home" | "away";
+type ChipTone =
+	| "default"
+	| "selected"
+	| "dark"
+	| "inverse"
+	| "win"
+	| "lose"
+	| "home"
+	| "away";
 
 const TONE: Record<ChipTone, string> = {
 	default: "border border-ink-200 bg-white text-ink-700 font-medium",
 	selected: "border border-brand-500 bg-brand-500 text-white font-bold",
+	// 다크 셸 위 기본 칩
+	dark: "border border-ink-700 bg-surface-dark text-ink-300 font-medium",
+	// 밝은 배경 위 반전 칩 (등번호 등)
+	inverse: "border border-ink-900 bg-ink-900 text-white font-bold",
 	win: "bg-win/[.12] text-win font-bold",
 	lose: "bg-ink-100 text-ink-500 font-semibold",
 	home: "bg-brand-50 text-brand-700 font-semibold",

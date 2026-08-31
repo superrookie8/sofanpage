@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useProfileQuery } from "@/features/profile/queries";
 import { Skeleton } from "@/shared/ui/primitives/skeleton";
+import { ErrorState } from "@/shared/ui/primitives/states";
 import Chip from "@/shared/ui/primitives/chip";
 
 const HERO_IMAGE = "/images/2026-27_profile.JPG";
@@ -12,7 +13,7 @@ function MetaChips({ profile }: { profile: { team: string; position: string; hei
 			<Chip>{profile.team}</Chip>
 			<Chip>{profile.position}</Chip>
 			<Chip>{profile.height}</Chip>
-			<Chip className="bg-ink-900 font-display text-white border-ink-900">
+			<Chip tone="inverse" className="font-display">
 				#{profile.jerseyNumber}
 			</Chip>
 		</div>
@@ -24,15 +25,21 @@ function MetaChips({ profile }: { profile: { team: string; position: string; hei
  * 데스크톱: 좌 사진 카드 / 우 이름·등번호 2컬럼.
  */
 export default function Hero() {
-	const { data: profile, isLoading } = useProfileQuery();
+	const { data: profile, isLoading, isError, refetch } = useProfileQuery();
 
-	if (isLoading || !profile) {
+	if (isLoading) {
 		return (
 			<>
 				<Skeleton className="-mx-4 h-[470px] rounded-none lg:hidden" />
 				<Skeleton className="hidden h-[560px] rounded-lg lg:block" />
 			</>
 		);
+	}
+
+	// 로딩이 끝났는데 프로필이 없으면(에러/빈 응답) 스켈레톤에 갇히지 않도록
+	// 명시적으로 에러 상태를 보여주고 재시도 경로를 준다.
+	if (isError || !profile) {
+		return <ErrorState onRetry={() => refetch()} />;
 	}
 
 	const meta = {

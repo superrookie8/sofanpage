@@ -1,13 +1,23 @@
 import { forwardRef } from "react";
 import { cn } from "../cn";
 
-type Variant = "primary" | "secondary" | "ghost" | "danger";
+type Variant =
+	| "primary"
+	| "secondary"
+	| "secondaryDark"
+	| "ghost"
+	| "danger";
 type Size = "sm" | "md" | "lg";
 
 const VARIANT: Record<Variant, string> = {
 	primary: "bg-brand-500 text-white font-bold hover:bg-brand-600",
 	secondary:
 		"bg-white text-ink-700 font-semibold border border-ink-200 hover:bg-ink-50",
+	// 다크 셸(이벤트·아케이드) 위의 secondary.
+	// className으로 색을 덮으면 Tailwind의 CSS 생성 순서 때문에 기본 variant에
+	// 밀릴 수 있어, 전용 variant로 분리한다.
+	secondaryDark:
+		"bg-transparent text-ink-300 font-semibold border border-ink-700 hover:bg-white/10",
 	ghost: "bg-transparent text-brand-700 font-semibold hover:bg-brand-50",
 	danger:
 		"bg-brand-50 text-brand-700 font-bold border border-brand-200 hover:bg-brand-100",

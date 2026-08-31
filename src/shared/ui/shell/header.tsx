@@ -153,25 +153,19 @@ export default function Header() {
 				<div className="ml-auto hidden items-center lg:flex lg:ml-0">
 					{isLoggedIn ? (
 						<Button
-							variant="secondary"
+							variant={dark ? "secondaryDark" : "secondary"}
 							size="sm"
 							onClick={handleLogout}
-							className={cn(
-								"lg:h-9 lg:px-4 lg:text-[14px]",
-								dark && "bg-transparent border-ink-700 text-ink-300 hover:bg-white/5"
-							)}
+							className="lg:h-9 lg:px-4 lg:text-[14px]"
 						>
 							로그아웃
 						</Button>
 					) : (
 						<Link href="/login">
 							<Button
-								variant="secondary"
+								variant={dark ? "secondaryDark" : "secondary"}
 								size="sm"
-								className={cn(
-									"lg:h-9 lg:px-4 lg:text-[14px]",
-									dark && "bg-transparent border-ink-700 text-ink-300 hover:bg-white/5"
-								)}
+								className="lg:h-9 lg:px-4 lg:text-[14px]"
 							>
 								로그인
 							</Button>

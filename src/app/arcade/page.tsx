@@ -33,7 +33,7 @@ export default function ArcadePage() {
 				title="달려라 슈퍼소히"
 				description="100코인 모으면 천재.."
 				action={
-					<Chip className="border-ink-700 bg-surface-dark text-ink-300">
+					<Chip tone="dark">
 						세로형 게임
 					</Chip>
 				}

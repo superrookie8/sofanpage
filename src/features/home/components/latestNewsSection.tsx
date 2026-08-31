@@ -3,16 +3,27 @@ import Link from "next/link";
 import { useJumpballNewsQuery, useLatestNewsQuery } from "@/features/news/queries";
 import NewsCard from "@/shared/ui/primitives/newsCard";
 import { CardSkeletonList } from "@/shared/ui/primitives/skeleton";
-import { EmptyState } from "@/shared/ui/primitives/states";
+import { EmptyState, ErrorState } from "@/shared/ui/primitives/states";
 import { formatRelativeTime } from "@/shared/lib/datetime";
 import type { Article } from "@/features/news/types";
 
 /** 홈의 "최신 소식" — 뉴스 3건 요약 + 더보기. */
 export default function LatestNewsSection() {
-	const { data: latest, isLoading: latestLoading } = useLatestNewsQuery();
-	const { data: jumpball, isLoading: jumpballLoading } = useJumpballNewsQuery(1, 3);
+	const {
+		data: latest,
+		isLoading: latestLoading,
+		isError: latestError,
+		refetch: refetchLatest,
+	} = useLatestNewsQuery();
+	const {
+		data: jumpball,
+		isLoading: jumpballLoading,
+		isError: jumpballError,
+		refetch: refetchJumpball,
+	} = useJumpballNewsQuery(1, 3);
 
 	const isLoading = latestLoading || jumpballLoading;
+	const isError = latestError && jumpballError;
 
 	const articles: Article[] = [];
 	if (latest?.main_article) articles.push(latest.main_article);
@@ -24,6 +35,17 @@ export default function LatestNewsSection() {
 
 	if (isLoading) {
 		return <CardSkeletonList count={3} />;
+	}
+
+	if (isError) {
+		return (
+			<ErrorState
+				onRetry={() => {
+					refetchLatest();
+					refetchJumpball();
+				}}
+			/>
+		);
 	}
 
 	if (articles.length === 0) {

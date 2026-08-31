@@ -5,7 +5,7 @@ import { useSchedulesByDateRangeQuery } from "@/features/games/queries";
 import { findNextGame, matchupLabel } from "@/features/games/nextGame";
 import GameCard from "@/shared/ui/primitives/gameCard";
 import { Skeleton } from "@/shared/ui/primitives/skeleton";
-import { EmptyState } from "@/shared/ui/primitives/states";
+import { EmptyState, ErrorState } from "@/shared/ui/primitives/states";
 import {
 	formatCountdown,
 	formatMonthDay,
@@ -28,11 +28,17 @@ export default function NextGameSection() {
 		return { start: isoDate(now), end: isoDate(later) };
 	}, []);
 
-	const { data, isLoading } = useSchedulesByDateRangeQuery(start, end);
+	const { data, isLoading, isError, refetch } =
+		useSchedulesByDateRangeQuery(start, end);
 	const nextGame = useMemo(() => findNextGame(data ?? []), [data]);
 
 	if (isLoading) {
 		return <Skeleton className="h-[86px] rounded-md" />;
+	}
+
+	// 조회 실패를 "예정 경기 없음"으로 표시하면 사용자가 오해한다.
+	if (isError) {
+		return <ErrorState onRetry={() => refetch()} />;
 	}
 
 	if (!nextGame) {
