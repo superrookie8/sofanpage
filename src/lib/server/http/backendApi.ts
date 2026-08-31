@@ -1,8 +1,8 @@
-const BACKEND_URL_KEYS = [
-	"BACKEND_API_URL",
-	"BACKAPI_URL",
-	"NEXT_PUBLIC_BACKAPI_URL",
-] as const;
+/**
+ * 서버 전용 키만 허용한다. `NEXT_PUBLIC_` 접두사가 붙은 값은 Next.js가 클라이언트
+ * 번들에 인라인하므로 백엔드 origin이 브라우저에 노출된다.
+ */
+const BACKEND_URL_KEYS = ["BACKEND_API_URL", "BACKAPI_URL"] as const;
 
 export class BackendApiConfigurationError extends Error {
 	constructor(message: string) {

@@ -1,4 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
+import { resolveBackendApiUrl } from "@/lib/server/http/backendApi";
 
 export async function GET(req: NextRequest) {
 	try {
@@ -7,7 +8,7 @@ export async function GET(req: NextRequest) {
 		const limit = searchParams.get("limit") || "10";
 
 		const res = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/articles/rookie?page=${page}&limit=${limit}`,
+			`${resolveBackendApiUrl()}/api/articles/rookie?page=${page}&limit=${limit}`,
 			{
 				cache: "no-store",
 			}

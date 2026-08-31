@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { resolveBackendApiUrl } from "@/lib/server/http/backendApi";
 
 export async function GET(req: NextRequest) {
 	try {
@@ -6,7 +7,7 @@ export async function GET(req: NextRequest) {
 		const nickname = searchParams.get("nickname");
 
 		// 기본 URL 설정
-		let url = `${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/user_stats`;
+		let url = `${resolveBackendApiUrl()}/api/user_stats`;
 
 		// nickname이 있을 경우에만 쿼리 파라미터에 추가
 		if (nickname) {

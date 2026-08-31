@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { resolveBackendApiUrl } from "@/lib/server/http/backendApi";
 import {
 	decodeStadiumPathParam,
 	encodeStadiumPathParam,
@@ -9,13 +10,7 @@ export async function GET(
 	{ params }: { params: Promise<{ stadiumId: string }> }
 ) {
 	try {
-		const backApiUrl = process.env.NEXT_PUBLIC_BACKAPI_URL;
-		if (!backApiUrl) {
-			return NextResponse.json(
-				{ message: "NEXT_PUBLIC_BACKAPI_URL이 설정되지 않았습니다" },
-				{ status: 500 }
-			);
-		}
+		const backApiUrl = resolveBackendApiUrl();
 
 		const { stadiumId: rawParam } = await params;
 		const encodedStadiumName = encodeStadiumPathParam(

@@ -12,13 +12,6 @@ export async function GET(
 	{ params }: { params: Promise<{ stadiumId: string }> }
 ) {
 	try {
-		if (!process.env.NEXT_PUBLIC_BACKAPI_URL) {
-			return NextResponse.json(
-				{ message: "NEXT_PUBLIC_BACKAPI_URL이 설정되지 않았습니다" },
-				{ status: 500 }
-			);
-		}
-
 		const { stadiumId: rawParam } = await params;
 		const stadiumKey = encodeStadiumPathParam(decodeStadiumPathParam(rawParam));
 		const path = `/api/stadiums/${stadiumKey}/seats/hierarchy`;

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import serverAxiosService from "@/lib/server/http/axiosService";
+import { resolveBackendApiUrl } from "@/lib/server/http/backendApi";
 
 // GET: 방명록 목록 조회
 export async function GET(req: NextRequest) {
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
 	try {
 		const formData = await req.formData();
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/post_guestbook`,
+			`${resolveBackendApiUrl()}/api/post_guestbook`,
 			{
 				method: "POST",
 				body: formData,

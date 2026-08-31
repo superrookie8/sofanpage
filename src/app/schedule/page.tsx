@@ -18,7 +18,7 @@ function isoDate(date: Date) {
 }
 
 export default function SchedulePage() {
-	const [view, setView] = useState<ViewMode>("list");
+	const [view, setView] = useState<ViewMode>("calendar");
 	const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(
 		null
 	);
@@ -81,7 +81,7 @@ export default function SchedulePage() {
 					onSelect={(scheduleId) => setSelectedScheduleId(scheduleId)}
 				/>
 			) : (
-				<div className="rounded-md border border-ink-200 bg-white p-2 lg:p-4">
+				<div>
 					<Suspense
 						fallback={
 							<div className="flex h-[600px] items-center justify-center text-ink-500">

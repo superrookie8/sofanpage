@@ -22,7 +22,7 @@ export const useSchedulesByDateRangeQuery = (
 	enabled: boolean = true
 ) => {
 	return useQuery({
-		queryKey: queryKeys.games.schedulesByDateRange(start),
+		queryKey: queryKeys.games.schedulesByDateRange(start, end),
 		queryFn: () => fetchSchedulesByDateRange(start, end),
 		enabled: enabled && !!start,
 		staleTime: 1000 * 60 * 5, // 5분간 캐시

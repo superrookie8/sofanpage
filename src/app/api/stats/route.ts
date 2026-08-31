@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { resolveBackendApiUrl } from "@/lib/server/http/backendApi";
 
 export async function GET(req: NextRequest) {
 	try {
 		const backendResponse = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/playerstat/all`,
+			`${resolveBackendApiUrl()}/api/playerstat/all`,
 			{
 				method: "GET",
 				headers: {

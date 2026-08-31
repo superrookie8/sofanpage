@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getRequestAccessToken } from "@/lib/server/http/getRequestAccessToken";
+import { resolveBackendApiUrl } from "@/lib/server/http/backendApi";
 
 function isHtmlResponse(contentType: string, body: string) {
 	const normalizedBody = body.trim().toLowerCase();
@@ -27,8 +28,10 @@ export async function POST(request: NextRequest) {
 		);
 	}
 
-	const backendBaseUrl = process.env.NEXT_PUBLIC_BACKAPI_URL;
-	if (!backendBaseUrl) {
+	let backendBaseUrl: string;
+	try {
+		backendBaseUrl = resolveBackendApiUrl();
+	} catch {
 		return NextResponse.json(
 			{ message: "Image service is not configured" },
 			{ status: 503 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import serverAxiosService from "@/lib/server/http/axiosService";
 import { getRequestAccessToken } from "@/lib/server/http/getRequestAccessToken";
+import { resolveBackendApiUrl } from "@/lib/server/http/backendApi";
 
 export async function GET(request: NextRequest) {
 	const token = await getRequestAccessToken(request);
@@ -32,7 +33,7 @@ export async function PUT(request: NextRequest) {
 	try {
 		const formData = await request.formData();
 		const response = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/put/userinfo`,
+			`${resolveBackendApiUrl()}/api/put/userinfo`,
 			{
 				method: "PUT",
 				headers: { Authorization: `Bearer ${token}` },

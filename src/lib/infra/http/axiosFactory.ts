@@ -1,25 +1,17 @@
 // src/lib/infra/http/axiosFactory.ts
 import axios, { AxiosInstance } from "axios";
-import { axiosConfig, clientAxiosConfig } from "@/config/http/axiosConfig";
-import {
-	setupClientInterceptors,
-	setupServerInterceptors,
-} from "@/config/http/axiosInterceptors";
+import { clientAxiosConfig } from "@/config/http/axiosConfig";
+import { setupClientInterceptors } from "@/config/http/axiosInterceptors";
 
+/**
+ * 클라이언트 전용 factory. 서버 인스턴스는 백엔드 origin을 알아야 하므로
+ * `@/lib/server/http/serverAxiosFactory`에 분리되어 있다. 두 경로를 한 모듈에
+ * 두면 클라이언트 번들이 서버 설정까지 끌어와 백엔드 주소가 노출된다.
+ */
 export default class axiosFactory {
-	// 클라이언트 사이드 인스턴스 생성
 	static createClientInstance(): AxiosInstance {
 		const instance = axios.create(clientAxiosConfig);
 		setupClientInterceptors(instance);
-		return instance;
-	}
-
-	// 서버 사이드 인스턴스 생성
-	static createServerInstance(
-		getToken: () => Promise<string | null>
-	): AxiosInstance {
-		const instance = axios.create(axiosConfig);
-		setupServerInterceptors(instance, getToken);
 		return instance;
 	}
 

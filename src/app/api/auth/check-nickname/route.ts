@@ -1,5 +1,6 @@
 // src/app/api/auth/check-nickname/route.ts
 import { NextRequest, NextResponse } from "next/server";
+import { resolveBackendApiUrl } from "@/lib/server/http/backendApi";
 
 export async function POST(request: NextRequest) {
 	try {
@@ -7,7 +8,7 @@ export async function POST(request: NextRequest) {
 		const nickname = requestBody.nickname;
 
 		const flaskResponse = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/nickname_check`,
+			`${resolveBackendApiUrl()}/api/nickname_check`,
 			{
 				method: "POST",
 				headers: {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { resolveBackendApiUrl } from "@/lib/server/http/backendApi";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -16,7 +17,7 @@ export async function GET(
 			);
 		}
 
-		const backendUrl = `${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/schedules/${scheduleId}/details`;
+		const backendUrl = `${resolveBackendApiUrl()}/api/schedules/${scheduleId}/details`;
 
 		const headers: HeadersInit = {
 			"Content-Type": "application/json",

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { resolveBackendApiUrl } from "@/lib/server/http/backendApi";
 
 // GET: 프로필 정보 조회 (공개 정보)
 export async function GET(req: NextRequest) {
@@ -7,7 +8,7 @@ export async function GET(req: NextRequest) {
 		const nickname = searchParams.get("nickname");
 
 		const backendResponse = await fetch(
-			`${process.env.NEXT_PUBLIC_BACKAPI_URL}/api/player${
+			`${resolveBackendApiUrl()}/api/player${
 				nickname ? `?nickname=${nickname}` : ""
 			}`,
 			{

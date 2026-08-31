@@ -7,27 +7,6 @@ interface EventDetailProps {
 	loadingDetails: boolean;
 }
 
-const getButtonText = (title: string) => {
-	// "데뷔 5주년", "6주년" 등의 패턴을 찾아서 버튼 텍스트 생성
-	const yearMatch = title.match(/(\d+)주년/);
-	if (yearMatch) {
-		return `데뷔 ${yearMatch[1]}주년 이벤트 사이트`;
-	}
-	return "이벤트 사이트";
-};
-
-const getEventUrl = (title: string, originalUrl?: string) => {
-	// 제목에서 주년 정보 추출
-	const yearMatch = title.match(/(\d+)주년/);
-	if (yearMatch) {
-		const year = yearMatch[1];
-		// 5주년이면 /events/5th, 6주년이면 /events/6th
-		return `/events/${year}th`;
-	}
-	// 주년 정보가 없으면 원래 URL 사용
-	return originalUrl || "#";
-};
-
 const EventDetail: React.FC<EventDetailProps> = ({
 	eventDetails,
 	loadingDetails,
@@ -48,7 +27,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
 		);
 	}
 
-	const buttonUrl = getEventUrl(eventDetails.title, eventDetails.url);
+	const buttonUrl = eventDetails.url;
 
 	return (
 		<div className="lg:w-2/3">
@@ -57,10 +36,10 @@ const EventDetail: React.FC<EventDetailProps> = ({
 				{eventDetails.description}
 			</div>
 			<div className="flex justify-center items-center">
-				{buttonUrl !== "#" && (
+				{buttonUrl && (
 					<Link href={buttonUrl}>
 						<button className="w-auto bg-red-500 text-white font-bold py-2 px-4 rounded">
-							{getButtonText(eventDetails.title)}
+							이벤트 사이트
 						</button>
 					</Link>
 				)}

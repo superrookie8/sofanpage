@@ -1,13 +1,9 @@
-import { NextRequest } from "next/server";
-import { proxyBackendRequest } from "@/lib/server/http/backendApi";
+import { NextResponse } from "next/server";
 
-export async function GET(
-	req: NextRequest,
-	{ params }: { params: Promise<{ eventId: string }> }
-) {
-	const { eventId } = await params;
-	return proxyBackendRequest({
-		path: `/api/events/${encodeURIComponent(eventId)}`,
-		requestUrl: req.url,
-	});
+/** 사진은 이벤트 상세 응답의 `photos` presigned URL 배열에서 제공한다. */
+export async function GET() {
+	return NextResponse.json(
+		{ message: "Event photos are available from /api/events/{eventId}." },
+		{ status: 410 }
+	);
 }

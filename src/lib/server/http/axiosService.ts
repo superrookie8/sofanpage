@@ -2,7 +2,7 @@
 
 // src/lib/server/http/axiosService.ts
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import axiosFactory from "@/lib/infra/http/axiosFactory";
+import { createServerAxiosInstance } from "./serverAxiosFactory";
 
 class ServerAxiosService {
 	private instance: AxiosInstance | null = null;
@@ -11,7 +11,7 @@ class ServerAxiosService {
 		if (!this.instance) {
 			// 공개 BFF는 인증정보를 전달하지 않는다. 보호 BFF는 NextRequest로
 			// 검증한 backend token을 명시적으로 전달해야 한다.
-			this.instance = axiosFactory.createServerInstance(async () => null);
+			this.instance = createServerAxiosInstance(async () => null);
 		}
 		return this.instance;
 	}
@@ -20,7 +20,7 @@ class ServerAxiosService {
 	private async getInstanceWithToken(
 		token: string
 	): Promise<AxiosInstance> {
-		return axiosFactory.createServerInstance(async () => token);
+		return createServerAxiosInstance(async () => token);
 	}
 
 	async get<T = any>(
