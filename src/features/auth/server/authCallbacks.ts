@@ -1,12 +1,22 @@
 import type { Account, Session } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import { getSafeCallbackUrl } from "../safeCallbackUrl";
-import type { GoogleExchangeResult } from "./googleExchange";
+import type {
+	GoogleExchangeResult,
+	IdentityProvider,
+} from "./googleExchange";
 import { GoogleExchangeError } from "./googleExchange";
 
 export type GoogleIdentityExchange = (
+	provider: IdentityProvider,
 	idToken: string
 ) => Promise<GoogleExchangeResult>;
+
+/**
+ * 백엔드 exchange endpoint가 있는 provider만 받는다. 새 provider를 NextAuth에
+ * 추가해도 여기 등록하지 않으면 로그인이 통과하지 못한다(의도된 fail-closed).
+ */
+const SUPPORTED_PROVIDERS = new Set<string>(["google", "kakao"]);
 
 export function createJwtCallback(exchangeIdentity: GoogleIdentityExchange) {
 	return async ({
@@ -17,11 +27,14 @@ export function createJwtCallback(exchangeIdentity: GoogleIdentityExchange) {
 		account?: Account | null;
 	}): Promise<JWT> => {
 		if (account) {
-			if (account.provider !== "google" || !account.id_token) {
+			if (!SUPPORTED_PROVIDERS.has(account.provider) || !account.id_token) {
 				throw new GoogleExchangeError("Unsupported or incomplete OAuth response");
 			}
 
-			const exchange = await exchangeIdentity(account.id_token);
+			const exchange = await exchangeIdentity(
+				account.provider as IdentityProvider,
+				account.id_token
+			);
 			return {
 				...token,
 				backendAccessToken: exchange.backendAccessToken,
