@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import PageHeader from "@/shared/ui/primitives/pageHeader";
 import Card from "@/shared/ui/primitives/card";
 import StatCard from "@/shared/ui/primitives/statCard";
@@ -16,6 +16,7 @@ import {
 	useMyArcadeScoreQuery,
 	useUserInfoQuery,
 } from "@/features/mypage/queries";
+import ProfileEditSheet from "@/features/mypage/components/profileEditSheet";
 
 function joinedLabel(createdAt?: string) {
 	if (!createdAt) return null;
@@ -35,6 +36,7 @@ export default function MyPage() {
 
 	const userInfo = useUserInfoQuery(isAuthenticated);
 	const arcadeScore = useMyArcadeScoreQuery(isAuthenticated);
+	const [editing, setEditing] = useState(false);
 
 	useEffect(() => {
 		if (status === "unauthenticated") {
@@ -105,7 +107,18 @@ export default function MyPage() {
 					<p className="truncate text-h2 text-ink-900">{nickname}</p>
 					{joined && <p className="mt-0.5 text-caption text-ink-500">{joined}</p>}
 				</div>
+				<Button variant="secondary" onClick={() => setEditing(true)}>
+					편집
+				</Button>
 			</Card>
+
+			{userInfo.data && (
+				<ProfileEditSheet
+					open={editing}
+					onClose={() => setEditing(false)}
+					user={userInfo.data}
+				/>
+			)}
 
 			<section className="mt-6">
 				<h2 className="mb-3 text-h2">활동</h2>

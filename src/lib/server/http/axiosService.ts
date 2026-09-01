@@ -61,9 +61,12 @@ class ServerAxiosService {
 	async patch<T = any>(
 		url: string,
 		data?: any,
-		config?: AxiosRequestConfig
+		config?: AxiosRequestConfig,
+		token?: string
 	): Promise<AxiosResponse<T>> {
-		const instance = await this.getInstance();
+		const instance = token
+			? await this.getInstanceWithToken(token)
+			: await this.getInstance();
 		return instance.patch<T>(url, data, config);
 	}
 

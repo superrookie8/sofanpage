@@ -53,6 +53,30 @@ describe("sanitizeRankingResponse", () => {
 		expect(result.totalCount).toBe(1);
 	});
 
+	// totalCount는 전체 인원이고 rankings는 한 페이지다. 페이지 길이로 덮으면
+	// "5명 중"처럼 총계가 잘린다.
+	it("페이지네이션된 응답의 전체 인원은 유지한다", () => {
+		const page = Array.from({ length: 5 }, (_, index) => ({
+			rank: index + 1,
+			nickname: `팬${index}`,
+			bestScore: 10 - index,
+		}));
+
+		expect(
+			(sanitizeRankingResponse({ rankings: page, totalCount: 100 }) as {
+				totalCount: number;
+			}).totalCount
+		).toBe(100);
+
+		// 그 페이지에서 하나를 걸러내면 전체에서도 하나를 뺀다.
+		expect(
+			(sanitizeRankingResponse({
+				rankings: [...page, { rank: 6, nickname: " ", bestScore: 4 }],
+				totalCount: 100,
+			}) as { totalCount: number }).totalCount
+		).toBe(99);
+	});
+
 	it("닉네임 앞뒤 공백을 정리한다", () => {
 		const result = sanitizeRankingResponse({
 			rankings: [{ rank: 1, nickname: "  팬  ", bestScore: 1 }],
@@ -71,13 +95,18 @@ describe("sanitizeRankingResponse", () => {
 		expect(result[0]).not.toHaveProperty("userId");
 	});
 
-	it("myRank가 객체면 동일하게 정리한다", () => {
-		const result = sanitizeRankingResponse({
-			rankings: [],
-			myRank: { rank: 7, nickname: "나", userId: "me", bestScore: 5 },
-		}) as { myRank: Record<string, unknown> };
+	// 백엔드 RankingResponse.myRank는 Integer다. 객체가 오면 계약 위반이므로
+	// 화면에 합성한 값을 흘리지 않고 null로 떨어뜨린다.
+	it("myRank는 양의 정수만 통과시킨다", () => {
+		const of = (myRank: unknown) =>
+			(sanitizeRankingResponse({ rankings: [], myRank }) as { myRank: unknown })
+				.myRank;
 
-		expect(result.myRank).not.toHaveProperty("userId");
-		expect(result.myRank.nickname).toBe("나");
+		expect(of(7)).toBe(7);
+		expect(of(null)).toBeNull();
+		expect(of(0)).toBeNull();
+		expect(of(-1)).toBeNull();
+		expect(of("7")).toBeNull();
+		expect(of({ rank: 7, nickname: "나", userId: "me" })).toBeNull();
 	});
 });
