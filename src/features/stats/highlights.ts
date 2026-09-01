@@ -10,7 +10,7 @@ function round(value: number) {
 }
 
 /**
- * 홈 상단 StatCard 4장(PPG·APG·3P%·RPG). 델타는 직전 시즌 대비 증감이며,
+ * 홈 상단 StatCard 4장(PPG·APG·3P%·TOT). 델타는 직전 시즌 대비 증감이며,
  * 비교할 시즌이 없으면 null로 두어 표기를 생략한다.
  */
 export function buildHighlights(stats: SeasonStats[]): {
@@ -45,7 +45,7 @@ export function buildHighlights(stats: SeasonStats[]): {
 				delta: delta((s) => s.average["3P%"]),
 			},
 			{
-				label: "RPG",
+				label: "TOT",
 				value: round(current.average.TOT).toFixed(1),
 				delta: delta((s) => s.average.TOT),
 			},
