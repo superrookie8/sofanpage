@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { track } from "@/lib/analytics/events";
 import { usePathname } from "next/navigation";
 import {
 	getBottomTabs,
@@ -30,6 +31,12 @@ export default function BottomNav() {
 						<li key={item.href} className="flex-1">
 							<Link
 								href={item.href}
+								onClick={() =>
+									track("nav_click", {
+										nav_item: item.label,
+										nav_location: "bottom_tab",
+									})
+								}
 								aria-current={active ? "page" : undefined}
 								className={cn(
 									"flex h-full min-h-[44px] flex-col items-center justify-center gap-1 transition-colors",

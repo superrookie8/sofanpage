@@ -11,6 +11,7 @@ import NextGameHighlight from "@/features/games/components/nextGameHighlight";
 import Chip from "@/shared/ui/primitives/chip";
 import { useAllSchedulesQuery } from "@/features/games/queries";
 import { findNextGame } from "@/features/games/nextGame";
+import { track } from "@/lib/analytics/events";
 import {
 	defaultSeason,
 	firstMonthOfSeason,
@@ -66,7 +67,13 @@ export default function SchedulePage() {
 				nextGame && (
 					<NextGameHighlight
 						game={nextGame}
-						onOpenDetail={() => setSelectedScheduleId(nextGame.id)}
+						onOpenDetail={() => {
+							setSelectedScheduleId(nextGame.id);
+							track("game_detail_open", {
+								game_id: nextGame.id,
+								entry_point: "next_game",
+							});
+						}}
 					/>
 				)
 			)}
@@ -81,7 +88,10 @@ export default function SchedulePage() {
 								as="button"
 								tone={value === season ? "selected" : "default"}
 								aria-pressed={value === season}
-								onSelect={() => setSeason(value)}
+								onSelect={() => {
+									setSeason(value);
+									track("schedule_season_change", { season: value });
+								}}
 							>
 								{value}
 							</Chip>
@@ -94,7 +104,10 @@ export default function SchedulePage() {
 				<SegmentedTabs
 					aria-label="일정 보기 방식"
 					value={view}
-					onChange={setView}
+					onChange={(next) => {
+						setView(next);
+						track("schedule_view_change", { view: next });
+					}}
 					options={[
 						{ value: "list", label: "목록" },
 						{ value: "calendar", label: "달력" },
@@ -111,7 +124,13 @@ export default function SchedulePage() {
 			) : isError ? null : view === "list" ? (
 				<GameList
 					schedules={seasonSchedules}
-					onSelect={(scheduleId) => setSelectedScheduleId(scheduleId)}
+					onSelect={(scheduleId) => {
+						setSelectedScheduleId(scheduleId);
+						track("game_detail_open", {
+							game_id: scheduleId,
+							entry_point: "list",
+						});
+					}}
 				/>
 			) : (
 				<div>

@@ -13,6 +13,7 @@ import type { CreateDiaryRequest } from "@/features/diary/types";
 import { getApiErrorMessage } from "@/lib/http/getApiErrorMessage";
 import LoadingSpinner from "@/shared/ui/loadingSpinner";
 import { isAxiosError } from "axios";
+import { track } from "@/lib/analytics/events";
 
 export default function DiaryCreatePage() {
 	const router = useRouter();
@@ -190,6 +191,12 @@ export default function DiaryCreatePage() {
 
 		try {
 			const result = await createDiaryMutation.mutateAsync(request);
+
+			track("diary_submit", {
+				mode: "create",
+				photo_count: photoUrls.length,
+				has_game: true,
+			});
 
 			if (!result || !result.id) {
 				alert(

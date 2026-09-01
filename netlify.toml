@@ -8,5 +8,16 @@
   # 로컬(.nvmrc)·Docker와 같은 메이저로 맞춰 버전 스큐를 없앤다.
   NODE_VERSION = "22"
 
+# GA4 측정 ID.
+#
+# NEXT_PUBLIC_* 은 빌드 시점에 번들로 인라인되므로 런타임이 아니라 빌드 환경에 있어야 한다.
+# 측정 ID는 어차피 클라이언트에 노출되는 값이라 Netlify UI 대신 여기 두어 버전 관리한다.
+#
+# production 컨텍스트에만 둔다. [build.environment]에 두면 Deploy Preview와 브랜치
+# 빌드까지 같은 속성으로 수집돼 운영 데이터가 더러워진다. 프리뷰에서는 값이 없고,
+# 값이 없으면 GA 스크립트 자체가 들어가지 않는다(googleAnalytics.tsx).
+[context.production.environment]
+  NEXT_PUBLIC_GA_ID = "G-FESK7ETCDB"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"

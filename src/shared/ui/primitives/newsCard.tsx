@@ -9,6 +9,8 @@ export interface NewsCardProps {
 	imageUrl?: string | null;
 	/** 데스크톱 3열 그리드용 세로형 */
 	orientation?: "horizontal" | "vertical";
+	/** 외부 기사로 이탈할 때. 계측용이라 링크 동작에는 관여하지 않는다. */
+	onOpen?: () => void;
 	className?: string;
 }
 
@@ -56,6 +58,7 @@ export default function NewsCard({
 	timeLabel,
 	imageUrl,
 	orientation = "horizontal",
+	onOpen,
 	className,
 }: NewsCardProps) {
 	const vertical = orientation === "vertical";
@@ -65,6 +68,7 @@ export default function NewsCard({
 			href={href}
 			target="_blank"
 			rel="noopener noreferrer"
+			onClick={onOpen}
 			className={cn(
 				"group block overflow-hidden rounded-md border border-ink-200 bg-white p-3 transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-raised motion-reduce:hover:translate-y-0",
 				className

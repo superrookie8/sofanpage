@@ -2,12 +2,13 @@
 import React from "react";
 import Image from "next/image";
 import { useProfileQuery } from "../queries";
+import { LoadingIndicator } from "@/shared/ui/loadingSpinner";
 
 const Profile: React.FC = () => {
 	const { data: profile, isLoading, error } = useProfileQuery();
 
 	if (isLoading) {
-		return <div>Loading...</div>;
+		return <LoadingIndicator className="py-10" />;
 	}
 
 	if (error) {

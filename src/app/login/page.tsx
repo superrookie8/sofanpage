@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getSafeCallbackUrl } from "@/features/auth/safeCallbackUrl";
 import { cn } from "@/shared/ui/cn";
 import { CHIBI } from "@/shared/ui/chibi";
+import { track, type AuthMethod } from "@/lib/analytics/events";
 
 const AUTH_ERROR_MESSAGES: Record<string, string> = {
 	OAuthSignin: "로그인을 시작하지 못했습니다.",
@@ -90,6 +91,8 @@ function LoginContent() {
 	}, [callbackUrl, router, session, status]);
 
 	const handleSignIn = async (providerId: string) => {
+		// 프로바이더로 리다이렉트된 뒤라 성공 여부는 여기서 알 수 없다. 시작만 센다.
+		track("login_start", { method: providerId as AuthMethod });
 		setPending(providerId);
 		try {
 			await signIn(providerId, { callbackUrl });

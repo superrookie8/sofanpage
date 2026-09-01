@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react";
 import { ExistingDiaryDialog } from "@/features/diary/editor/components/ExistingDiaryDialog";
 import Sheet from "@/shared/ui/primitives/sheet";
 import Button from "@/shared/ui/primitives/button";
+import { LoadingIndicator } from "@/shared/ui/loadingSpinner";
 import { isMvpDisabledPage } from "@/features/mvp/accessPolicy";
 
 // 타임존 정보가 없는 ISO 문자열을 한국 시간대(KST)로 정규화하는 헬퍼 함수
@@ -151,7 +152,7 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 				<div>
 					{isLoading ? (
 						<div className="flex items-center justify-center h-full min-h-[300px] md:min-h-[500px]">
-							<div className="text-base md:text-lg">로딩 중...</div>
+							<LoadingIndicator label="경기 정보를 불러오는 중" />
 						</div>
 					) : error ? (
 						<div className="flex flex-col items-center justify-center h-full min-h-[300px] md:min-h-[500px]">

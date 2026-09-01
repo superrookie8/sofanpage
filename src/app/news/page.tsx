@@ -4,6 +4,7 @@ import PageHeader from "@/shared/ui/primitives/pageHeader";
 import Chip from "@/shared/ui/primitives/chip";
 import Button from "@/shared/ui/primitives/button";
 import NewsCard from "@/shared/ui/primitives/newsCard";
+import { track } from "@/lib/analytics/events";
 import { CardSkeletonList } from "@/shared/ui/primitives/skeleton";
 import { EmptyState, ErrorState } from "@/shared/ui/primitives/states";
 import FeatureCard from "@/features/news/components/featureCard";
@@ -71,6 +72,7 @@ export default function NewsPage() {
 	const changeSource = (next: Source) => {
 		setSource(next);
 		setPage(1);
+		track("news_source_filter", { source: next });
 	};
 
 	return (
@@ -129,6 +131,12 @@ export default function NewsPage() {
 								source={article.source || "뉴스"}
 								timeLabel={formatRelativeTime(article.publishedAt)}
 								imageUrl={article.imageUrl}
+								onOpen={() =>
+									track("news_article_open", {
+										source: article.source || "뉴스",
+										surface: "news_page",
+									})
+								}
 							/>
 						))}
 					</div>
@@ -137,7 +145,11 @@ export default function NewsPage() {
 						<div className="mt-6 flex justify-center">
 							<Button
 								variant="secondary"
-								onClick={() => setPage((current) => current + 1)}
+								onClick={() => {
+									const next = page + 1;
+									setPage(next);
+									track("news_load_more", { page: next });
+								}}
 							>
 								더 보기
 							</Button>

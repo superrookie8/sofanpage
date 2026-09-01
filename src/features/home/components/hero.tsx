@@ -7,7 +7,15 @@ import Chip from "@/shared/ui/primitives/chip";
 
 const HERO_IMAGE = "/images/2026-27_profile.JPG";
 
-function MetaChips({ profile }: { profile: { team: string; position: string; height: string; jerseyNumber: number } }) {
+type HeroMeta = {
+	team: string;
+	position: string;
+	height: string;
+	jerseyNumber: number;
+	nationalTeamJerseyNumber?: number | null;
+};
+
+function MetaChips({ profile }: { profile: HeroMeta }) {
 	return (
 		<div className="mt-3 flex flex-wrap gap-1.5">
 			<Chip>{profile.team}</Chip>
@@ -16,6 +24,13 @@ function MetaChips({ profile }: { profile: { team: string; position: string; hei
 			<Chip tone="inverse" className="font-display">
 				#{profile.jerseyNumber}
 			</Chip>
+			{/* 국가대표 번호는 등록됐을 때만 노출한다. Anton은 라틴 전용이라 숫자에만 적용. */}
+			{profile.nationalTeamJerseyNumber != null && (
+				<Chip tone="inverse">
+					국가대표
+					<span className="font-display">#{profile.nationalTeamJerseyNumber}</span>
+				</Chip>
+			)}
 		</div>
 	);
 }
@@ -42,11 +57,12 @@ export default function Hero() {
 		return <ErrorState onRetry={() => refetch()} />;
 	}
 
-	const meta = {
+	const meta: HeroMeta = {
 		team: profile.team,
 		position: profile.position,
 		height: profile.height,
 		jerseyNumber: profile.jerseyNumber || 6,
+		nationalTeamJerseyNumber: profile.nationalTeamJerseyNumber,
 	};
 
 	return (

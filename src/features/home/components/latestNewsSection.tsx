@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useJumpballNewsQuery, useLatestNewsQuery } from "@/features/news/queries";
 import NewsCard from "@/shared/ui/primitives/newsCard";
+import { track } from "@/lib/analytics/events";
 import { CardSkeletonList } from "@/shared/ui/primitives/skeleton";
 import { EmptyState, ErrorState } from "@/shared/ui/primitives/states";
 import { formatRelativeTime } from "@/shared/lib/datetime";
@@ -57,6 +58,12 @@ export default function LatestNewsSection() {
 			{articles.slice(0, 3).map((article) => (
 				<NewsCard
 					key={article.id}
+					onOpen={() =>
+						track("news_article_open", {
+							source: article.source || "뉴스",
+							surface: "home",
+						})
+					}
 					href={article.url}
 					title={article.title}
 					source={article.source || "뉴스"}

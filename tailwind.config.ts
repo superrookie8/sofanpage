@@ -134,9 +134,22 @@ const config: Config = {
 					"0%": { backgroundPosition: "-400px 0" },
 					"100%": { backgroundPosition: "400px 0" },
 				},
+				// 로딩 치비가 슛 리듬으로 가볍게 떠오른다.
+				"loader-bob": {
+					"0%, 100%": { transform: "translateY(0)" },
+					"50%": { transform: "translateY(-7px)" },
+				},
+				// 진행률을 모르므로 필을 트랙 밖에서 밖으로 통과시킨다.
+				// 필 폭이 트랙의 1/3이라 -100% -> 300% 가 정확히 한 번 통과다.
+				"loader-bar": {
+					"0%": { transform: "translateX(-100%)" },
+					"100%": { transform: "translateX(300%)" },
+				},
 			},
 			animation: {
 				shimmer: "shimmer 1.4s linear infinite",
+				"loader-bob": "loader-bob 1.6s ease-in-out infinite",
+				"loader-bar": "loader-bar 1.25s cubic-bezier(.65,.05,.36,1) infinite",
 			},
 			backgroundImage: {
 				shimmer:

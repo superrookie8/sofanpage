@@ -11,6 +11,7 @@ import { Skeleton } from "@/shared/ui/primitives/skeleton";
 import RankingList from "@/features/arcade/components/rankingList";
 import { useMyArcadeScoreQuery } from "@/features/mypage/queries";
 import { CHIBI } from "@/shared/ui/chibi";
+import { track } from "@/lib/analytics/events";
 
 const UnityGame = dynamic(() => import("@/components/arcade/unityGame"), {
 	ssr: false,
@@ -48,7 +49,13 @@ export default function ArcadePage() {
 						<>
 							<UnityGame />
 							<div className="mt-4 flex justify-center">
-								<Button variant="secondary" onClick={() => setPlaying(false)}>
+								<Button
+									variant="secondary"
+									onClick={() => {
+										setPlaying(false);
+										track("arcade_exit");
+									}}
+								>
 									게임 끄기
 								</Button>
 							</div>
@@ -68,7 +75,13 @@ export default function ArcadePage() {
 								세로 화면에 맞춰 만든 러닝 게임입니다.
 								{!isAuthenticated && " 로그인하면 점수가 랭킹에 기록돼요."}
 							</p>
-							<Button size="lg" onClick={() => setPlaying(true)}>
+							<Button
+								size="lg"
+								onClick={() => {
+									setPlaying(true);
+									track("arcade_start");
+								}}
+							>
 								시작하기
 							</Button>
 						</div>
