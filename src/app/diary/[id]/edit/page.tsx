@@ -9,7 +9,7 @@ import {
 	diaryEntryToDraft,
 	pickSeatFieldsForRequest,
 } from "@/features/diary/editor/utils";
-import LoadingSpinner from "@/shared/ui/loadingSpinner";
+import { LoadingIndicator } from "@/shared/ui/loadingSpinner";
 import type { DiaryDraft } from "@/features/diary/editor/types";
 import type { CreateDiaryRequest } from "@/features/diary/types";
 import { track } from "@/lib/analytics/events";
@@ -158,7 +158,7 @@ export default function DiaryEditPage() {
 	if (isLoading) {
 		return (
 			<div className="flex items-center justify-center min-h-screen">
-				<LoadingSpinner />
+				<LoadingIndicator />
 			</div>
 		);
 	}

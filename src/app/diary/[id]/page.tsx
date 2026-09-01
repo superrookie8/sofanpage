@@ -3,7 +3,7 @@
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useDiaryQuery } from "@/features/diary/queries";
-import LoadingSpinner from "@/shared/ui/loadingSpinner";
+import { LoadingIndicator } from "@/shared/ui/loadingSpinner";
 import AlertModal from "@/shared/ui/alertModal";
 import { format } from "date-fns";
 import Image from "next/image";
@@ -31,7 +31,7 @@ export default function DiaryDetailPage() {
 	if (isLoading) {
 		return (
 			<div className="flex items-center justify-center min-h-screen">
-				<LoadingSpinner />
+				<LoadingIndicator />
 			</div>
 		);
 	}

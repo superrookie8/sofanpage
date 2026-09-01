@@ -1,7 +1,7 @@
 // components/eventPhotos.tsx
 import { useState } from "react";
 import Image from "next/image";
-import LoadingSpinner from "@/shared/ui/loadingSpinner";
+import { LoadingIndicator } from "@/shared/ui/loadingSpinner";
 
 interface EventPhotosProps {
 	eventId: string;
@@ -81,7 +81,7 @@ const EventPhotos: React.FC<EventPhotosProps> = ({
 
 					{isLoadingMore && (
 						<div className="mt-4 flex flex-col items-center gap-2 p-4 bg-white bg-opacity-70 rounded">
-							<LoadingSpinner />
+							<LoadingIndicator />
 							<span className="text-gray-700">
 								추가 사진을 불러오는 중입니다...
 							</span>
@@ -94,7 +94,7 @@ const EventPhotos: React.FC<EventPhotosProps> = ({
 			)}
 			{/* {loadingPhotos && eventPhotos.length > 0 && (
 				<div className="flex justify-center items-center mt-4">
-					<LoadingSpinner />
+					<LoadingIndicator />
 				</div>
 			)} */}
 		</div>

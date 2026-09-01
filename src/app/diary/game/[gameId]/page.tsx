@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useDiaryCheckByGameIdQuery } from "@/features/diary/queries";
-import LoadingSpinner from "@/shared/ui/loadingSpinner";
+import { LoadingIndicator } from "@/shared/ui/loadingSpinner";
 
 export default function DiaryGameEntryPage() {
 	const params = useParams();
@@ -35,7 +35,7 @@ export default function DiaryGameEntryPage() {
 
 	return (
 		<div className="flex items-center justify-center min-h-screen">
-			<LoadingSpinner />
+			<LoadingIndicator />
 		</div>
 	);
 }
