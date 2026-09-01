@@ -17,9 +17,9 @@ export const CHIBI = {
 	white: "/images/chibi/soheewhite.webp",
 	/** 레드 유니폼, 결연한 표정 — 브랜드/프로필용 */
 	no6: "/images/chibi/no6.webp",
-	/** 슛 동작 (화이트) — 로딩 */
+	/** 슛 동작 (화이트) */
 	shotWhite: "/images/chibi/shot1.webp",
-	/** 슛 동작 (블랙, 공 포함) */
+	/** 슛 동작 (블랙, 공 포함) — 로딩. 밝은 배경에서 대비가 가장 좋다. */
 	shotBlack: "/images/chibi/shot2.webp",
 	/** 눈물 — 에러 상태 */
 	tears: "/images/chibi/winner1.webp",

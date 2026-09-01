@@ -6,6 +6,7 @@ import { where, weather, together, result } from "@/shared/constants";
 import { fetchUserStats } from "@/features/diary/api";
 import UserProfileModal from "@/components/mypage/userProfileModal";
 import AlertModal from "@/shared/ui/alertModal";
+import { LoadingIndicator } from "@/shared/ui/loadingSpinner";
 import Slider from "react-slick";
 import ReactDOM from "react-dom";
 import clientAxiosService from "@/lib/client/http/axiosService";
@@ -224,7 +225,7 @@ const DiaryTabs: React.FC = () => {
 	};
 
 	if (loading) {
-		return <div>Loading...</div>;
+		return <LoadingIndicator className="py-12" />;
 	}
 
 	const handleImageClick = (diary: DiaryEntry, event: React.MouseEvent) => {
