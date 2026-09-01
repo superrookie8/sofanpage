@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
-import { signIn, useSession } from "next-auth/react";
+import { getProviders, signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getSafeCallbackUrl } from "@/features/auth/safeCallbackUrl";
 import { cn } from "@/shared/ui/cn";
@@ -56,14 +56,12 @@ const PROVIDERS = [
 		label: "카카오로 시작하기",
 		className: "bg-kakao text-[rgba(0,0,0,.85)] hover:bg-[#F6DC00]",
 		glyph: <KakaoGlyph />,
-		enabled: false,
 	},
 	{
 		id: "naver",
 		label: "네이버로 시작하기",
 		className: "bg-naver text-white hover:bg-[#02B351]",
 		glyph: <span className="text-[17px] font-black leading-none">N</span>,
-		enabled: false,
 	},
 	{
 		id: "google",
@@ -71,7 +69,6 @@ const PROVIDERS = [
 		className:
 			"bg-white text-ink-700 font-semibold border border-ink-200 hover:bg-ink-50",
 		glyph: <GoogleGlyph />,
-		enabled: true,
 	},
 ] as const;
 
@@ -80,6 +77,27 @@ function LoginContent() {
 	const searchParams = useSearchParams();
 	const { data: session, status } = useSession();
 	const [pending, setPending] = useState<string | null>(null);
+	// 어떤 provider가 살아 있는지는 서버 설정 하나만이 안다. 자격증명이 없으면
+	// NextAuth가 provider를 등록하지 않으므로 여기에도 내려오지 않는다.
+	// 버튼 노출을 별도 플래그로 관리하면 설정과 화면이 어긋난다(PRD §7.4.1 kill switch).
+	const [availableProviders, setAvailableProviders] = useState<Set<string> | null>(
+		null
+	);
+
+	useEffect(() => {
+		let cancelled = false;
+		getProviders()
+			.then((providers) => {
+				if (cancelled) return;
+				setAvailableProviders(new Set(Object.keys(providers ?? {})));
+			})
+			.catch(() => {
+				if (!cancelled) setAvailableProviders(new Set());
+			});
+		return () => {
+			cancelled = true;
+		};
+	}, []);
 
 	const callbackUrl = getSafeCallbackUrl(searchParams.get("callbackUrl"));
 	const authError = searchParams.get("error");
@@ -157,14 +175,16 @@ function LoginContent() {
 				<div className="mt-6 flex flex-col gap-2.5">
 					{PROVIDERS.map((provider) => {
 						const loading = pending === provider.id;
+						// 목록을 받기 전에는 아직 모른다. 잠깐 눌러도 실패하지 않도록 비활성으로 둔다.
+						const enabled = availableProviders?.has(provider.id) ?? false;
 						const disabled =
-							!provider.enabled || loading || status === "loading";
+							!enabled || loading || status === "loading" || !availableProviders;
 
 						return (
 							<button
 								key={provider.id}
 								type="button"
-								onClick={() => provider.enabled && handleSignIn(provider.id)}
+								onClick={() => enabled && handleSignIn(provider.id)}
 								disabled={disabled}
 								aria-disabled={disabled}
 								className={cn(
@@ -175,7 +195,7 @@ function LoginContent() {
 							>
 								{loading ? <Spinner /> : provider.glyph}
 								<span>{provider.label}</span>
-								{!provider.enabled && (
+								{availableProviders && !enabled && (
 									<span className="rounded-full bg-black/10 px-2 py-0.5 text-[11px] font-semibold">
 										준비 중
 									</span>

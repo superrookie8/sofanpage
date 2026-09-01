@@ -11,7 +11,7 @@ import type { DiaryDraft } from "@/features/diary/editor/types";
 import { pickSeatFieldsForRequest } from "@/features/diary/editor/utils";
 import type { CreateDiaryRequest } from "@/features/diary/types";
 import { getApiErrorMessage } from "@/lib/http/getApiErrorMessage";
-import LoadingSpinner from "@/shared/ui/loadingSpinner";
+import { LoadingIndicator } from "@/shared/ui/loadingSpinner";
 import { isAxiosError } from "axios";
 import { track } from "@/lib/analytics/events";
 
@@ -230,7 +230,7 @@ export default function DiaryCreatePage() {
 	if (!urlCheckDone) {
 		return (
 			<div className="flex items-center justify-center min-h-screen">
-				<LoadingSpinner />
+				<LoadingIndicator />
 			</div>
 		);
 	}
