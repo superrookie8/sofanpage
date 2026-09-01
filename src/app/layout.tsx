@@ -1,6 +1,5 @@
 // src/app/layout.tsx
 import type { Metadata } from "next";
-import Script from "next/script"; // Import Script from next
 import "./globals.css";
 import Providers from "@/components/providers/sessionProvider";
 import { getServerSession } from "next-auth";
@@ -11,6 +10,7 @@ import Header from "@/shared/ui/shell/header";
 import BottomNav from "@/shared/ui/shell/bottomNav";
 import { LoadingProvider } from "@/context/LoadingContext";
 import LoadingSpinner from "@/shared/ui/loadingSpinner";
+import GoogleAnalytics from "@/components/analytics/googleAnalytics";
 
 // next-auth(getServerSession)가 headers/cookies를 사용하므로
 // 루트 레이아웃은 정적 프리렌더링(SSG) 대상이 되면 빌드가 실패할 수 있음.
@@ -108,22 +108,9 @@ export default async function RootLayout({
 					rel="stylesheet"
 				/>
 			</head>
-			{/* Google Tag Manager Script */}
-			<Script
-				async
-				src="https://www.googletagmanager.com/gtag/js?id=G-FESK7ETCDB"
-			></Script>
-			<Script id="google-analytics" strategy="afterInteractive">
-				{`
-				  if (typeof window !== 'undefined') {
-				    window.dataLayer = window.dataLayer || [];
-				    function gtag(){dataLayer.push(arguments);}
-				    gtag('config', 'G-FESK7ETCDB');
-				  }
-				`}
-			</Script>
 			<ScriptProvider />
 			<body>
+				<GoogleAnalytics />
 				<Providers session={session}>
 					<LoadingProvider>
 						<LoadingSpinner />

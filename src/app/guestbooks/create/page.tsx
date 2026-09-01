@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import PhotoUpload from "@/shared/ui/photoUpload";
 import useAuth from "@/features/auth/hooks/useAuth";
 import AlertModal from "@/shared/ui/alertModal";
+import { track } from "@/lib/analytics/events";
 
 const GuestBookCreate: React.FC = () => {
 	const user = useAuth();
@@ -69,8 +70,11 @@ const GuestBookCreate: React.FC = () => {
 				throw new Error(errorData.message || "Network response was not ok");
 			}
 
-			const responseData = await response.json();
-			console.log(responseData);
+			await response.json();
+
+			track("guestbook_submit", {
+				has_photo: currentPage === "photoAndText" && Boolean(photo),
+			});
 			setModalMessage("방명록이 성공적으로 추가되었습니다.");
 			setModalOpen(true);
 			// 사진 업로드 후 미리보기 상태 초기화

@@ -12,6 +12,7 @@ import {
 import LoadingSpinner from "@/shared/ui/loadingSpinner";
 import type { DiaryDraft } from "@/features/diary/editor/types";
 import type { CreateDiaryRequest } from "@/features/diary/types";
+import { track } from "@/lib/analytics/events";
 
 export default function DiaryEditPage() {
 	const params = useParams();
@@ -140,6 +141,12 @@ export default function DiaryEditPage() {
 		await updateDiaryMutation.mutateAsync({
 			diaryId,
 			data: request,
+		});
+
+		track("diary_submit", {
+			mode: "edit",
+			photo_count: request.photoUrls?.length ?? 0,
+			has_game: Boolean(request.gameId),
 		});
 		router.push(`/diary/${diaryId}`);
 	};

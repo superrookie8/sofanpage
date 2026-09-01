@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
+import { track } from "@/lib/analytics/events";
 import {
 	getNavItems,
 	isDarkShellPath,
@@ -68,6 +69,7 @@ export default function Header() {
 	}, []);
 
 	const handleLogout = async () => {
+		track("logout");
 		try {
 			// 모바일 사파리에서 next-auth 리다이렉트가 동작하지 않는 경우가 있어
 			// redirect:false + 수동 이동으로 처리한다.
@@ -103,6 +105,12 @@ export default function Header() {
 							<Link
 								key={item.href}
 								href={item.href}
+								onClick={() =>
+									track("nav_click", {
+										nav_item: item.label,
+										nav_location: "header",
+									})
+								}
 								aria-current={active ? "page" : undefined}
 								className={cn(
 									"relative py-1 text-[15px] transition-colors",
@@ -212,6 +220,12 @@ export default function Header() {
 								<li key={item.href}>
 									<Link
 										href={item.href}
+										onClick={() =>
+											track("nav_click", {
+												nav_item: item.label,
+												nav_location: "drawer",
+											})
+										}
 										aria-current={active ? "page" : undefined}
 										className={cn(
 											"flex min-h-[44px] items-center gap-3 rounded-[10px] px-2 text-[15px]",
