@@ -7,6 +7,7 @@ interface ProfileData {
 	team: string;
 	position: string;
 	number: string;
+	nationalNumber: string;
 	height: string;
 	nickname: string;
 	features: string;
@@ -101,7 +102,19 @@ const ProfileForm: React.FC = () => {
 			</div>
 			<div>
 				<label>Number:</label>
-				<input type="number" min="6" max="6" name="number" value={profile.number} onChange={handleChange} />
+				<input type="number" min="0" max="99" name="number" value={profile.number} onChange={handleChange} />
+			</div>
+			<div>
+				<label>National Team Number:</label>
+				<input
+					type="number"
+					min="0"
+					max="99"
+					name="nationalNumber"
+					value={profile.nationalNumber}
+					onChange={handleChange}
+					placeholder="없으면 비워두세요"
+				/>
 			</div>
 			<div>
 				<label>Height:</label>

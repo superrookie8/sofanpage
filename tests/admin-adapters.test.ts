@@ -73,19 +73,31 @@ test("guestbook adapter uses the protected entry photo route without exposing ph
 	assert.equal(value.photo_data, "/api/admin/getguestbookphoto?entry_id=guest%2Fid");
 });
 
-test("profile adapter preserves jersey number and nickname list", () => {
+test("profile adapter preserves jersey numbers and nickname list", () => {
 	const legacy = toLegacyProfile({
 		name: "이소희", team: "부산 BNK 썸", position: "가드", jerseyNumber: 6,
+		nationalTeamJerseyNumber: 9,
 		height: "171cm", nicknames: ["슈퍼소닉", "소히힛"], features: "빠른 스피드",
 		profileImageUrl: "https://example.com/profile.jpg",
 	});
 	assert.equal(legacy.number, "6");
+	assert.equal(legacy.nationalNumber, "9");
 	assert.equal(legacy.nickname, "슈퍼소닉, 소히힛");
 	assert.deepEqual(legacyProfileRequest(legacy), {
 		name: "이소희", team: "부산 BNK 썸", position: "가드", jerseyNumber: 6,
+		nationalTeamJerseyNumber: 9,
 		height: "171cm", nicknames: ["슈퍼소닉", "소히힛"], features: "빠른 스피드",
 		profileImageUrl: "https://example.com/profile.jpg",
 	});
+});
+
+test("profile adapter maps a missing national team number to null, not 0", () => {
+	const legacy = toLegacyProfile({
+		name: "이소희", team: "부산 BNK 썸", position: "가드", jerseyNumber: 6,
+		height: "171cm", nicknames: [], features: "",
+	});
+	assert.equal(legacy.nationalNumber, "");
+	assert.equal(legacyProfileRequest(legacy).nationalTeamJerseyNumber, null);
 });
 
 test("guestbook adapter preserves legacy id, date and optional photo data", () => {

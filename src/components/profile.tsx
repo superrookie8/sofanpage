@@ -5,6 +5,7 @@ interface ProfileData {
 	team: string;
 	position: string;
 	number: string;
+	nationalNumber: string;
 	height: string;
 	nickname: string;
 	features: string;
@@ -53,6 +54,7 @@ const Profile: React.FC = () => {
 			<p className="ml-8 mt-4">Team : {profile.team}</p>
 			<p className="ml-8 mt-4">Position : {profile.position}</p>
 			<p className="ml-8 mt-4">Number : {profile.number}</p>
+			<p className="ml-8 mt-4">National Team Number : {profile.nationalNumber || "-"}</p>
 			<p className="ml-8 mt-4">Height : {profile.height}</p>
 			<p className="ml-8 mt-4">Nickname : {profile.nickname}</p>
 			<p className="ml-8 mt-4">Features : {profile.features}</p>

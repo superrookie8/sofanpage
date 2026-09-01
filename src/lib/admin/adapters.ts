@@ -211,6 +211,7 @@ export type LegacyProfile = {
 	team: string;
 	position: string;
 	number: string;
+	nationalNumber: string;
 	height: string;
 	nickname: string;
 	features: string;
@@ -226,6 +227,10 @@ export function toLegacyProfile(value: Record<string, unknown>): LegacyProfile {
 		team: String(value.team ?? ""),
 		position: String(value.position ?? ""),
 		number: String(value.jerseyNumber ?? ""),
+		nationalNumber:
+			value.nationalTeamJerseyNumber === null || value.nationalTeamJerseyNumber === undefined
+				? ""
+				: String(value.nationalTeamJerseyNumber),
 		height: String(value.height ?? ""),
 		nickname: nicknames.join(", "),
 		features: String(value.features ?? ""),
@@ -234,11 +239,14 @@ export function toLegacyProfile(value: Record<string, unknown>): LegacyProfile {
 }
 
 export function legacyProfileRequest(value: LegacyProfile) {
+	// 빈 입력은 Number("") === 0 으로 뭉개지므로 명시적으로 null 로 보낸다.
+	const nationalNumber = (value.nationalNumber ?? "").trim();
 	return {
 		name: value.name.trim(),
 		team: value.team.trim(),
 		position: value.position.trim(),
 		jerseyNumber: Number(value.number),
+		nationalTeamJerseyNumber: nationalNumber === "" ? null : Number(nationalNumber),
 		height: value.height.trim(),
 		nicknames: value.nickname.split(",").map((item) => item.trim()).filter(Boolean),
 		features: value.features.trim(),
