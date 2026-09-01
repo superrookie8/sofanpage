@@ -2,6 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/react-query/queryKeys";
 import {
+	fetchAllSchedules,
 	fetchGameSchedule,
 	fetchScheduleDetails,
 	fetchSchedulesByDateRange,
@@ -27,6 +28,16 @@ export const useSchedulesByDateRangeQuery = (
 		enabled: enabled && !!start,
 		staleTime: 1000 * 60 * 5, // 5분간 캐시
 		gcTime: 1000 * 60 * 30, // 30분간 유지
+	});
+};
+
+// 시즌 선택용: 활성 스케줄 전체 조회
+export const useAllSchedulesQuery = () => {
+	return useQuery({
+		queryKey: queryKeys.games.allSchedules(),
+		queryFn: fetchAllSchedules,
+		staleTime: 1000 * 60 * 5,
+		gcTime: 1000 * 60 * 30,
 	});
 };
 

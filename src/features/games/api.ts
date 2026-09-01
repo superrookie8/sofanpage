@@ -73,3 +73,25 @@ export const fetchSchedulesByDateRange = async (
 	const data = await response.json();
 	return Array.isArray(data) ? data : [];
 };
+
+/**
+ * 활성 스케줄 전체 조회.
+ *
+ * 예전에는 "오늘 −6개월 ~ +8개월" 창으로 받았는데, 기준이 오늘이라 비시즌에는
+ * 지난 시즌이 통째로 창 밖으로 밀려났다. 시즌 단위로 보여주려면 전체를 받아
+ * 시즌별로 나눈다. 한 시즌이 30경기 안팎이라 양이 크지 않다.
+ */
+export const fetchAllSchedules = async (): Promise<ScheduleResponse[]> => {
+	const response = await fetch("/api/schedules", {
+		method: "GET",
+		cache: "no-store",
+	});
+
+	if (!response.ok) {
+		const errorData = await response.json().catch(() => ({}));
+		throw new Error(errorData.message || "스케줄 조회 실패");
+	}
+
+	const data = await response.json();
+	return Array.isArray(data) ? data : [];
+};

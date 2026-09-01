@@ -42,6 +42,11 @@ interface CalendarProps {
 	syncUrl?: boolean;
 	/** syncUrl이 true일 때 월 변경 시 반영할 경로 (기본: /schedule) */
 	urlPath?: string;
+	/**
+	 * 처음 보여줄 달. 시즌을 고르면 그 시즌의 첫 경기 달에서 시작하도록 넘긴다.
+	 * URL에 year·month가 있으면 그쪽이 우선한다.
+	 */
+	initialMonth?: Date;
 }
 
 const Calendar: React.FC<CalendarProps> = ({
@@ -49,6 +54,7 @@ const Calendar: React.FC<CalendarProps> = ({
 	onGameClick,
 	syncUrl = true,
 	urlPath = "/schedule",
+	initialMonth: requestedMonth,
 }) => {
 	const searchParams = useSearchParams();
 	const router = useRouter();
@@ -57,9 +63,19 @@ const Calendar: React.FC<CalendarProps> = ({
 	const yearParam = searchParams.get("year");
 	const monthParam = searchParams.get("month");
 
+	const requestedMonthKey = requestedMonth
+		? `${requestedMonth.getFullYear()}-${requestedMonth.getMonth()}`
+		: null;
+
 	const initialMonth = useMemo(() => {
 		if (!syncUrl) {
-			return new Date();
+			return requestedMonthKey
+				? new Date(
+						Number(requestedMonthKey.split("-")[0]),
+						Number(requestedMonthKey.split("-")[1]),
+						1
+				  )
+				: new Date();
 		}
 		if (yearParam && monthParam) {
 			const year = parseInt(yearParam);
@@ -68,8 +84,13 @@ const Calendar: React.FC<CalendarProps> = ({
 				return new Date(year, month, 1);
 			}
 		}
-		return new Date(); // URL에 없으면 현재 날짜
-	}, [yearParam, monthParam, syncUrl]);
+		// URL에 없으면 호출한 쪽이 지정한 달, 그것도 없으면 현재 날짜
+		if (requestedMonthKey) {
+			const [year, month] = requestedMonthKey.split("-").map(Number);
+			return new Date(year, month, 1);
+		}
+		return new Date();
+	}, [yearParam, monthParam, syncUrl, requestedMonthKey]);
 
 	const [currentMonth, setCurrentMonth] = useState(initialMonth);
 	const isUpdatingFromURL = useRef(false);

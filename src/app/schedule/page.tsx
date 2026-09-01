@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import PageHeader from "@/shared/ui/primitives/pageHeader";
 import SegmentedTabs from "@/shared/ui/primitives/segmentedTabs";
 import { Skeleton } from "@/shared/ui/primitives/skeleton";
@@ -8,37 +8,51 @@ import Calendar from "@/features/games/components/calender";
 import GameInfoModal from "@/features/games/components/gameInfoModal";
 import GameList from "@/features/games/components/gameList";
 import NextGameHighlight from "@/features/games/components/nextGameHighlight";
-import { useSchedulesByDateRangeQuery } from "@/features/games/queries";
+import Chip from "@/shared/ui/primitives/chip";
+import { useAllSchedulesQuery } from "@/features/games/queries";
 import { findNextGame } from "@/features/games/nextGame";
+import {
+	defaultSeason,
+	firstMonthOfSeason,
+	listSeasons,
+	schedulesInSeason,
+} from "@/features/games/season";
 
 type ViewMode = "list" | "calendar";
-
-function isoDate(date: Date) {
-	return date.toISOString().slice(0, 10);
-}
 
 export default function SchedulePage() {
 	const [view, setView] = useState<ViewMode>("calendar");
 	const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(
 		null
 	);
+	const [season, setSeason] = useState<string | null>(null);
 
-	// 시즌 전체가 보이도록 과거 6개월 ~ 미래 8개월 범위를 받는다.
-	const { start, end } = useMemo(() => {
-		const now = new Date();
-		const from = new Date(now);
-		from.setMonth(from.getMonth() - 6);
-		const to = new Date(now);
-		to.setMonth(to.getMonth() + 8);
-		return { start: isoDate(from), end: isoDate(to) };
-	}, []);
+	// 예전에는 "오늘 −6개월 ~ +8개월" 창으로 받아, 비시즌에는 지난 시즌이
+	// 통째로 창 밖으로 밀려나 지난 경기를 볼 수 없었다. 전체를 받아 시즌으로 나눈다.
+	const { data, isLoading, isError, refetch } = useAllSchedulesQuery();
+	const schedules = useMemo(() => data ?? [], [data]);
 
-	const { data, isLoading, isError, refetch } = useSchedulesByDateRangeQuery(
-		start,
-		end
+	const seasons = useMemo(() => listSeasons(schedules), [schedules]);
+
+	// 첫 로딩 뒤 한 번만 기본 시즌을 정한다. 이후 선택은 사용자가 바꾼 값을 따른다.
+	useEffect(() => {
+		if (season !== null || schedules.length === 0) return;
+		setSeason(defaultSeason(schedules));
+	}, [season, schedules]);
+
+	const seasonSchedules = useMemo(
+		() => schedulesInSeason(schedules, season),
+		[schedules, season]
 	);
 
-	const nextGame = useMemo(() => findNextGame(data ?? []), [data]);
+	// 달력은 선택한 시즌의 첫 경기 달에서 시작한다.
+	const seasonFirstMonth = useMemo(
+		() => firstMonthOfSeason(schedules, season),
+		[schedules, season]
+	);
+
+	// 다음 경기 안내는 시즌과 무관하게 전체에서 찾는다.
+	const nextGame = useMemo(() => findNextGame(schedules), [schedules]);
 
 	return (
 		<div>
@@ -55,6 +69,25 @@ export default function SchedulePage() {
 						onOpenDetail={() => setSelectedScheduleId(nextGame.id)}
 					/>
 				)
+			)}
+
+			{seasons.length > 1 && (
+				<div className="mt-8">
+					<h2 className="mb-2 text-[12px] font-bold text-ink-500">시즌</h2>
+					<div className="flex flex-wrap gap-2" role="group" aria-label="시즌 선택">
+						{seasons.map((value) => (
+							<Chip
+								key={value}
+								as="button"
+								tone={value === season ? "selected" : "default"}
+								aria-pressed={value === season}
+								onSelect={() => setSeason(value)}
+							>
+								{value}
+							</Chip>
+						))}
+					</div>
+				</div>
 			)}
 
 			<div className="mt-8 mb-4">
@@ -77,7 +110,7 @@ export default function SchedulePage() {
 				</div>
 			) : isError ? null : view === "list" ? (
 				<GameList
-					schedules={data ?? []}
+					schedules={seasonSchedules}
 					onSelect={(scheduleId) => setSelectedScheduleId(scheduleId)}
 				/>
 			) : (
@@ -90,6 +123,8 @@ export default function SchedulePage() {
 						}
 					>
 						<Calendar
+							key={season ?? "all"}
+							initialMonth={seasonFirstMonth ?? undefined}
 							onLocationSelect={() => {}}
 							onGameClick={(scheduleId) => setSelectedScheduleId(scheduleId)}
 						/>
