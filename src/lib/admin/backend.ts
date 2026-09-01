@@ -1,6 +1,7 @@
 import "server-only";
 
 import { NextRequest, NextResponse } from "next/server";
+import { notifyAdminError } from "../alerts/slack";
 import { clearAdminSession, getAdminToken } from "./session";
 
 const PRESERVED_ERROR_STATUSES = new Set([
@@ -24,6 +25,27 @@ async function responseBody(response: Response): Promise<unknown> {
 	} catch {
 		return { message: text };
 	}
+}
+
+function backendErrorCategory(error: unknown) {
+	if (error instanceof Error && ["AbortError", "TimeoutError"].includes(error.name)) {
+		return "backend_timeout" as const;
+	}
+	if (error instanceof SyntaxError) return "backend_response" as const;
+	return "backend_connection" as const;
+}
+
+async function alertBackendFailure(
+	operation: string,
+	path: string,
+	error: unknown
+): Promise<void> {
+	await notifyAdminError({
+		operation,
+		route: path,
+		status: 502,
+		category: backendErrorCategory(error),
+	});
 }
 
 export async function adminBackendFetch(
@@ -55,6 +77,7 @@ export async function adminBackendFetch(
 		if (status === 401) clearAdminSession(result);
 		return result;
 	} catch (error) {
+		await alertBackendFailure("adminBackendFetch", path, error);
 		const message = error instanceof Error ? error.message : "백엔드 연결에 실패했습니다.";
 		return NextResponse.json({ message }, { status: 502 });
 	}
@@ -88,6 +111,7 @@ export async function adminBackendBinaryFetch(path: string): Promise<NextRespons
 			},
 		});
 	} catch (error) {
+		await alertBackendFailure("adminBackendBinaryFetch", path, error);
 		const message = error instanceof Error ? error.message : "백엔드 연결에 실패했습니다.";
 		return NextResponse.json({ message }, { status: 502 });
 	}
@@ -97,14 +121,19 @@ export async function backendLogin(credentials: {
 	username: string;
 	password: string;
 }): Promise<{ response: Response; body: Record<string, unknown> | null }> {
-	const response = await fetch(`${backendBaseUrl()}/api/admin/login`, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(credentials),
-		cache: "no-store",
-	});
-	const body = (await responseBody(response)) as Record<string, unknown> | null;
-	return { response, body };
+	try {
+		const response = await fetch(`${backendBaseUrl()}/api/admin/login`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(credentials),
+			cache: "no-store",
+		});
+		const body = (await responseBody(response)) as Record<string, unknown> | null;
+		return { response, body };
+	} catch (error) {
+		await alertBackendFailure("backendLogin", "/api/admin/login", error);
+		throw error;
+	}
 }
 
 export function clientErrorMessage(body: unknown, fallback: string): string {
