@@ -6,6 +6,7 @@ import { useSession, signOut } from "next-auth/react";
 import {
 	getNavItems,
 	isDarkShellPath,
+	isMyPageEnabled,
 	isNavItemActive,
 } from "@/shared/nav/navItems";
 import Wordmark from "./wordmark";
@@ -28,6 +29,9 @@ export default function Header() {
 	const dark = isDarkShellPath(pathname);
 	const navItems = getNavItems();
 	const isLoggedIn = !!session;
+	// 마이페이지는 메뉴 목록이 아니라 계정 영역에서 다룬다(navItems.ts 참고).
+	// 로그인해야 열리는 화면이라 로그인 상태에서만 노출한다.
+	const showMyPage = isLoggedIn && isMyPageEnabled();
 
 	// 경로가 바뀌면 모바일 메뉴를 닫는다.
 	useEffect(() => {
@@ -150,7 +154,26 @@ export default function Header() {
 					</svg>
 				</button>
 
-				<div className="ml-auto hidden items-center lg:flex lg:ml-0">
+				<div className="ml-auto hidden items-center gap-2 lg:flex lg:ml-0">
+					{showMyPage && (
+						<Link
+							href="/mypage"
+							aria-current={
+								isNavItemActive(pathname, "/mypage") ? "page" : undefined
+							}
+							className={cn(
+								"flex h-9 items-center gap-1.5 rounded-[10px] px-3 text-[14px]",
+								isNavItemActive(pathname, "/mypage")
+									? "font-bold text-brand-500"
+									: dark
+									? "font-medium text-ink-300 hover:bg-white/10"
+									: "font-medium text-ink-700 hover:bg-ink-50"
+							)}
+						>
+							<NavIcon name="me" size={18} />
+							마이페이지
+						</Link>
+					)}
 					{isLoggedIn ? (
 						<Button
 							variant={dark ? "secondaryDark" : "secondary"}
@@ -205,6 +228,27 @@ export default function Header() {
 								</li>
 							);
 						})}
+						{showMyPage && (
+							<li>
+								<Link
+									href="/mypage"
+									aria-current={
+										isNavItemActive(pathname, "/mypage") ? "page" : undefined
+									}
+									className={cn(
+										"flex min-h-[44px] items-center gap-3 rounded-[10px] px-2 text-[15px]",
+										isNavItemActive(pathname, "/mypage")
+											? "font-bold text-brand-500"
+											: dark
+											? "font-medium text-ink-300"
+											: "font-medium text-ink-700"
+									)}
+								>
+									<NavIcon name="me" size={20} />
+									마이페이지
+								</Link>
+							</li>
+						)}
 						<li className="mt-2 border-t border-ink-200 pt-2">
 							{isLoggedIn ? (
 								<button

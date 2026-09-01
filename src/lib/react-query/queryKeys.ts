@@ -33,6 +33,7 @@ export const queryKeys = {
 		schedule: () => [...queryKeys.games.all, "schedule"] as const,
 		schedulesByDateRange: (start: string, end?: string) =>
 			[...queryKeys.games.all, "schedules", start, end] as const,
+		allSchedules: () => [...queryKeys.games.all, "schedules", "all"] as const,
 	},
 
 	// News 관련

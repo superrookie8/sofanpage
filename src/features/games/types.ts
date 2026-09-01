@@ -44,6 +44,8 @@ export interface ScheduleResponse {
 	updatedAt: string;
 	/** 관리자 일정 계약의 상대팀 이름. 구형 응답에서는 title만 올 수 있다. */
 	opponent?: string | null;
+	/** 시즌(YYYY-YYYY). 구형 응답에는 없어 경기일로 유추한다. */
+	season?: string | null;
 	/** 관리자 일정 계약의 홈 경기 여부. 구형 응답에서는 location으로 판정한다. */
 	isHome?: boolean | null;
 	/** 특수 경기 여부. 구형 응답에서는 type === "specialGame"으로 판정한다. */
