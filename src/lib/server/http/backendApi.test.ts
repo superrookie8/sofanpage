@@ -61,6 +61,7 @@ describe("backend response proxy", () => {
 	});
 
 	it("preserves an upstream error status and response body", async () => {
+		const reportError = vi.fn();
 		const fetchImplementation: typeof fetch = vi.fn(async () =>
 			new Response(JSON.stringify({ message: "temporarily unavailable" }), {
 				status: 503,
@@ -72,11 +73,33 @@ describe("backend response proxy", () => {
 			path: "/api/events/event-6",
 			environment: { BACKEND_API_URL: "http://127.0.0.1:8080" },
 			fetchImplementation,
+			reportError,
 		});
 
 		expect(response.status).toBe(503);
 		expect(await response.json()).toEqual({
 			message: "temporarily unavailable",
 		});
+		expect(reportError).not.toHaveBeenCalled();
+	});
+
+	it("reports local connection failures without changing the 502 contract", async () => {
+		const reportError = vi.fn(async () => undefined);
+		const response = await proxyBackendRequest({
+			path: "/api/events",
+			environment: { BACKEND_API_URL: "http://127.0.0.1:8080" },
+			fetchImplementation: vi.fn(async () => {
+				throw new Error("connect ECONNREFUSED");
+			}),
+			reportError,
+		});
+
+		expect(response.status).toBe(502);
+		expect(reportError).toHaveBeenCalledWith(
+			expect.objectContaining({
+				source: "backend-connect",
+				route: "/api/events",
+			})
+		);
 	});
 });

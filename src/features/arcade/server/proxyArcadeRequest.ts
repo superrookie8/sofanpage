@@ -5,6 +5,10 @@ import {
 	resolveBackendApiUrl,
 } from "../../../lib/server/http/backendApi";
 import { readFetchResponseAsText } from "../../../lib/server/http/readFetchResponse";
+import {
+	reportSlackError,
+	type SlackErrorEvent,
+} from "../../../lib/server/alerts/slackErrorReporter";
 
 interface ArcadeProxyOptions {
 	/**
@@ -19,6 +23,7 @@ interface ArcadeProxyOptions {
 	body?: unknown;
 	environment?: Record<string, string | undefined>;
 	fetchImplementation?: typeof fetch;
+	reportError?: (event: SlackErrorEvent) => Promise<unknown>;
 }
 
 export async function proxyArcadeRequest({
@@ -30,6 +35,7 @@ export async function proxyArcadeRequest({
 	sanitizeJson,
 	environment = process.env,
 	fetchImplementation = fetch,
+	reportError = reportSlackError,
 }: ArcadeProxyOptions) {
 	let backendUrl: URL;
 	try {
@@ -37,6 +43,13 @@ export async function proxyArcadeRequest({
 		backendUrl.search = request.nextUrl.search;
 	} catch (error) {
 		if (error instanceof BackendApiConfigurationError) {
+			await reportError({
+				source: "backend-config",
+				error,
+				route: path,
+				method,
+				routeType: "route",
+			});
 			return NextResponse.json(
 				{ message: "Backend API is not configured" },
 				{ status: 500 }
@@ -45,8 +58,9 @@ export async function proxyArcadeRequest({
 		throw error;
 	}
 
+	let response: Response;
 	try {
-		const response = await fetchImplementation(backendUrl, {
+		response = await fetchImplementation(backendUrl, {
 			method,
 			headers: {
 				Accept: "application/json",
@@ -58,33 +72,62 @@ export async function proxyArcadeRequest({
 			body: body === undefined ? undefined : JSON.stringify(body),
 			cache: "no-store",
 		});
-		let responseBody = await readFetchResponseAsText(response);
-
-		// 성공 응답만 가공한다. 에러 본문은 그대로 통과시켜 진단 정보를 잃지 않는다.
-		if (sanitizeJson && response.ok && responseBody) {
-			try {
-				responseBody = JSON.stringify(sanitizeJson(JSON.parse(responseBody)));
-			} catch {
-				// 공개 응답의 화이트리스트 처리가 실패하면 원문을 노출하지 않는다.
-				return NextResponse.json(
-					{ message: "Invalid backend response" },
-					{ status: 502 }
-				);
-			}
-		}
-
-		return new NextResponse(responseBody || null, {
-			status: response.status,
-			headers: {
-				"Cache-Control": "no-store",
-				"Content-Type":
-					response.headers.get("content-type") || "application/json; charset=utf-8",
-			},
+	} catch (error) {
+		await reportError({
+			source: "backend-connect",
+			error,
+			route: path,
+			method,
+			routeType: "route",
 		});
-	} catch {
 		return NextResponse.json(
 			{ message: "아케이드 서버에 연결하지 못했습니다." },
 			{ status: 502 }
 		);
 	}
+
+	let responseBody: string;
+	try {
+		responseBody = await readFetchResponseAsText(response);
+	} catch (error) {
+		await reportError({
+			source: "backend-parse",
+			error,
+			route: path,
+			method,
+			routeType: "route",
+		});
+		return NextResponse.json(
+			{ message: "Invalid backend response" },
+			{ status: 502 }
+		);
+	}
+
+	// 성공 응답만 가공한다. upstream HTTP 오류는 backend 소유라 알림 없이 전달한다.
+	if (sanitizeJson && response.ok && responseBody) {
+		try {
+			responseBody = JSON.stringify(sanitizeJson(JSON.parse(responseBody)));
+		} catch (error) {
+			await reportError({
+				source: "backend-parse",
+				error,
+				route: path,
+				method,
+				routeType: "route",
+			});
+			return NextResponse.json(
+				{ message: "Invalid backend response" },
+				{ status: 502 }
+			);
+		}
+	}
+
+	return new NextResponse(responseBody || null, {
+		status: response.status,
+		headers: {
+			"Cache-Control": "no-store",
+			"Content-Type":
+				response.headers.get("content-type") || "application/json; charset=utf-8",
+		},
+	});
 }

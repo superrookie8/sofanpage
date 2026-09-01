@@ -11,7 +11,7 @@ class ServerAxiosService {
 		if (!this.instance) {
 			// 공개 BFF는 인증정보를 전달하지 않는다. 보호 BFF는 NextRequest로
 			// 검증한 backend token을 명시적으로 전달해야 한다.
-			this.instance = createServerAxiosInstance(async () => null);
+			this.instance = await createServerAxiosInstance(async () => null);
 		}
 		return this.instance;
 	}
@@ -20,7 +20,7 @@ class ServerAxiosService {
 	private async getInstanceWithToken(
 		token: string
 	): Promise<AxiosInstance> {
-		return createServerAxiosInstance(async () => token);
+		return await createServerAxiosInstance(async () => token);
 	}
 
 	async get<T = any>(

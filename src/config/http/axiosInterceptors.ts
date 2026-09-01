@@ -49,6 +49,7 @@ export const setupClientInterceptors = (instance: AxiosInstance) => {
 export const setupServerInterceptors = (
 	instance: AxiosInstance,
 	getToken: () => Promise<string | null>,
+	onNetworkError?: (error: AxiosError) => void | Promise<void>,
 ) => {
 	// Request 인터셉터 - 서버에서 토큰 가져오기
 	instance.interceptors.request.use(
@@ -59,7 +60,8 @@ export const setupServerInterceptors = (
 			}
 			return config;
 		},
-		(error: AxiosError) => {
+		async (error: AxiosError) => {
+			await onNetworkError?.(error);
 			return Promise.reject(error);
 		},
 	);
@@ -69,7 +71,9 @@ export const setupServerInterceptors = (
 		(response: AxiosResponse) => {
 			return response;
 		},
-		(error: AxiosError) => {
+		async (error: AxiosError) => {
+			// A response means the backend owns the HTTP error, including upstream 5xx.
+			if (!error.response) await onNetworkError?.(error);
 			return Promise.reject(error);
 		},
 	);

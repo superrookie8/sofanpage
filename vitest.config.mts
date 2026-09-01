@@ -9,6 +9,14 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"@": fileURLToPath(new URL("./src", import.meta.url)),
+			// Next replaces this marker during server builds. Vitest needs the same
+			// empty server-side target so it can exercise server-only modules.
+			"server-only": fileURLToPath(
+				new URL(
+					"./node_modules/next/dist/compiled/server-only/empty.js",
+					import.meta.url
+				)
+			),
 		},
 	},
 });

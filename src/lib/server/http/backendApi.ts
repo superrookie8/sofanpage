@@ -1,3 +1,8 @@
+import {
+	reportSlackError,
+	type SlackErrorEvent,
+} from "../alerts/slackErrorReporter";
+
 /**
  * 서버 전용 키만 허용한다. `NEXT_PUBLIC_` 접두사가 붙은 값은 Next.js가 클라이언트
  * 번들에 인라인하므로 백엔드 origin이 브라우저에 노출된다.
@@ -48,6 +53,7 @@ interface ProxyBackendRequestOptions {
 	requestUrl?: string | URL;
 	environment?: Record<string, string | undefined>;
 	fetchImplementation?: typeof fetch;
+	reportError?: (event: SlackErrorEvent) => Promise<unknown>;
 }
 
 function jsonError(message: string, status: number) {
@@ -66,8 +72,16 @@ export async function proxyBackendRequest({
 	requestUrl,
 	environment = process.env,
 	fetchImplementation = fetch,
+	reportError = reportSlackError,
 }: ProxyBackendRequestOptions) {
 	if (!path.startsWith("/") || path.startsWith("//")) {
+		await reportError({
+			source: "backend-config",
+			error: new Error("Invalid backend request path"),
+			route: "backend-proxy",
+			method: "GET",
+			routeType: "route",
+		});
 		return jsonError("Invalid backend request path", 500);
 	}
 
@@ -76,6 +90,13 @@ export async function proxyBackendRequest({
 		backendUrl = new URL(path, `${resolveBackendApiUrl(environment)}/`);
 	} catch (error) {
 		if (error instanceof BackendApiConfigurationError) {
+			await reportError({
+				source: "backend-config",
+				error,
+				route: path,
+				method: "GET",
+				routeType: "route",
+			});
 			return jsonError("Backend API is not configured", 500);
 		}
 		throw error;
@@ -85,24 +106,46 @@ export async function proxyBackendRequest({
 		backendUrl.search = new URL(requestUrl).search;
 	}
 
+	let upstreamResponse: Response;
 	try {
-		const upstreamResponse = await fetchImplementation(backendUrl, {
+		upstreamResponse = await fetchImplementation(backendUrl, {
 			method: "GET",
 			headers: { Accept: "application/json" },
 			cache: "no-store",
 		});
-		const responseBody = await upstreamResponse.arrayBuffer();
-
-		return new Response(responseBody.byteLength > 0 ? responseBody : null, {
-			status: upstreamResponse.status,
-			headers: {
-				"Cache-Control": "no-store",
-				"Content-Type":
-					upstreamResponse.headers.get("content-type") ||
-					"application/json; charset=utf-8",
-			},
+	} catch (error) {
+		await reportError({
+			source: "backend-connect",
+			error,
+			route: path,
+			method: "GET",
+			routeType: "route",
 		});
-	} catch {
 		return jsonError("Backend API is unavailable", 502);
 	}
+
+	let responseBody: ArrayBuffer;
+	try {
+		responseBody = await upstreamResponse.arrayBuffer();
+	} catch (error) {
+		await reportError({
+			source: "backend-parse",
+			error,
+			route: path,
+			method: "GET",
+			routeType: "route",
+		});
+		return jsonError("Backend API returned an invalid response", 502);
+	}
+
+	// Upstream HTTP errors are owned and alerted by the backend service.
+	return new Response(responseBody.byteLength > 0 ? responseBody : null, {
+		status: upstreamResponse.status,
+		headers: {
+			"Cache-Control": "no-store",
+			"Content-Type":
+				upstreamResponse.headers.get("content-type") ||
+				"application/json; charset=utf-8",
+		},
+	});
 }

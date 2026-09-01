@@ -70,3 +70,30 @@ jobs:
           path: /private/tmp/supersohee-weekly-review.json
           if-no-files-found: ignore
           retention-days: 14
+
+      - name: Notify Slack when the crawler job fails
+        if: ${{ failure() }}
+        continue-on-error: true
+        timeout-minutes: 1
+        env:
+          SLACK_ERROR_ALERTS_ENABLED: ${{ vars.SLACK_ERROR_ALERTS_ENABLED }}
+          SLACK_ERROR_WEBHOOK_URL: ${{ secrets.SLACK_ERROR_WEBHOOK_URL }}
+          SLACK_ERROR_JOB: crawl-and-submit
+          SLACK_ERROR_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ "$SLACK_ERROR_ALERTS_ENABLED" != "true" ]; then
+            exit 0
+          fi
+          if [ -z "$SLACK_ERROR_WEBHOOK_URL" ]; then
+            exit 0
+          fi
+          case "$SLACK_ERROR_WEBHOOK_URL" in
+            https://hooks.slack.com/services/*|https://hooks.slack-gov.com/services/*) ;;
+            *) exit 0 ;;
+          esac
+          payload="$(python3 -c 'import json,os; print(json.dumps({"text": ":red_circle: Supersohee weekly crawler failed\\nJob: " + os.environ["SLACK_ERROR_JOB"] + "\\nRun: " + os.environ["SLACK_ERROR_RUN_URL"]}))')"
+          curl --fail --silent --show-error --output /dev/null \
+            --max-time 10 --retry 0 \
+            --header "Content-Type: application/json" \
+            --data "$payload" \
+            "$SLACK_ERROR_WEBHOOK_URL"

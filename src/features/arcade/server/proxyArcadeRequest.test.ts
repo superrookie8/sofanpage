@@ -59,6 +59,7 @@ describe("proxyArcadeRequest", () => {
 	});
 
 	it("공개 응답 정제가 실패하면 backend 원문을 노출하지 않는다", async () => {
+		const reportError = vi.fn(async () => undefined);
 		const fetchImplementation: typeof fetch = vi.fn(async () =>
 			new Response("private raw response", {
 				status: 200,
@@ -70,11 +71,31 @@ describe("proxyArcadeRequest", () => {
 			request: new NextRequest("http://localhost:3000/api/arcade/ranking"),
 			path: "/api/arcade/ranking",
 			sanitizeJson: (data) => data,
+			reportError,
 			environment: { BACKEND_API_URL: "https://backend.example.test" },
 			fetchImplementation,
 		});
 
 		expect(response.status).toBe(502);
 		expect(await response.text()).not.toContain("private raw response");
+		expect(reportError).toHaveBeenCalledWith(
+			expect.objectContaining({ source: "backend-parse" })
+		);
+	});
+
+	it("upstream 5xx는 backend 소유로 전달하고 중복 알림하지 않는다", async () => {
+		const reportError = vi.fn(async () => undefined);
+		const response = await proxyArcadeRequest({
+			request: new NextRequest("http://localhost:3000/api/arcade/ranking"),
+			path: "/api/arcade/ranking",
+			environment: { BACKEND_API_URL: "https://backend.example.test" },
+			fetchImplementation: vi.fn(async () =>
+				new Response(JSON.stringify({ message: "unavailable" }), { status: 503 })
+			),
+			reportError,
+		});
+
+		expect(response.status).toBe(503);
+		expect(reportError).not.toHaveBeenCalled();
 	});
 });
