@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server.js";
 
 const COOKIE_NAME = "supersohee_admin_session";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
 	const path = request.nextUrl.pathname;
 	const hasSession = Boolean(request.cookies.get(COOKIE_NAME)?.value);
 

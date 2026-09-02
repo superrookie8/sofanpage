@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRecoilState } from "recoil";
+import { useRecoilState } from "@/utils/globalState";
 import { nicknameState } from "@/states/nicknameState";
 import { passwordState } from "@/states/passwordState";
 import EyeIcon from "@/icons/eyeicon";
@@ -92,10 +92,8 @@ const SignUp: React.FC = () => {
 					setFormValid(false);
 				}
 			})
-			.catch((error) => {
-				setNicknameMessage(
-					{ message: "알수 없는 에러입니다", color: "red" } || error
-				);
+			.catch(() => {
+				setNicknameMessage({ message: "알수 없는 에러입니다", color: "red" });
 				setNicknameChecked(false);
 			});
 	};

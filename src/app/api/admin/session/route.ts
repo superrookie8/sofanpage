@@ -3,7 +3,7 @@ import { rejectCrossOriginMutation } from "@/lib/admin/request";
 import { clearAdminSession, getAdminToken, isTokenExpired } from "@/lib/admin/session";
 
 export async function GET() {
-	const token = getAdminToken();
+	const token = await getAdminToken();
 	if (!token || isTokenExpired(token)) {
 		const response = NextResponse.json({ authenticated: false }, { status: 401 });
 		if (token) clearAdminSession(response);

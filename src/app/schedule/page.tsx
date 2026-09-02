@@ -5,7 +5,7 @@ import Sidebar from "@/components/sidebar";
 import Calendar from "@/components/calender";
 import { locations } from "@/data/schedule";
 import Map from "@/components/kakaoMap";
-import { useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "@/utils/globalState";
 import { selectedLocationState } from "@/states/locationState";
 import useAuth from "@/hooks/useAuth";
 

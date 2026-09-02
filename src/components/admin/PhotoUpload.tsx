@@ -1,6 +1,6 @@
 "use client";
 import { useRef, ChangeEvent, useState } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState } from "@/utils/globalState";
 import { photoPreviewState } from "@/states/photoPreviewState";
 import Image from "next/legacy/image";
 import imageCompression from "browser-image-compression";

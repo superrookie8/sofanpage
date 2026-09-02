@@ -3,7 +3,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useState } from "react";
 import { GuestBookButtons } from "@/components/buttons";
 import DateTimeDisplay from "@/components/date";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue } from "@/utils/globalState";
 import { pageState } from "@/states/pageState";
 import PhotoUpload from "@/components/photoUpload";
 import Header from "@/components/header";

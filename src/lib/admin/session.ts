@@ -12,8 +12,8 @@ const sessionCookieOptions = {
 	path: "/",
 };
 
-export function getAdminToken(): string | null {
-	return cookies().get(ADMIN_SESSION_COOKIE)?.value ?? null;
+export async function getAdminToken(): Promise<string | null> {
+	return (await cookies()).get(ADMIN_SESSION_COOKIE)?.value ?? null;
 }
 
 export function setAdminSession(response: NextResponse, token: string) {

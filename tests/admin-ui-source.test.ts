@@ -86,6 +86,7 @@ test("event UI validates selected files and never shows raw upstream JSON", () =
 	assert.match(eventOrderRoute, /adminBackendFetch\("\/api\/admin\/events\/order"/);
 	assert.match(eventUpdateRoute, /rejectCrossOriginMutation/);
 	assert.match(eventUpdateRoute, /canonicalEventUpdateFormData/);
-	assert.match(eventUpdateRoute, /adminBackendFetch\(`\/api\/admin\/events\/\$\{encodeURIComponent\(params\.id\)\}`/);
+	assert.match(eventUpdateRoute, /const \{ id \} = await params/);
+	assert.match(eventUpdateRoute, /adminBackendFetch\(`\/api\/admin\/events\/\$\{encodeURIComponent\(id\)\}`/);
 	assert.doesNotMatch(eventsPage, /Authorization|NEXT_PUBLIC_BACKAPI_URL|sessionStorage/);
 });

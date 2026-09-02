@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue } from "@/utils/globalState";
 import { selectedLocationState } from "@/states/locationState";
 
 declare global {

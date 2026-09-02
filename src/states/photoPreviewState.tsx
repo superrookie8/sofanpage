@@ -1,4 +1,4 @@
-import { atom } from "recoil";
+import { atom } from "@/utils/globalState";
 export interface PhotoData {
 	id: string;
 	preview: string;

@@ -1,4 +1,4 @@
-import { atom } from "recoil";
+import { atom } from "@/utils/globalState";
 import { GameLocation, locations } from "@/data/schedule";
 
 export const selectedLocationState = atom<GameLocation | null>({

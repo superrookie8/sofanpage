@@ -5,11 +5,12 @@ import { rejectCrossOriginMutation } from "@/lib/admin/request";
 
 export async function PUT(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id: string }> }
 ) {
+	const { id } = await params;
 	const rejected = rejectCrossOriginMutation(request);
 	if (rejected) return rejected;
-	if (!params.id) {
+	if (!id) {
 		return NextResponse.json({ message: "event id가 필요합니다." }, { status: 400 });
 	}
 	if (!(request.headers.get("content-type") ?? "").startsWith("multipart/form-data")) {
@@ -27,7 +28,7 @@ export async function PUT(
 		}, { status: 400 });
 	}
 
-	return adminBackendFetch(`/api/admin/events/${encodeURIComponent(params.id)}`, {
+	return adminBackendFetch(`/api/admin/events/${encodeURIComponent(id)}`, {
 		method: "PUT",
 		body,
 	});

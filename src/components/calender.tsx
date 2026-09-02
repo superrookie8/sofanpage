@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "@/utils/globalState";
 import { selectedLocationState } from "@/states/locationState";
 import { locations, GameSchedule } from "@/data/schedule";
 import {

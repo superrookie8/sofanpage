@@ -1,4 +1,4 @@
-FROM node:20.11.1
+FROM node:22.23.2
 
 WORKDIR /
 
@@ -6,9 +6,9 @@ COPY package.json package-lock.json ./
 
 RUN npm ci
 
-COPY . . 
+COPY . .
 
-RUN npm run build 
+RUN npm run build
 
 EXPOSE 3000
 

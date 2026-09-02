@@ -1,5 +1,5 @@
 import { useRouter, useParams } from "next/navigation";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "@/utils/globalState";
 import { pageState } from "@/states/pageState";
 
 interface Props {

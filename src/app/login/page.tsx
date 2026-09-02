@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useRecoilState } from "recoil";
+import { useRecoilState } from "@/utils/globalState";
 import { nicknameState } from "@/states/nicknameState";
 import { passwordState } from "@/states/passwordState";
 import EyeIcon from "@/icons/eyeicon";
