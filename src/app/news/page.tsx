@@ -14,11 +14,14 @@ import {
 	useRookieNewsQuery,
 } from "@/features/news/queries";
 import type { Article } from "@/features/news/types";
+import {
+	newsPageStatus,
+	resolveNewsTotalPages,
+	type NewsSource,
+} from "@/features/news/pagination";
 import { formatRelativeTime, parseDate } from "@/shared/lib/datetime";
 
-type Source = "all" | "jumpball" | "rookie";
-
-const SOURCES: ReadonlyArray<{ value: Source; label: string }> = [
+const SOURCES: ReadonlyArray<{ value: NewsSource; label: string }> = [
 	{ value: "all", label: "전체" },
 	{ value: "jumpball", label: "점프볼" },
 	{ value: "rookie", label: "루키" },
@@ -27,7 +30,7 @@ const SOURCES: ReadonlyArray<{ value: Source; label: string }> = [
 const PAGE_SIZE = 8;
 
 export default function NewsPage() {
-	const [source, setSource] = useState<Source>("all");
+	const [source, setSource] = useState<NewsSource>("all");
 	const [page, setPage] = useState(1);
 
 	const { data: latest, isLoading: latestLoading } = useLatestNewsQuery();
@@ -68,8 +71,13 @@ export default function NewsPage() {
 	const hasMore =
 		(wantJumpball && jumpball.data?.hasNext) ||
 		(wantRookie && rookie.data?.hasNext);
+	const totalPages = resolveNewsTotalPages(
+		source,
+		jumpball.data?.totalPages,
+		rookie.data?.totalPages
+	);
 
-	const changeSource = (next: Source) => {
+	const changeSource = (next: NewsSource) => {
 		setSource(next);
 		setPage(1);
 		track("news_source_filter", { source: next });
@@ -141,10 +149,21 @@ export default function NewsPage() {
 						))}
 					</div>
 
-					{hasMore && (
-						<div className="mt-6 flex justify-center">
+					<div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+						<p
+							className="text-sm font-semibold tabular-nums text-ink-500"
+							role="status"
+							aria-live="polite"
+							aria-atomic="true"
+						>
+							<span className="sr-only">뉴스 목록 </span>
+							{newsPageStatus(page, totalPages)}
+						</p>
+
+						{hasMore && (
 							<Button
 								variant="secondary"
+								aria-label={`다음 뉴스 페이지 보기 (${page + 1}페이지)`}
 								onClick={() => {
 									const next = page + 1;
 									setPage(next);
@@ -153,8 +172,8 @@ export default function NewsPage() {
 							>
 								더 보기
 							</Button>
-						</div>
-					)}
+						)}
+					</div>
 				</>
 			)}
 		</div>
