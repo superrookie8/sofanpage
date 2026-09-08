@@ -23,6 +23,11 @@ export const metadata: Metadata = {
 	},
 	description:
 		SITE_DESCRIPTION,
+	verification: {
+		other: {
+			"naver-site-verification": "cc0b88bb58ab22b8c90d420ca4864053147f6afb",
+		},
+	},
 	keywords: [
 		"WKBL",
 		"BNK SUM",
