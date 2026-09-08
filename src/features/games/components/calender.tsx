@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { GameLocation, ScheduleResponse } from "../types";
+import { matchesScheduleFilters, competitionLabel, competitionOf, venueTypeLabel, type ScheduleFilters } from "../competition";
 import {
 	format,
 	startOfMonth,
@@ -36,6 +37,7 @@ const formatYearMonth = (date: Date): string => {
 const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 
 interface CalendarProps {
+	filters?: ScheduleFilters;
 	onLocationSelect: (location: GameLocation) => void;
 	onGameClick?: (scheduleId: string) => void;
 	/** false면 URL과 동기화하지 않음 (직관일지 작성 등 다른 페이지에서 사용 시) */
@@ -55,6 +57,7 @@ const Calendar: React.FC<CalendarProps> = ({
 	syncUrl = true,
 	urlPath = "/schedule",
 	initialMonth: requestedMonth,
+	filters = {},
 }) => {
 	const searchParams = useSearchParams();
 	const router = useRouter();
@@ -67,6 +70,7 @@ const Calendar: React.FC<CalendarProps> = ({
 		? `${requestedMonth.getFullYear()}-${requestedMonth.getMonth()}`
 		: null;
 
+	const hasSelection = Boolean(filters.competitionKey || filters.editionLabel || filters.teamType || filters.season);
 	const initialMonth = useMemo(() => {
 		if (!syncUrl) {
 			return requestedMonthKey
@@ -77,7 +81,7 @@ const Calendar: React.FC<CalendarProps> = ({
 				  )
 				: new Date();
 		}
-		if (yearParam && monthParam) {
+		if (!hasSelection && yearParam && monthParam) {
 			const year = parseInt(yearParam);
 			const month = parseInt(monthParam) - 1; // 0-based (1월 = 0)
 			if (!isNaN(year) && !isNaN(month) && month >= 0 && month <= 11) {
@@ -90,7 +94,7 @@ const Calendar: React.FC<CalendarProps> = ({
 			return new Date(year, month, 1);
 		}
 		return new Date();
-	}, [yearParam, monthParam, syncUrl, requestedMonthKey]);
+	}, [yearParam, monthParam, syncUrl, requestedMonthKey, hasSelection]);
 
 	const [currentMonth, setCurrentMonth] = useState(initialMonth);
 	const isUpdatingFromURL = useRef(false);
@@ -176,13 +180,15 @@ const Calendar: React.FC<CalendarProps> = ({
 	// React Query로 데이터 가져오기
 	const { data: allSchedules = [] } = useSchedulesByDateRangeQuery(
 		startISO,
-		endISO
+		endISO,
+		true,
+		filters
 	);
 
 	// type이 "game" 또는 "specialGame"인 스케줄만 필터링
 	const schedules: ScheduleResponse[] = useMemo(() => {
-		return allSchedules.filter(isGameSchedule);
-	}, [allSchedules]);
+		return allSchedules.filter((schedule) => isGameSchedule(schedule) && matchesScheduleFilters(schedule, filters));
+	}, [allSchedules, filters]);
 
 	const weekDayHeader = weekDays.map((day, index) => (
 		<div
@@ -242,12 +248,12 @@ const Calendar: React.FC<CalendarProps> = ({
 					key={schedule.id || index}
 					type="button"
 					onClick={() => handleDateClick(schedule)}
-					title={`${opponentName(schedule)} ${time} ${isHome ? "홈" : "원정"}`}
+					title={`${competitionLabel(schedule)} ${competitionOf(schedule).ourTeamName || ""} vs ${opponentName(schedule)} ${time} ${venueTypeLabel(schedule)}`}
 					className={cn(
 						"mt-1 w-full rounded-sm border px-1 py-0.5 text-left transition-colors",
 						isHome
 							? "border-brand-200 bg-brand-50 hover:bg-brand-100"
-							: "border-ink-200 bg-ink-50 hover:bg-ink-100"
+							: competitionOf(schedule).venueType === "neutral" ? "border-amber-200 bg-amber-50 hover:bg-amber-100" : "border-ink-200 bg-ink-50 hover:bg-ink-100"
 					)}
 				>
 					<span
@@ -256,13 +262,14 @@ const Calendar: React.FC<CalendarProps> = ({
 							isHome ? "text-brand-700" : "text-ink-700"
 						)}
 					>
-						{opponentName(schedule)}
+						{competitionOf(schedule).ourTeamName ? `${competitionOf(schedule).ourTeamName} vs ` : ""}{opponentName(schedule)}
 					</span>
+					<span className="block truncate text-[9px] text-ink-500">{competitionLabel(schedule)}</span>
 					<span
 						data-numeric
 						className="block text-[9px] leading-tight text-ink-500 lg:text-[10px]"
 					>
-						{time} · {isHome ? "홈" : "원정"}
+						{time} · {venueTypeLabel(schedule)}
 					</span>
 				</button>
 			);
@@ -335,7 +342,7 @@ const Calendar: React.FC<CalendarProps> = ({
 			</div>
 
 			{/* 범례 — 색만으로 구분하지 않도록 라벨을 함께 둔다 */}
-			<div className="mt-4 flex items-center gap-4 text-caption text-ink-500">
+			<div className="mt-4 flex flex-wrap items-center gap-4 text-caption text-ink-500">
 				<span className="flex items-center gap-1.5">
 					<span className="h-3 w-3 rounded-sm border border-brand-200 bg-brand-50" />
 					홈 경기
@@ -344,6 +351,7 @@ const Calendar: React.FC<CalendarProps> = ({
 					<span className="h-3 w-3 rounded-sm border border-ink-200 bg-ink-50" />
 					원정 경기
 				</span>
+				<span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-sm border border-amber-200 bg-amber-50" />중립 경기</span>
 				<span className="flex items-center gap-1.5">
 					<span className="h-3 w-3 rounded-full bg-brand-500" />
 					오늘

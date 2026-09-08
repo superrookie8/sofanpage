@@ -6,6 +6,7 @@ import type { Article, NewsData, SectionData } from "./types";
 const SOURCE_LABELS: Record<string, string> = {
 	jumpball: "점프볼",
 	rookie: "루키",
+	other: "그외",
 };
 
 export function sourceLabel(source: string | undefined, fallback = "뉴스") {
@@ -91,6 +92,32 @@ export const fetchRookieNews = async (
 	if (data.articles && Array.isArray(data.articles)) {
 		return {
 			articles: withSource(data.articles, "루키"),
+			total: data.total || 0,
+			totalPages: data.totalPages || 0,
+			hasNext: data.hasNext || false,
+			hasPrevious: data.hasPrevious || false,
+		};
+	}
+	return { articles: [] };
+};
+
+// Other 기사 조회
+export const fetchOtherNews = async (
+	page: number,
+	limit: number
+): Promise<SectionData> => {
+	// 백엔드는 0부터 시작하므로 page - 1
+	const res = await fetch(`/api/news/other?page=${page - 1}&limit=${limit}`);
+
+	if (!res.ok) {
+		throw new Error(`HTTP error! status: ${res.status}`);
+	}
+
+	const data = await res.json();
+	// 백엔드 응답 형식: { articles: [...], total: 1000, totalPages: 200, ... }
+	if (data.articles && Array.isArray(data.articles)) {
+		return {
+			articles: withSource(data.articles, "그외"),
 			total: data.total || 0,
 			totalPages: data.totalPages || 0,
 			hasNext: data.hasNext || false,

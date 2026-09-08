@@ -89,9 +89,9 @@ export default function Hero() {
 					<p className="font-display text-[15px] tracking-[.08em] text-brand-500">
 						LEE SOHEE
 					</p>
-					<h1 className="text-[34px] font-extrabold leading-tight text-ink-900">
+					<h2 className="text-[34px] font-extrabold leading-tight text-ink-900">
 						{profile.name}
-					</h1>
+					</h2>
 					<MetaChips profile={meta} />
 				</div>
 			</section>
@@ -120,7 +120,7 @@ export default function Hero() {
 							<p className="font-display text-[18px] tracking-[.1em] text-brand-500">
 								LEE SOHEE
 							</p>
-							<h1 className="text-display-lg text-ink-900">{profile.name}</h1>
+							<h2 className="text-display-lg text-ink-900">{profile.name}</h2>
 							<MetaChips profile={meta} />
 						</div>
 						<span

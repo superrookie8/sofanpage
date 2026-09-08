@@ -1,4 +1,6 @@
 "use client";
+import { competitionLabel, venueTypeLabel } from "../competition";
+import { matchupLabel, venueName } from "../scheduleView";
 import React, { useMemo, useState } from "react";
 import { ScheduleDetailsResponse, GameLocation } from "../types";
 import { useRouter } from "next/navigation";
@@ -80,6 +82,8 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 				longitude: scheduleDetails.stadium.longitude,
 			} as GameLocation;
 		}
+
+		if (scheduleDetails.competitionKey) return null;
 
 		// 백엔드에서 좌표가 없으면 location 기반으로 로컬 상수에서 찾기
 		const isHome = scheduleDetails.location === "Home";
@@ -167,10 +171,10 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 							{/* 일정 정보 */}
 							<div className="mb-4 md:mb-6">
 								<h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 pr-8">
-									vs {scheduleDetails.title} (
-									{scheduleDetails.location === "Home" ? "BNK 홈 경기" : "원정"}
-									)
+									{matchupLabel(scheduleDetails)} ({venueTypeLabel(scheduleDetails)})
 								</h2>
+								<p className="mb-2 text-sm">{competitionLabel(scheduleDetails)}</p>
+								<p className="mb-3 text-sm">{venueName(scheduleDetails) || scheduleDetails.stadium?.name || "경기장 미정"}</p>
 								{scheduleDetails.description && (
 									<p className="text-gray-600 mb-3 md:mb-4 text-sm md:text-base">
 										{scheduleDetails.description}
@@ -178,7 +182,7 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 								)}
 								<div className="space-y-2">
 									<p className="text-sm md:text-base">
-										<span className="font-semibold">경기 시작:</span>{" "}
+										<span className="font-semibold">경기 시작 (한국시간):</span>{" "}
 										{formatDateTime(scheduleDetails.startDateTime)}
 									</p>
 								</div>

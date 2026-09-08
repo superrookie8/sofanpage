@@ -1,3 +1,4 @@
+import { scheduleFilterParams, type ScheduleFilters } from "./competition";
 // src/features/games/api.ts
 import type {
 	GameSchedule,
@@ -54,11 +55,11 @@ export const fetchScheduleDetails = async (
 // 날짜 범위로 스케줄 조회 (캘린더용)
 export const fetchSchedulesByDateRange = async (
 	start: string,
-	end?: string
+	end?: string,
+	filters: ScheduleFilters = {}
 ): Promise<ScheduleResponse[]> => {
-	const params = new URLSearchParams({
-		start: toScheduleDateTime(start, "start"),
-	});
+	const params = scheduleFilterParams(filters);
+	params.set("start", toScheduleDateTime(start, "start"));
 	if (end) params.set("end", toScheduleDateTime(end, "end"));
 	const response = await fetch(`/api/schedules?${params.toString()}`, {
 		method: "GET",
@@ -81,8 +82,9 @@ export const fetchSchedulesByDateRange = async (
  * 지난 시즌이 통째로 창 밖으로 밀려났다. 시즌 단위로 보여주려면 전체를 받아
  * 시즌별로 나눈다. 한 시즌이 30경기 안팎이라 양이 크지 않다.
  */
-export const fetchAllSchedules = async (): Promise<ScheduleResponse[]> => {
-	const response = await fetch("/api/schedules", {
+export const fetchAllSchedules = async (filters: ScheduleFilters = {}): Promise<ScheduleResponse[]> => {
+	const query = scheduleFilterParams(filters).toString();
+	const response = await fetch(`/api/schedules${query ? `?${query}` : ""}`, {
 		method: "GET",
 		cache: "no-store",
 	});

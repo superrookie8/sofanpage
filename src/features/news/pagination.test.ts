@@ -5,10 +5,12 @@ describe("resolveNewsTotalPages", () => {
 	it("uses the selected source total", () => {
 		expect(resolveNewsTotalPages("jumpball", 4, 9)).toBe(4);
 		expect(resolveNewsTotalPages("rookie", 4, 9)).toBe(9);
+		expect(resolveNewsTotalPages("other", 4, 9, 12)).toBe(12);
 	});
 
 	it("uses the longer source for the combined list", () => {
 		expect(resolveNewsTotalPages("all", 4, 9)).toBe(9);
+		expect(resolveNewsTotalPages("all", 4, 9, 12)).toBe(12);
 	});
 
 	it("falls back to the available source total", () => {

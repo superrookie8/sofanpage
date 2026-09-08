@@ -1,3 +1,4 @@
+import { scheduleFilterKey, type ScheduleFilters } from "./competition";
 // src/features/games/queries.ts
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/react-query/queryKeys";
@@ -20,11 +21,12 @@ export const useGameScheduleQuery = () => {
 export const useSchedulesByDateRangeQuery = (
 	start: string,
 	end: string,
-	enabled: boolean = true
+	enabled: boolean = true,
+	filters: ScheduleFilters = {}
 ) => {
 	return useQuery({
-		queryKey: queryKeys.games.schedulesByDateRange(start, end),
-		queryFn: () => fetchSchedulesByDateRange(start, end),
+		queryKey: [...queryKeys.games.schedulesByDateRange(start, end), scheduleFilterKey(filters)],
+		queryFn: () => fetchSchedulesByDateRange(start, end, filters),
 		enabled: enabled && !!start,
 		staleTime: 1000 * 60 * 5, // 5분간 캐시
 		gcTime: 1000 * 60 * 30, // 30분간 유지
@@ -32,10 +34,10 @@ export const useSchedulesByDateRangeQuery = (
 };
 
 // 시즌 선택용: 활성 스케줄 전체 조회
-export const useAllSchedulesQuery = () => {
+export const useAllSchedulesQuery = (filters: ScheduleFilters = {}) => {
 	return useQuery({
-		queryKey: queryKeys.games.allSchedules(),
-		queryFn: fetchAllSchedules,
+		queryKey: [...queryKeys.games.allSchedules(), scheduleFilterKey(filters)],
+		queryFn: () => fetchAllSchedules(filters),
 		staleTime: 1000 * 60 * 5,
 		gcTime: 1000 * 60 * 30,
 	});

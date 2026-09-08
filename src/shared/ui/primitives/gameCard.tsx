@@ -12,6 +12,8 @@ export interface GameCardProps {
 	/** "19:00 · 부산 사직실내체육관" */
 	detail: string;
 	isHome: boolean;
+	venueLabel?: string;
+	competition?: string;
 	onClick?: () => void;
 	className?: string;
 }
@@ -24,6 +26,8 @@ export default function GameCard({
 	opponent,
 	detail,
 	isHome,
+	venueLabel,
+	competition,
 	onClick,
 	className,
 }: GameCardProps) {
@@ -53,13 +57,14 @@ export default function GameCard({
 			</div>
 			<div className="w-px self-stretch bg-ink-100" />
 			<div className="min-w-0 flex-1">
+				{competition && <p className="mb-1 text-xs text-ink-500">{competition}</p>}
 				<div className="truncate text-[16px] font-bold text-ink-900">
 					{opponent}
 				</div>
 				<div className="mt-0.5 truncate text-[13px] text-ink-500">{detail}</div>
 			</div>
-			<Chip tone={isHome ? "home" : "away"} className="h-[26px] flex-shrink-0 px-2.5 text-[12px]">
-				{isHome ? "홈" : "원정"}
+			<Chip tone={venueLabel === "중립" ? "neutral" : isHome ? "home" : "away"} className="h-[26px] flex-shrink-0 px-2.5 text-[12px]">
+				{venueLabel || (isHome ? "홈" : "원정")}
 			</Chip>
 		</Tag>
 	);

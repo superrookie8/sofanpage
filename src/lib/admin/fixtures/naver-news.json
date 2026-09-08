@@ -1,0 +1,61 @@
+{
+  "total": 1200,
+  "items": [
+    {
+      "title": "이소희 월드컵",
+      "originallink": "http://www.jumpball.co.kr/news/1?utm_source=naver#x",
+      "link": "http://www.jumpball.co.kr/news/1?utm_source=naver#x",
+      "description": "여자농구 대표팀",
+      "pubDate": "Tue, 08 Sep 2026 11:00:00 +0900"
+    },
+    {
+      "title": "이소희 월드컵",
+      "originallink": "https://jumpball.co.kr/news/1",
+      "link": "https://jumpball.co.kr/news/1",
+      "description": "농구",
+      "pubDate": "Tue, 08 Sep 2026 11:00:00 +0900"
+    },
+    {
+      "title": "이소희 우승",
+      "originallink": "https://www.rookie.co.kr/news/articleView.html?idxno=3",
+      "link": "https://www.rookie.co.kr/news/articleView.html?idxno=3",
+      "description": "BNK",
+      "pubDate": "Tue, 08 Sep 2026 11:00:00 +0900"
+    },
+    {
+      "title": "이소희 세계선수권",
+      "originallink": "https://news.example.com/4",
+      "link": "https://news.example.com/4",
+      "description": "배드민턴 복식 우승",
+      "pubDate": "Tue, 08 Sep 2026 11:00:00 +0900"
+    },
+    {
+      "title": "이소희 인터뷰",
+      "originallink": "https://news.example.com/5",
+      "link": "https://news.example.com/5",
+      "description": "월드컵 도전",
+      "pubDate": "Tue, 08 Sep 2026 11:00:00 +0900"
+    },
+    {
+      "title": "이소희 종목들",
+      "originallink": "https://news.example.com/6",
+      "link": "https://news.example.com/6",
+      "description": "농구와 배드민턴",
+      "pubDate": "Tue, 08 Sep 2026 11:00:00 +0900"
+    },
+    {
+      "title": "다른 선수",
+      "originallink": "https://news.example.com/7",
+      "link": "https://news.example.com/7",
+      "description": "여자농구",
+      "pubDate": "Tue, 08 Sep 2026 11:00:00 +0900"
+    },
+    {
+      "title": "이소희 농구",
+      "originallink": "javascript:alert(1)",
+      "link": "javascript:alert(1)",
+      "description": "농구",
+      "pubDate": "Tue, 08 Sep 2026 11:00:00 +0900"
+    }
+  ]
+}

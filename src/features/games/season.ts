@@ -1,3 +1,4 @@
+import { legacySeason } from "./competition";
 import type { ScheduleResponse } from "./types";
 
 /**
@@ -18,8 +19,9 @@ export function seasonOfDate(date: Date): string {
 export function seasonOf(schedule: ScheduleResponse): string | null {
 	const declared = schedule.season?.trim();
 	if (declared) return declared;
-	const date = new Date(schedule.startDateTime);
-	return Number.isNaN(date.getTime()) ? null : seasonOfDate(date);
+	if (schedule.competitionKey) return null;
+	const resolved = legacySeason(schedule);
+	return resolved === "미분류" ? null : resolved;
 }
 
 /** 경기가 있는 시즌 목록. 최신 시즌이 앞에 온다. */

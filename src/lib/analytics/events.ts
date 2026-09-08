@@ -20,7 +20,7 @@ type NoParams = Record<string, never>;
 
 export type AuthMethod = "kakao" | "naver" | "google";
 export type NavLocation = "header" | "bottom_tab" | "drawer";
-export type NewsSource = "all" | "jumpball" | "rookie";
+export type NewsSource = "all" | "jumpball" | "rookie" | "other";
 export type ContentSurface = "home" | "news_page";
 
 export interface EventMap {

@@ -1,3 +1,4 @@
+import type { CompetitionMetadata } from "./competition";
 // src/features/games/types.ts
 export interface GameSchedule {
 	_id: string;
@@ -29,7 +30,7 @@ export interface RecommendedRoute {
 }
 
 // 새로운 스케줄 API 응답 타입
-export interface ScheduleResponse {
+export interface ScheduleResponse extends CompetitionMetadata {
 	id: string;
 	title: string;
 	description: string | null;
@@ -66,7 +67,11 @@ export interface StadiumInfo {
 	intercityRoute: string | null; // 교통정보: 시외교통 (KTX, 시외버스 등)
 }
 
-export interface ScheduleDetailsResponse {
+export interface ScheduleDetailsResponse extends CompetitionMetadata {
+	season?: string | null;
+	opponent?: string | null;
+	isHome?: boolean | null;
+	specialGame?: boolean | null;
 	// 기본 스케줄 정보
 	id: string;
 	title: string;

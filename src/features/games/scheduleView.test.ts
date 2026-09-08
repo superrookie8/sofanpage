@@ -34,7 +34,7 @@ describe("scheduleView", () => {
 		const game = schedule({ location: "Home" });
 		expect(isHomeGame(game)).toBe(true);
 		expect(venueName(game)).toBe(HOME_VENUE);
-		expect(matchupLabel(game)).toBe("vs 우리은행 우리WON");
+		expect(matchupLabel(game)).toBe("BNK 썸 vs 우리은행 우리WON");
 	});
 
 	it("원정 경기장은 opponent가 아니라 location에서 표시한다", () => {
@@ -45,7 +45,7 @@ describe("scheduleView", () => {
 		});
 		expect(isHomeGame(game)).toBe(false);
 		expect(venueName(game)).toBe("청주체육관");
-		expect(matchupLabel(game)).toBe("@ KB스타즈");
+		expect(matchupLabel(game)).toBe("BNK 썸 vs KB스타즈");
 	});
 
 	it("레거시 location 팀 키는 실제 경기장으로 정규화한다", () => {
@@ -61,7 +61,7 @@ describe("scheduleView", () => {
 			latitude: 36.6365,
 			longitude: 127.4734,
 		});
-		expect(matchupLabel(game)).toBe("@ 우리은행");
+		expect(matchupLabel(game)).toBe("BNK 썸 vs 우리은행");
 	});
 
 	it("location이 없을 때 opponent를 경기장 fallback으로 쓰지 않는다", () => {

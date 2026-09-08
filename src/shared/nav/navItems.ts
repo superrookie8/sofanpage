@@ -26,7 +26,7 @@ export interface NavItem {
  * 어긋나지 않으며, 공개 시점에 accessPolicy만 고치면 메뉴가 따라온다.
  */
 const ALL_NAV_ITEMS: readonly NavItem[] = [
-	{ href: "/home", label: "홈", icon: "home", tabPriority: 0 },
+	{ href: "/", label: "홈", icon: "home", tabPriority: 0 },
 	{ href: "/news", label: "뉴스", icon: "news", tabPriority: 1 },
 	{ href: "/schedule", label: "스케줄", icon: "schedule", tabPriority: 2 },
 	{ href: "/events", label: "이벤트", icon: "events", tabPriority: 4 },
@@ -69,6 +69,7 @@ export function isDarkShellPath(pathname: string | null | undefined) {
 
 export function isNavItemActive(pathname: string | null, href: string) {
 	if (!pathname) return false;
+	if (href === "/") return pathname === "/" || pathname === "/home";
 	// "/diary/read" 같은 항목은 섹션 루트 기준으로 활성 판정한다.
 	const section = `/${href.split("/").filter(Boolean)[0] ?? ""}`;
 	return pathname === section || pathname.startsWith(`${section}/`);

@@ -42,6 +42,7 @@ export const queryKeys = {
 		latest: () => [...queryKeys.news.all, "latest"] as const,
 		jumpball: () => [...queryKeys.news.all, "jumpball"] as const,
 		rookie: () => [...queryKeys.news.all, "rookie"] as const,
+		other: () => [...queryKeys.news.all, "other"] as const,
 	},
 
 	// Events 관련

@@ -12,6 +12,7 @@ import {
 	useJumpballNewsQuery,
 	useLatestNewsQuery,
 	useRookieNewsQuery,
+	useOtherNewsQuery,
 } from "@/features/news/queries";
 import type { Article } from "@/features/news/types";
 import {
@@ -25,6 +26,7 @@ const SOURCES: ReadonlyArray<{ value: NewsSource; label: string }> = [
 	{ value: "all", label: "전체" },
 	{ value: "jumpball", label: "점프볼" },
 	{ value: "rookie", label: "루키" },
+	{ value: "other", label: "그외" },
 ];
 
 const PAGE_SIZE = 8;
@@ -35,15 +37,19 @@ export default function NewsPage() {
 
 	const { data: latest, isLoading: latestLoading } = useLatestNewsQuery();
 
-	// "전체"에서는 두 매체를 모두 받아 발행일 기준으로 합친다.
+	// "전체"에서는 각 출처를 모두 받아 발행일 기준으로 합친다.
 	const wantJumpball = source === "all" || source === "jumpball";
 	const wantRookie = source === "all" || source === "rookie";
 
-	const jumpball = useJumpballNewsQuery(page, wantJumpball ? PAGE_SIZE : 1);
-	const rookie = useRookieNewsQuery(page, wantRookie ? PAGE_SIZE : 1);
+	const wantOther = source === "all" || source === "other";
+	const jumpball = useJumpballNewsQuery(page, PAGE_SIZE, wantJumpball);
+	const rookie = useRookieNewsQuery(page, PAGE_SIZE, wantRookie);
+	const other = useOtherNewsQuery(page, PAGE_SIZE, wantOther);
 
-	const isLoading = jumpball.isLoading || rookie.isLoading;
-	const isError = jumpball.isError && rookie.isError;
+	const activeQueries = [wantJumpball && jumpball, wantRookie && rookie, wantOther && other].filter(Boolean) as typeof jumpball[];
+	const isLoading = activeQueries.some((query) => query.isLoading);
+	const isError = activeQueries.every((query) => query.isError);
+	const hasPartialError = !isError && activeQueries.some((query) => query.isError);
 
 	const featured = latest?.main_article;
 
@@ -51,9 +57,10 @@ export default function NewsPage() {
 		const collected: Article[] = [];
 		if (wantJumpball) collected.push(...(jumpball.data?.articles ?? []));
 		if (wantRookie) collected.push(...(rookie.data?.articles ?? []));
+		if (wantOther) collected.push(...(other.data?.articles ?? []));
 
 		const seen = new Set<string>();
-		if (featured) seen.add(featured.id);
+		if (featured && source === "all") seen.add(featured.id);
 
 		return collected
 			.filter((article) => {
@@ -66,15 +73,17 @@ export default function NewsPage() {
 				const right = parseDate(b.publishedAt)?.getTime() ?? 0;
 				return right - left;
 			});
-	}, [wantJumpball, wantRookie, jumpball.data, rookie.data, featured]);
+	}, [wantJumpball, wantRookie, wantOther, jumpball.data, rookie.data, other.data, featured, source]);
 
 	const hasMore =
 		(wantJumpball && jumpball.data?.hasNext) ||
-		(wantRookie && rookie.data?.hasNext);
+		(wantRookie && rookie.data?.hasNext) ||
+		(wantOther && other.data?.hasNext);
 	const totalPages = resolveNewsTotalPages(
 		source,
 		jumpball.data?.totalPages,
-		rookie.data?.totalPages
+		rookie.data?.totalPages,
+		other.data?.totalPages
 	);
 
 	const changeSource = (next: NewsSource) => {
@@ -113,11 +122,13 @@ export default function NewsPage() {
 				</div>
 			)}
 
+			{hasPartialError && (
+				<p role="status" className="mb-4 text-sm text-ink-700">일부 출처의 기사를 불러오지 못했어요. <button className="underline" onClick={() => activeQueries.filter((query) => query.isError).forEach((query) => query.refetch())}>다시 시도</button></p>
+			)}
 			{isError ? (
 				<ErrorState
 					onRetry={() => {
-						jumpball.refetch();
-						rookie.refetch();
+						activeQueries.forEach((query) => query.refetch());
 					}}
 				/>
 			) : isLoading ? (

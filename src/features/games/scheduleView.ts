@@ -1,3 +1,4 @@
+import { competitionOf } from "./competition";
 import { locations } from "./constants";
 import type { GameLocation, ScheduleResponse } from "./types";
 
@@ -11,6 +12,7 @@ import type { GameLocation, ScheduleResponse } from "./types";
 export const HOME_VENUE = "부산 사직실내체육관";
 
 export function isHomeGame(schedule: ScheduleResponse): boolean {
+	if (schedule.venueType) return schedule.venueType === "home";
 	return typeof schedule.isHome === "boolean"
 		? schedule.isHome
 		: schedule.location === "Home";
@@ -23,11 +25,14 @@ export function opponentName(schedule: ScheduleResponse): string {
 
 /** "vs 우리은행" / "@ KB스타즈" */
 export function matchupLabel(schedule: ScheduleResponse): string {
-	return `${isHomeGame(schedule) ? "vs" : "@"} ${opponentName(schedule)}`;
+	const metadata = competitionOf(schedule);
+	return `${metadata.ourTeamName ? `${metadata.ourTeamName} ` : ""}vs ${opponentName(schedule)}`;
 }
 
 /** 경기장 표시값. opponent는 상대팀이므로 venue로 사용하지 않는다. */
 export function venueName(schedule: ScheduleResponse): string | null {
+	if (schedule.venueName?.trim()) return schedule.venueName.trim();
+	if (schedule.competitionKey) return null;
 	const knownLocation = resolveGameLocation(schedule);
 	if (knownLocation) return knownLocation.name;
 
@@ -42,6 +47,8 @@ export function venueName(schedule: ScheduleResponse): string | null {
 export function resolveGameLocation(
 	schedule: ScheduleResponse
 ): GameLocation | null {
+	if (schedule.venueName?.trim()) return locations[schedule.venueName.trim()] ?? null;
+	if (schedule.competitionKey) return null;
 	const locationKey = isHomeGame(schedule)
 		? HOME_VENUE
 		: schedule.location?.trim();

@@ -1,10 +1,25 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+	async redirects() {
+		return [{ source: "/home", destination: "/", permanent: true }];
+	},
 	compiler: {
 		styledComponents: true,
 	},
 	async headers() {
 		return [
+			...['/admin/:path*', '/api/admin/:path*'].map((source) => ({
+				source,
+				headers: [
+					{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+					{ key: "X-Content-Type-Options", value: "nosniff" },
+					{ key: "X-Frame-Options", value: "DENY" },
+					{ key: "Referrer-Policy", value: "same-origin" },
+					{ key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+					{ key: "Content-Security-Policy", value: "frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'" },
+					{ key: "Cache-Control", value: "private, no-store" },
+				],
+			})),
 			{
 				// API 응답은 사용자/세션에 따라 달라질 수 있어 캐싱 금지
 				// (특히 next-auth의 /api/auth/*, 그리고 인증이 필요한 /api/diary 등)

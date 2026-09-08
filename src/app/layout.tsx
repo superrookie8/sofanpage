@@ -1,16 +1,14 @@
 // src/app/layout.tsx
 import type { Metadata } from "next";
+import { SITE_URL, SITE_DESCRIPTION } from "@/lib/seo";
 import "./globals.css";
 import Providers from "@/components/providers/sessionProvider";
 import { getServerSession } from "next-auth";
 import { getMissingAuthEnvironmentKeys } from "@/features/auth/server/authEnvironment";
 import ScriptProvider from "@/utils/scriptProvider";
-import AppShell from "@/shared/ui/shell/appShell";
-import Header from "@/shared/ui/shell/header";
-import BottomNav from "@/shared/ui/shell/bottomNav";
 import { LoadingProvider } from "@/context/LoadingContext";
 import LoadingSpinner from "@/shared/ui/loadingSpinner";
-import GoogleAnalytics from "@/components/analytics/googleAnalytics";
+import SiteSurface from "@/shared/ui/shell/siteSurface";
 
 // next-auth(getServerSession)가 headers/cookies를 사용하므로
 // 루트 레이아웃은 정적 프리렌더링(SSG) 대상이 되면 빌드가 실패할 수 있음.
@@ -18,12 +16,13 @@ import GoogleAnalytics from "@/components/analytics/googleAnalytics";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
+	metadataBase: new URL(SITE_URL),
 	title: {
 		default: "농구선수 이소희 팬페이지 SUPER SOHEE",
-		template: "%s | Lee Sohee",
+		template: "%s | SUPER SOHEE",
 	},
 	description:
-		"Welcome to the fan page of BNK NO 6. Lee Sohee. 농구선수 이소희의 팬페이지 입니다!",
+		SITE_DESCRIPTION,
 	keywords: [
 		"WKBL",
 		"BNK SUM",
@@ -110,13 +109,10 @@ export default async function RootLayout({
 			</head>
 			<ScriptProvider />
 			<body>
-				<GoogleAnalytics />
 				<Providers session={session}>
 					<LoadingProvider>
 						<LoadingSpinner />
-						<Header />
-						<AppShell>{children}</AppShell>
-						<BottomNav />
+						<SiteSurface>{children}</SiteSurface>
 					</LoadingProvider>
 				</Providers>
 			</body>

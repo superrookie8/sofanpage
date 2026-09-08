@@ -1,4 +1,5 @@
 "use client";
+import { competitionLabel, venueTypeLabel } from "@/features/games/competition";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { useSchedulesByDateRangeQuery } from "@/features/games/queries";
@@ -66,6 +67,8 @@ export default function NextGameSection() {
 				.filter(Boolean)
 				.join(" · ")}
 			isHome={isHomeGame(nextGame)}
+				competition={competitionLabel(nextGame)}
+				venueLabel={venueTypeLabel(nextGame)}
 			onClick={() => router.push("/schedule")}
 		/>
 	);

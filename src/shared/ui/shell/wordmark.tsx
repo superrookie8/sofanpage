@@ -10,7 +10,7 @@ export default function Wordmark({
 	compact?: boolean;
 }) {
 	return (
-		<Link href="/home" className="flex items-center gap-2.5" aria-label="SUPER SOHEE 홈">
+		<Link href="/" className="flex items-center gap-2.5" aria-label="SUPER SOHEE 홈">
 			<span
 				className={cn(
 					"flex items-center justify-center rounded-[8px] bg-brand-500 font-display text-white",

@@ -1,0 +1,122 @@
+import "server-only";
+
+import { NextRequest, NextResponse } from "next/server";
+import { notifyAdminError } from "./alerts/slack";
+import { getAdminToken } from "./session";
+import { resolveBackendApiUrl } from "@/lib/server/http/backendApi";
+
+const PRESERVED_ERROR_STATUSES = new Set([
+	400, 401, 403, 404, 409, 413, 422, 429,
+]);
+
+const backendBaseUrl = resolveBackendApiUrl;
+
+async function responseBody(response: Response): Promise<unknown> {
+	const text = await response.text();
+	if (!text) return null;
+	try {
+		return JSON.parse(text);
+	} catch {
+		return { message: text };
+	}
+}
+
+function backendErrorCategory(error: unknown) {
+	if (error instanceof Error && ["AbortError", "TimeoutError"].includes(error.name)) {
+		return "backend_timeout" as const;
+	}
+	if (error instanceof SyntaxError) return "backend_response" as const;
+	return "backend_connection" as const;
+}
+
+async function alertBackendFailure(
+	operation: string,
+	path: string,
+	error: unknown
+): Promise<void> {
+	await notifyAdminError({
+		operation,
+		route: path,
+		status: 502,
+		category: backendErrorCategory(error),
+	});
+}
+
+export async function adminBackendFetch(
+	path: string,
+	init: RequestInit = {}
+): Promise<NextResponse> {
+	const token = await getAdminToken();
+	if (!token) {
+		return NextResponse.json({ message: "관리자 로그인이 필요합니다." }, { status: 401 });
+	}
+
+	try {
+		const headers = new Headers(init.headers);
+		headers.set("Authorization", `Bearer ${token}`);
+		const response = await fetch(`${backendBaseUrl()}${path}`, {
+			...init,
+			headers,
+			cache: "no-store",
+			signal: init.signal ?? AbortSignal.timeout(15000),
+		});
+		const body = await responseBody(response);
+		const status = response.ok
+			? response.status
+			: PRESERVED_ERROR_STATUSES.has(response.status) || response.status >= 500
+				? response.status
+				: 502;
+		const result = body === null && [204, 205, 304].includes(status)
+			? new NextResponse(null, { status })
+			: NextResponse.json(response.ok ? body : { message: status === 401 ? "관리자 로그인이 필요합니다." : status === 403 ? "관리자 권한이 필요합니다." : "요청 처리에 실패했습니다. 입력과 서버 상태를 확인해주세요." }, { status, headers: {"Cache-Control":"private, no-store"} });
+		return result;
+	} catch (error) {
+		await alertBackendFailure("adminBackendFetch", path, error);
+		const message = "백엔드 연결에 실패했습니다.";
+		return NextResponse.json({ message }, { status: 502 });
+	}
+}
+
+export async function adminBackendBinaryFetch(path: string): Promise<NextResponse> {
+	const token = await getAdminToken();
+	if (!token) {
+		return NextResponse.json({ message: "관리자 로그인이 필요합니다." }, { status: 401 });
+	}
+	try {
+		const response = await fetch(`${backendBaseUrl()}${path}`, {
+			headers: { Authorization: `Bearer ${token}` },
+			cache: "no-store",
+			signal: AbortSignal.timeout(15000),
+		});
+		if (!response.ok) {
+			const body = await responseBody(response);
+			const status = PRESERVED_ERROR_STATUSES.has(response.status) || response.status >= 500
+				? response.status
+				: 502;
+			const result = NextResponse.json(response.ok ? body : { message: status === 401 ? "관리자 로그인이 필요합니다." : status === 403 ? "관리자 권한이 필요합니다." : "요청 처리에 실패했습니다. 입력과 서버 상태를 확인해주세요." }, { status, headers: {"Cache-Control":"private, no-store"} });
+			return result;
+		}
+		return new NextResponse(await response.arrayBuffer(), {
+			status: response.status,
+			headers: {
+				"Content-Type": response.headers.get("content-type") ?? "application/octet-stream",
+				"Cache-Control": "private, no-store",
+				"X-Content-Type-Options": "nosniff",
+			},
+		});
+	} catch (error) {
+		await alertBackendFailure("adminBackendBinaryFetch", path, error);
+		const message = "백엔드 연결에 실패했습니다.";
+		return NextResponse.json({ message }, { status: 502 });
+	}
+}
+
+export function clientErrorMessage(body: unknown, fallback: string): string {
+	if (!body || typeof body !== "object") return fallback;
+	const value = body as Record<string, unknown>;
+	for (const key of ["message", "error", "msg"]) {
+		const candidate = value[key];
+		if (typeof candidate === "string" && candidate) return candidate;
+	}
+	return fallback;
+}

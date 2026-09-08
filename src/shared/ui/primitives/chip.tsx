@@ -8,7 +8,8 @@ type ChipTone =
 	| "win"
 	| "lose"
 	| "home"
-	| "away";
+	| "away"
+	| "neutral";
 
 const TONE: Record<ChipTone, string> = {
 	default: "border border-ink-200 bg-white text-ink-700 font-medium",
@@ -21,6 +22,7 @@ const TONE: Record<ChipTone, string> = {
 	lose: "bg-ink-100 text-ink-500 font-semibold",
 	home: "bg-brand-50 text-brand-700 font-semibold",
 	away: "bg-ink-100 text-ink-700 font-semibold",
+	neutral: "bg-amber-50 text-amber-800 font-semibold",
 };
 
 export interface ChipProps extends React.HTMLAttributes<HTMLSpanElement> {

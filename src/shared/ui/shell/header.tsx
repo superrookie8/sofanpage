@@ -24,6 +24,7 @@ export default function Header() {
 	const { data: session } = useSession();
 	const [scrolled, setScrolled] = useState(false);
 	const [menuOpen, setMenuOpen] = useState(false);
+	const [canAdmin, setCanAdmin] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const menuButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -33,6 +34,15 @@ export default function Header() {
 	// 마이페이지는 메뉴 목록이 아니라 계정 영역에서 다룬다(navItems.ts 참고).
 	// 로그인해야 열리는 화면이라 로그인 상태에서만 노출한다.
 	const showMyPage = isLoggedIn && isMyPageEnabled();
+
+	useEffect(() => {
+		let active = true;
+		setCanAdmin(false);
+		if (isLoggedIn) fetch("/api/admin/session", { cache: "no-store" })
+			.then((response) => { if (active) setCanAdmin(response.ok); })
+			.catch(() => { if (active) setCanAdmin(false); });
+		return () => { active = false; };
+	}, [isLoggedIn, pathname]);
 
 	// 경로가 바뀌면 모바일 메뉴를 닫는다.
 	useEffect(() => {
@@ -182,6 +192,7 @@ export default function Header() {
 							마이페이지
 						</Link>
 					)}
+					{canAdmin && <Link href="/admin" className="hidden text-xs text-ink-500 lg:inline-flex">관리자</Link>}
 					{isLoggedIn ? (
 						<Button
 							variant={dark ? "secondaryDark" : "secondary"}
@@ -263,6 +274,7 @@ export default function Header() {
 								</Link>
 							</li>
 						)}
+						{canAdmin && <li><Link href="/admin" className="flex min-h-[44px] items-center px-2 text-sm">관리자</Link></li>}
 						<li className="mt-2 border-t border-ink-200 pt-2">
 							{isLoggedIn ? (
 								<button

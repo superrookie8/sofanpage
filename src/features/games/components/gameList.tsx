@@ -1,4 +1,5 @@
 "use client";
+import { competitionLabel, venueTypeLabel } from "@/features/games/competition";
 import { useMemo } from "react";
 import type { ScheduleResponse } from "../types";
 import { isGameSchedule } from "../nextGame";
@@ -62,6 +63,8 @@ export default function GameList({
 									.filter(Boolean)
 									.join(" · ")}
 								isHome={isHomeGame(game)}
+				competition={competitionLabel(game)}
+				venueLabel={venueTypeLabel(game)}
 								onClick={() => onSelect(game.id)}
 							/>
 						))}
