@@ -1,10 +1,14 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchInternationalResults } from "./api";
 import InternationalResultCard from "./components/internationalResultCard";
+import InternationalResultsSection from "./components/internationalResultsSection";
 import {
 	formatCompetitionDate,
+	internationalResultsViewReducer,
+	paginateInternationalResults,
 	safeSourceUrl,
 	visibleInternationalResults,
 } from "./presentation";
@@ -125,4 +129,76 @@ describe("international results public data", () => {
 		);
 		expect(safeSourceUrl("mailto:test@example.com")).toBeNull();
 	});
+
+	it("paginates nine results as 4, 4, and 1", () => {
+		const rows = Array.from({ length: 9 }, (_, index) =>
+			result({ id: `result-${index + 1}` })
+		);
+
+		expect(paginateInternationalResults(rows, 1).map((row) => row.id)).toEqual([
+			"result-1",
+			"result-2",
+			"result-3",
+			"result-4",
+		]);
+		expect(paginateInternationalResults(rows, 2)).toHaveLength(4);
+		expect(paginateInternationalResults(rows, 3).map((row) => row.id)).toEqual([
+			"result-9",
+		]);
+	});
+
+	it("resets to page one whenever the category filter changes", () => {
+		expect(
+			internationalResultsViewReducer(
+				{ filter: "ALL", page: 3 },
+				{ type: "FILTER", filter: "NATIONAL_TEAM" }
+			)
+		).toEqual({ filter: "NATIONAL_TEAM", page: 1 });
+	});
+
+	it.each([
+		{ count: 9, navigation: true, label: "1 / 3" },
+		{ count: 4, navigation: false, label: "1 / 1" },
+	])(
+		"renders the first four of $count results and shows navigation only when needed",
+		({ count, navigation, label }) => {
+			const client = new QueryClient({
+				defaultOptions: { queries: { retry: false } },
+			});
+			client.setQueryData(
+				["international-results", "public"],
+				Array.from({ length: count }, (_, index) =>
+					result({
+						id: `page-result-${index + 1}`,
+						competitionName: `국제대회 ${index + 1}`,
+						displayOrder: index + 1,
+					})
+				)
+			);
+
+			const html = renderToStaticMarkup(
+				React.createElement(
+					QueryClientProvider,
+					{ client },
+					React.createElement(InternationalResultsSection)
+				)
+			);
+
+			expect(html).toContain("국제대회 1");
+			expect(html).toContain("국제대회 4");
+			expect(html).not.toContain("국제대회 5");
+			expect(html.includes('aria-label="국제대회 기록 페이지"')).toBe(
+				navigation
+			);
+		if (navigation) {
+				expect(html).toContain(label);
+				expect(html).toContain(
+					'aria-label="이전 국제대회 기록 페이지" disabled=""'
+				);
+		} else {
+				expect(html).not.toContain(label);
+		}
+		client.clear();
+		}
+	);
 });

@@ -1,12 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useReducer } from "react";
+import Button from "@/shared/ui/primitives/button";
 import SegmentedTabs from "@/shared/ui/primitives/segmentedTabs";
 import { Skeleton } from "@/shared/ui/primitives/skeleton";
 import { EmptyState, ErrorState } from "@/shared/ui/primitives/states";
 import { useInternationalResultsQuery } from "../queries";
 import {
 	type InternationalResultFilter,
+	clampInternationalResultsPage,
+	INTERNATIONAL_RESULTS_PAGE_SIZE,
+	internationalResultsViewReducer,
+	paginateInternationalResults,
 	visibleInternationalResults,
 } from "../presentation";
 import InternationalResultCard from "./internationalResultCard";
@@ -19,12 +24,27 @@ const FILTERS = [
 ] as const;
 
 export default function InternationalResultsSection() {
-	const [filter, setFilter] = useState<InternationalResultFilter>("ALL");
+	const [view, dispatch] = useReducer(internationalResultsViewReducer, {
+		filter: "ALL" as InternationalResultFilter,
+		page: 1,
+	});
 	const { data, isLoading, isError, refetch } = useInternationalResultsQuery();
 	const results = useMemo(
-		() => visibleInternationalResults(data ?? [], filter),
-		[data, filter]
+		() => visibleInternationalResults(data ?? [], view.filter),
+		[data, view.filter]
 	);
+	const totalPages = Math.ceil(results.length / INTERNATIONAL_RESULTS_PAGE_SIZE);
+	const currentPage = clampInternationalResultsPage(view.page, totalPages);
+	const pageResults = useMemo(
+		() => paginateInternationalResults(results, currentPage),
+		[results, currentPage]
+	);
+
+	useEffect(() => {
+		if (view.page !== currentPage) {
+			dispatch({ type: "PAGE", page: currentPage });
+		}
+	}, [currentPage, view.page]);
 
 	if (isLoading) {
 		return (
@@ -62,8 +82,8 @@ export default function InternationalResultsSection() {
 			<div className="mb-4 overflow-x-auto pb-1">
 				<SegmentedTabs
 					aria-label="국제대회 종류"
-					value={filter}
-					onChange={setFilter}
+					value={view.filter}
+					onChange={(filter) => dispatch({ type: "FILTER", filter })}
 					options={FILTERS}
 					className="min-w-max"
 				/>
@@ -75,11 +95,47 @@ export default function InternationalResultsSection() {
 					description="다른 종류를 선택해 확인해보세요"
 				/>
 			) : (
-				<div className="grid gap-3 md:grid-cols-2">
-					{results.map((result) => (
-						<InternationalResultCard key={result.id} result={result} />
-					))}
-				</div>
+				<>
+					<div className="grid gap-3 md:grid-cols-2">
+						{pageResults.map((result) => (
+							<InternationalResultCard key={result.id} result={result} />
+						))}
+					</div>
+
+					{totalPages > 1 && (
+						<nav
+							aria-label="국제대회 기록 페이지"
+							className="mt-5 flex items-center justify-center gap-3"
+						>
+							<Button
+								variant="secondary"
+								size="sm"
+								aria-label="이전 국제대회 기록 페이지"
+								disabled={currentPage === 1}
+								onClick={() =>
+									dispatch({ type: "PAGE", page: currentPage - 1 })
+								}
+							>
+								이전
+							</Button>
+							<p className="min-w-16 text-center text-sm font-semibold tabular-nums text-ink-700">
+								<span className="sr-only">현재 페이지 </span>
+								{currentPage} / {totalPages}
+							</p>
+							<Button
+								variant="secondary"
+								size="sm"
+								aria-label="다음 국제대회 기록 페이지"
+								disabled={currentPage === totalPages}
+								onClick={() =>
+									dispatch({ type: "PAGE", page: currentPage + 1 })
+								}
+							>
+								다음
+							</Button>
+						</nav>
+					)}
+				</>
 			)}
 		</div>
 	);

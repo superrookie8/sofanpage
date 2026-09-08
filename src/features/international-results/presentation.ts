@@ -5,6 +5,39 @@ import type {
 } from "./types";
 
 export type InternationalResultFilter = "ALL" | InternationalResultCategory;
+export const INTERNATIONAL_RESULTS_PAGE_SIZE = 4;
+
+export interface InternationalResultsViewState {
+	filter: InternationalResultFilter;
+	page: number;
+}
+
+export type InternationalResultsViewAction =
+	| { type: "FILTER"; filter: InternationalResultFilter }
+	| { type: "PAGE"; page: number };
+
+export function internationalResultsViewReducer(
+	state: InternationalResultsViewState,
+	action: InternationalResultsViewAction
+): InternationalResultsViewState {
+	if (action.type === "FILTER") {
+		return { filter: action.filter, page: 1 };
+	}
+	return { ...state, page: Math.max(1, action.page) };
+}
+
+export function clampInternationalResultsPage(page: number, totalPages: number) {
+	return Math.min(Math.max(1, page), Math.max(1, totalPages));
+}
+
+export function paginateInternationalResults<T>(
+	results: T[],
+	page: number,
+	pageSize = INTERNATIONAL_RESULTS_PAGE_SIZE
+) {
+	const start = (page - 1) * pageSize;
+	return results.slice(start, start + pageSize);
+}
 
 export const CATEGORY_LABELS: Record<InternationalResultCategory, string> = {
 	NATIONAL_TEAM: "국가대표",
