@@ -26,10 +26,6 @@ function SectionHeading({
 export default function HomePage() {
 	return (
 		<div className="flex flex-col gap-10 lg:gap-14">
-			<section aria-labelledby="fanpage-title">
-				<h1 id="fanpage-title" className="text-h2 lg:text-h2-lg">농구선수 이소희 팬페이지 슈퍼소희(SUPER SOHEE)</h1>
-				<p className="mt-2 text-sm text-ink-700">이소희 선수를 응원하며 선수 소식, 관련 기사, 경기 일정과 팬 이벤트를 함께 나눕니다.</p>
-			</section>
 			<Hero />
 
 			<section aria-labelledby="season-stats">
@@ -57,6 +53,18 @@ export default function HomePage() {
 			<section>
 				<SectionHeading title="최신 소식" action={<MoreNewsLink />} />
 				<LatestNewsSection />
+			</section>
+
+			<section
+				aria-labelledby="fanpage-title"
+				className="border-t border-ink-100 pt-6 lg:pt-8"
+			>
+				<h1 id="fanpage-title" className="text-h2 lg:text-h2-lg">
+					농구선수 이소희 팬페이지 슈퍼소희(SUPER SOHEE)
+				</h1>
+				<p className="mt-2 text-sm text-ink-700">
+					이소희 선수를 응원하며 선수 소식, 관련 기사, 경기 일정과 팬 이벤트를 함께 나눕니다.
+				</p>
 			</section>
 		</div>
 	);
