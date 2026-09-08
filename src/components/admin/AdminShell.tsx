@@ -12,6 +12,7 @@ const navItems: Array<{ href: string; label: string; heading?: string; descripti
 	{ href: "/admin", label: "대시보드", description: "운영 현황", icon: "home" },
 	{ href: "/admin/profile", label: "프로필", heading: "Manage Profiles", description: "선수 소개", icon: "profile" },
 	{ href: "/admin/stats", label: "기록", heading: "Manage Stats", description: "시즌 스탯", icon: "stats" },
+	{ href: "/admin/international-results", label: "국제대회", heading: "International Results", description: "국가대표·구단 성적", icon: "stats" },
 	{ href: "/admin/photos", label: "사진 업로드", description: "갤러리 추가", icon: "photos" },
 	{ href: "/admin/deletephotos", label: "사진 관리", heading: "Delete Photos", description: "갤러리 정리", icon: "photos" },
 	{ href: "/admin/schedule", label: "경기 일정", heading: "Manage Game Schedules", description: "시즌 스케줄", icon: "schedule" },

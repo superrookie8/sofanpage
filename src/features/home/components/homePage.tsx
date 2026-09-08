@@ -4,17 +4,20 @@ import NextGameSection from "@/features/home/components/nextGameSection";
 import LatestNewsSection, {
 	MoreNewsLink,
 } from "@/features/home/components/latestNewsSection";
+import InternationalResultsSection from "@/features/international-results/components/internationalResultsSection";
 
 function SectionHeading({
 	title,
 	action,
+	id,
 }: {
 	title: string;
 	action?: React.ReactNode;
+	id?: string;
 }) {
 	return (
 		<div className="mb-3 flex items-baseline justify-between gap-3">
-			<h2 className="text-h2 lg:text-h2-lg">{title}</h2>
+			<h2 id={id} className="text-h2 lg:text-h2-lg">{title}</h2>
 			{action}
 		</div>
 	);
@@ -34,6 +37,16 @@ export default function HomePage() {
 					시즌 기록
 				</h2>
 				<SeasonStats />
+			</section>
+
+			<section aria-labelledby="international-results">
+				<SectionHeading id="international-results" title="국가대표·국제대회" />
+				<p className="mb-4 text-sm text-ink-500">
+					대한민국 대표팀과 소속팀에서 치른 국제무대 기록입니다.
+				</p>
+				<div>
+					<InternationalResultsSection />
+				</div>
 			</section>
 
 			<section>
