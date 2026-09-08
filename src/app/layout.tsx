@@ -1,6 +1,6 @@
 // src/app/layout.tsx
 import type { Metadata } from "next";
-import { SITE_URL, SITE_DESCRIPTION } from "@/lib/seo";
+import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION } from "@/lib/seo";
 import "./globals.css";
 import Providers from "@/components/providers/sessionProvider";
 import { getServerSession } from "next-auth";
@@ -18,7 +18,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
 	metadataBase: new URL(SITE_URL),
 	title: {
-		default: "농구선수 이소희 팬페이지 SUPER SOHEE",
+		default: SITE_TITLE,
 		template: "%s | SUPER SOHEE",
 	},
 	description:

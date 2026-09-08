@@ -3,11 +3,12 @@ import type { Metadata } from "next";
 // The public host currently redirects www to this apex domain.
 export const SITE_URL = "https://supersohee.com";
 export const SITE_NAME = "SUPER SOHEE";
-export const SITE_DESCRIPTION = "농구선수 이소희를 응원하는 팬페이지 SUPER SOHEE. 선수 소식, 관련 기사, 경기 일정과 팬 이벤트를 만나보세요.";
+export const SITE_TITLE = "슈퍼소희 | 농구선수 이소희 팬페이지 SUPER SOHEE";
+export const SITE_DESCRIPTION = "농구선수 이소희를 응원하는 팬페이지 슈퍼소희(SUPER SOHEE). 선수 소식, 관련 기사, 경기 일정과 팬 이벤트를 만나보세요.";
 export const SOCIAL_IMAGE = "/images/2026-27_profile.JPG";
 
 export const PUBLIC_PAGES = [
-	{ path: "/", title: "농구선수 이소희 팬페이지 SUPER SOHEE", description: SITE_DESCRIPTION },
+	{ path: "/", title: SITE_TITLE, description: SITE_DESCRIPTION },
 	{ path: "/news", title: "이소희 선수 뉴스", description: "점프볼, 루키와 여러 매체의 농구선수 이소희 관련 기사를 모아보세요." },
 	{ path: "/schedule", title: "경기 일정", description: "이소희 선수의 경기 일정과 경기 결과를 확인하세요." },
 	{ path: "/events", title: "팬 이벤트", description: "이소희 선수와 함께한 팬 이벤트와 응원 기록을 만나보세요." },
