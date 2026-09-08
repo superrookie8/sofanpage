@@ -75,6 +75,20 @@ export interface SeasonStats {
 	total: TotalStats;
 }
 
+export type DisplayAverageStats = {
+	[K in keyof AverageStats]: AverageStats[K] | null;
+};
+
+export type DisplayTotalStats = {
+	[K in keyof TotalStats]: TotalStats[K] | null;
+};
+
+export interface StatsTableRow {
+	season: string;
+	average: DisplayAverageStats;
+	total: DisplayTotalStats;
+}
+
 /** 홈 상단 StatCard 4장에 쓰는 요약 */
 export interface StatHighlight {
 	label: string;

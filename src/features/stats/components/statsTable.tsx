@@ -1,5 +1,6 @@
-import type { AverageStats, SeasonStats, TotalStats } from "../types";
+import type { SeasonStats, StatsTableRow } from "../types";
 import { AVERAGE_KEYS, TOTAL_KEYS } from "../types";
+import { buildCareerStats } from "../career";
 
 /**
  * 전체 시즌 기록 표.
@@ -14,6 +15,8 @@ export default function StatsTable({
 	mode: "average" | "total";
 }) {
 	const keys = (mode === "average" ? AVERAGE_KEYS : TOTAL_KEYS) as string[];
+	const career = buildCareerStats(stats);
+	const rows: StatsTableRow[] = career ? [...stats, career] : stats;
 
 	return (
 		<div
@@ -46,28 +49,49 @@ export default function StatsTable({
 					</tr>
 				</thead>
 				<tbody>
-					{stats.map((stat) => (
-						<tr key={stat.season} className="border-t border-ink-100">
-							<th
-								scope="row"
-								className="sticky left-0 z-10 bg-white px-3 py-2.5 text-left font-bold text-ink-900"
+					{rows.map((stat) => {
+						const isCareer = stat.season === "통산";
+						return (
+							<tr
+								key={stat.season}
+								className={
+									isCareer
+										? "border-t-2 border-brand-200 bg-brand-50"
+										: "border-t border-ink-100"
+								}
 							>
-								{stat.season}
-							</th>
-							{keys.map((key) => (
-								<td
-									key={key}
-									className="whitespace-nowrap px-3 py-2.5 text-center text-ink-700"
+								<th
+									scope="row"
+									className={
+										isCareer
+											? "sticky left-0 z-10 bg-brand-50 px-3 py-2.5 text-left font-extrabold text-brand-700"
+											: "sticky left-0 z-10 bg-white px-3 py-2.5 text-left font-bold text-ink-900"
+									}
 								>
-									{String(
-										(stat[mode] as unknown as Record<string, string | number>)[
-											key
-										] ?? "-"
-									)}
-								</td>
-							))}
-						</tr>
-					))}
+									{stat.season}
+								</th>
+								{keys.map((key) => (
+									<td
+										key={key}
+										className={
+											isCareer
+												? "whitespace-nowrap px-3 py-2.5 text-center font-bold text-ink-900"
+												: "whitespace-nowrap px-3 py-2.5 text-center text-ink-700"
+										}
+									>
+										{String(
+											(
+												stat[mode] as unknown as Record<
+													string,
+													string | number | null
+												>
+											)[key] ?? "-"
+										)}
+									</td>
+								))}
+							</tr>
+						);
+					})}
 				</tbody>
 			</table>
 		</div>
