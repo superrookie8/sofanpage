@@ -11,7 +11,13 @@ import { cn } from "../cn";
  *
  * 페이지 전환은 opacity + y 8px (기존 translateX(100%) 슬라이드 제거).
  */
-export default function AppShell({ children }: { children: React.ReactNode }) {
+export default function AppShell({
+	children,
+	footer,
+}: {
+	children: React.ReactNode;
+	footer?: React.ReactNode;
+}) {
 	const pathname = usePathname();
 	const dark = isDarkShellPath(pathname);
 
@@ -26,7 +32,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 	}, [dark]);
 
 	return (
-		<motion.main
+		<motion.div
 			key={pathname}
 			initial={{ opacity: 0, y: 8 }}
 			animate={{ opacity: 1, y: 0 }}
@@ -37,7 +43,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 			)}
 			style={{ ["--nav-bottom" as string]: "64px" }}
 		>
-			{children}
-		</motion.main>
+			<main>{children}</main>
+			{footer}
+		</motion.div>
 	);
 }
