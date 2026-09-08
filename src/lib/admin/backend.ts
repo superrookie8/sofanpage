@@ -69,6 +69,8 @@ export async function adminBackendFetch(
 		const result = body === null && [204, 205, 304].includes(status)
 			? new NextResponse(null, { status })
 			: NextResponse.json(response.ok ? body : { message: status === 401 ? "관리자 로그인이 필요합니다." : status === 403 ? "관리자 권한이 필요합니다." : "요청 처리에 실패했습니다. 입력과 서버 상태를 확인해주세요." }, { status, headers: {"Cache-Control":"private, no-store"} });
+		const retryAfter = response.headers.get("retry-after");
+		if (status === 429 && retryAfter && /^\d{1,6}$/.test(retryAfter)) result.headers.set("Retry-After", retryAfter);
 		return result;
 	} catch (error) {
 		await alertBackendFailure("adminBackendFetch", path, error);

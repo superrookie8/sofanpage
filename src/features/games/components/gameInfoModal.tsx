@@ -171,10 +171,11 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 							{/* 일정 정보 */}
 							<div className="mb-4 md:mb-6">
 								<h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 pr-8">
-									{matchupLabel(scheduleDetails)} ({venueTypeLabel(scheduleDetails)})
+									{matchupLabel(scheduleDetails)}
 								</h2>
 								<p className="mb-2 text-sm">{competitionLabel(scheduleDetails)}</p>
-								<p className="mb-3 text-sm">{venueName(scheduleDetails) || scheduleDetails.stadium?.name || "경기장 미정"}</p>
+								<p className="mb-1 text-base font-semibold">{venueName(scheduleDetails) || scheduleDetails.stadium?.name || "장소 미정"}</p>
+								<p className="mb-3 text-xs text-ink-500">{venueTypeLabel(scheduleDetails)}</p>
 								{scheduleDetails.description && (
 									<p className="text-gray-600 mb-3 md:mb-4 text-sm md:text-base">
 										{scheduleDetails.description}

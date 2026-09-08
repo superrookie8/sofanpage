@@ -18,6 +18,7 @@ import { isGameSchedule } from "../nextGame";
 import {
 	isHomeGame,
 	opponentName,
+	venueName,
 	resolveGameLocation,
 } from "../scheduleView";
 import { cn } from "@/shared/ui/cn";
@@ -242,13 +243,14 @@ const Calendar: React.FC<CalendarProps> = ({
 			// 시간 추출 (HH:mm 형식) - 백엔드 데이터를 그대로 파싱
 			const time = format(parseISO(schedule.startDateTime), "HH:mm");
 			const isHome = isHomeGame(schedule);
+			const venue = venueName(schedule) || "장소 미정";
 
 			return (
 				<button
 					key={schedule.id || index}
 					type="button"
 					onClick={() => handleDateClick(schedule)}
-					title={`${competitionLabel(schedule)} ${competitionOf(schedule).ourTeamName || ""} vs ${opponentName(schedule)} ${time} ${venueTypeLabel(schedule)}`}
+					title={`${competitionLabel(schedule)} ${competitionOf(schedule).ourTeamName || ""} vs ${opponentName(schedule)} ${time} ${venue} ${venueTypeLabel(schedule)}`}
 					className={cn(
 						"mt-1 w-full rounded-sm border px-1 py-0.5 text-left transition-colors",
 						isHome
@@ -267,10 +269,11 @@ const Calendar: React.FC<CalendarProps> = ({
 					<span className="block truncate text-[9px] text-ink-500">{competitionLabel(schedule)}</span>
 					<span
 						data-numeric
-						className="block text-[9px] leading-tight text-ink-500 lg:text-[10px]"
+						className="block text-[10px] font-medium leading-tight text-ink-700 lg:text-[11px]"
 					>
-						{time} · {venueTypeLabel(schedule)}
+						{time} · {venue}
 					</span>
+					<span className="block text-[9px] leading-tight text-ink-400">{venueTypeLabel(schedule)}</span>
 				</button>
 			);
 		});

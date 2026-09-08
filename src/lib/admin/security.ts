@@ -1,7 +1,7 @@
 import { trustedAdminOrigin } from "./origin";
 export type SecurityCheck = {
   id: string;
-  status: "pass" | "warn" | "fail";
+  status: "pass" | "warn" | "fail" | "unknown";
   message: string;
 };
 export function deploymentChecks(
@@ -27,10 +27,10 @@ export function deploymentChecks(
     },
     {
       id: "admin_session",
-      status: env.NODE_ENV === "production" ? "pass" : "warn",
+      status: "warn",
       message:
         env.NODE_ENV === "production"
-          ? "기존 사이트 로그인 세션을 사용하며 관리자 권한은 서버에서 확인합니다."
+          ? "운영 모드 설정입니다. 실제 로그인·권한 회수·쿠키 보호는 별도 확인이 필요합니다."
           : "개발 환경입니다. 실제 운영 로그인과 권한 회수를 별도로 확인하세요.",
     },
     {

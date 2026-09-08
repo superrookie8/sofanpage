@@ -63,7 +63,7 @@ export default function NextGameSection() {
 			weekdayLabel={formatWeekday(nextGame.startDateTime)}
 			countdownLabel={formatCountdown(nextGame.startDateTime)}
 			opponent={matchupLabel(nextGame)}
-			detail={[formatTime(nextGame.startDateTime), venueName(nextGame)]
+			detail={[formatTime(nextGame.startDateTime), venueName(nextGame) || "장소 미정"]
 				.filter(Boolean)
 				.join(" · ")}
 			isHome={isHomeGame(nextGame)}

@@ -1,4 +1,3 @@
-import Chip from "./chip";
 import { cn } from "../cn";
 
 export interface GameCardProps {
@@ -18,7 +17,7 @@ export interface GameCardProps {
 	className?: string;
 }
 
-/** 시안 §04 — 날짜 블록 | 세로 구분선 | 매치업 | 홈·원정 뱃지 */
+/** 날짜와 매치업 아래에 경기 장소를 표시하고 홈·원정·중립은 보조 정보로 둔다. */
 export default function GameCard({
 	dateLabel,
 	weekdayLabel,
@@ -61,11 +60,11 @@ export default function GameCard({
 				<div className="truncate text-[16px] font-bold text-ink-900">
 					{opponent}
 				</div>
-				<div className="mt-0.5 truncate text-[13px] text-ink-500">{detail}</div>
+				<div className="mt-1 text-[13px] font-medium text-ink-700">{detail}</div>
+				<span className="mt-1 block text-[11px] text-ink-400">
+					{venueLabel || (isHome ? "홈" : "원정")}
+				</span>
 			</div>
-			<Chip tone={venueLabel === "중립" ? "neutral" : isHome ? "home" : "away"} className="h-[26px] flex-shrink-0 px-2.5 text-[12px]">
-				{venueLabel || (isHome ? "홈" : "원정")}
-			</Chip>
 		</Tag>
 	);
 }

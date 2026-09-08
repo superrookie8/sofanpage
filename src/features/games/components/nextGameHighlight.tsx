@@ -1,7 +1,7 @@
 "use client";
 import { competitionLabel, venueTypeLabel } from "../competition";
 import type { ScheduleResponse } from "../types";
-import { isHomeGame, matchupLabel, venueName } from "../scheduleView";
+import { matchupLabel, venueName } from "../scheduleView";
 import Button from "@/shared/ui/primitives/button";
 import {
 	formatCountdown,
@@ -20,7 +20,6 @@ export default function NextGameHighlight({
 }) {
 	const date = parseDate(game.startDateTime);
 	const countdown = formatCountdown(game.startDateTime);
-	const isHome = isHomeGame(game);
 
 	return (
 		<section className="relative overflow-hidden rounded-lg bg-ink-900 p-6 lg:p-8">
@@ -44,14 +43,12 @@ export default function NextGameHighlight({
 							game.startDateTime
 					  )}) ${formatTime(game.startDateTime)}`
 					: ""}
-				 · 한국시간{venueName(game) ? ` · ${venueName(game)}` : " · 경기장 미정"}
+				 · 한국시간{venueName(game) ? ` · ${venueName(game)}` : " · 장소 미정"}
 			</p>
 
 			<div className="mt-4 flex items-center gap-3">
 				<span
-					className={`inline-flex h-7 items-center rounded-full px-3 text-[12px] font-bold ${
-						venueTypeLabel(game) === "중립" ? "bg-amber-50 text-amber-800" : isHome ? "bg-brand-50 text-brand-700" : "bg-white/[.16] text-white"
-					}`}
+					className="text-[11px] text-ink-300"
 				>
 					{venueTypeLabel(game)}
 				</span>

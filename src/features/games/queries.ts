@@ -28,7 +28,9 @@ export const useSchedulesByDateRangeQuery = (
 		queryKey: [...queryKeys.games.schedulesByDateRange(start, end), scheduleFilterKey(filters)],
 		queryFn: () => fetchSchedulesByDateRange(start, end, filters),
 		enabled: enabled && !!start,
-		staleTime: 1000 * 60 * 5, // 5분간 캐시
+		// 다른 탭의 관리자 수정·배포 후 돌아왔을 때 오래된 대회/장소 표시를 갱신한다.
+		staleTime: 1000 * 60,
+		refetchOnWindowFocus: true,
 		gcTime: 1000 * 60 * 30, // 30분간 유지
 	});
 };
@@ -38,7 +40,8 @@ export const useAllSchedulesQuery = (filters: ScheduleFilters = {}) => {
 	return useQuery({
 		queryKey: [...queryKeys.games.allSchedules(), scheduleFilterKey(filters)],
 		queryFn: () => fetchAllSchedules(filters),
-		staleTime: 1000 * 60 * 5,
+		staleTime: 1000 * 60,
+		refetchOnWindowFocus: true,
 		gcTime: 1000 * 60 * 30,
 	});
 };
@@ -58,6 +61,6 @@ export const useScheduleDetailsQuery = (
 		gcTime: 1000 * 60 * 30,
 		// 모달을 열 때마다 항상 refetch (캐시로 인해 gameId=null이 고정되는 현상 방지)
 		refetchOnMount: "always",
-		refetchOnWindowFocus: false,
+		refetchOnWindowFocus: true,
 	});
 };
