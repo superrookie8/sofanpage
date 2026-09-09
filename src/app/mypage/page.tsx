@@ -17,6 +17,12 @@ import {
 	useUserInfoQuery,
 } from "@/features/mypage/queries";
 import ProfileEditSheet from "@/features/mypage/components/profileEditSheet";
+import AccountWithdrawalSheet from "@/features/mypage/components/accountWithdrawalSheet";
+import {
+	clearWithdrawalAccountMarker,
+	consumeWithdrawalAccountMarker,
+	WITHDRAWAL_SUMMARY,
+} from "@/features/mypage/withdrawal";
 
 function joinedLabel(createdAt?: string) {
 	if (!createdAt) return null;
@@ -37,12 +43,37 @@ export default function MyPage() {
 	const userInfo = useUserInfoQuery(isAuthenticated);
 	const arcadeScore = useMyArcadeScoreQuery(isAuthenticated);
 	const [editing, setEditing] = useState(false);
+	const [withdrawing, setWithdrawing] = useState(false);
+	const [withdrawalReauthenticated, setWithdrawalReauthenticated] = useState(false);
+	const [withdrawalExpectedAccountId, setWithdrawalExpectedAccountId] = useState<string>();
+	const [withdrawalReturnPending, setWithdrawalReturnPending] = useState(false);
+	const [withdrawalReauthenticationIssue, setWithdrawalReauthenticationIssue] = useState(false);
 
 	useEffect(() => {
 		if (status === "unauthenticated") {
 			router.replace("/login?callbackUrl=/mypage");
 		}
 	}, [router, status]);
+
+	useEffect(() => {
+		const params = new URLSearchParams(window.location.search);
+		if (params.get("withdraw") === "confirm") {
+			setWithdrawalReturnPending(true);
+			window.history.replaceState(window.history.state, "", "/mypage");
+			return;
+		}
+		clearWithdrawalAccountMarker(sessionStorage);
+	}, []);
+
+	useEffect(() => {
+		if (!withdrawalReturnPending || !userInfo.data?.id) return;
+		const marker = consumeWithdrawalAccountMarker(sessionStorage, userInfo.data.id);
+		setWithdrawalReturnPending(false);
+		setWithdrawalExpectedAccountId(marker.expectedAccountId ?? userInfo.data.id);
+		setWithdrawalReauthenticated(marker.matches);
+		setWithdrawalReauthenticationIssue(!marker.matches);
+		setWithdrawing(true);
+	}, [withdrawalReturnPending, userInfo.data?.id]);
 
 	if (status === "loading" || (isAuthenticated && userInfo.isLoading)) {
 		return (
@@ -69,6 +100,7 @@ export default function MyPage() {
 	const guestbookEnabled = !isMvpDisabledPage("/guestbooks/read");
 
 	const handleLogout = async () => {
+		clearWithdrawalAccountMarker(sessionStorage);
 		try {
 			await signOut({ redirect: false, callbackUrl: "/home" });
 		} catch (error) {
@@ -171,6 +203,33 @@ export default function MyPage() {
 					홈으로
 				</Button>
 			</div>
+
+			<section className="mt-12 border-t border-ink-200 pt-6">
+				<h2 className="text-sm font-bold text-ink-900">계정 삭제</h2>
+				<p className="mt-1 text-sm leading-6 text-ink-500">{WITHDRAWAL_SUMMARY}</p>
+				<Button variant="danger" className="mt-4" onClick={() => {
+					clearWithdrawalAccountMarker(sessionStorage);
+					setWithdrawalExpectedAccountId(userInfo.data?.id);
+					setWithdrawalReauthenticated(false);
+					setWithdrawalReauthenticationIssue(false);
+					setWithdrawing(true);
+				}}>
+					회원 탈퇴
+				</Button>
+			</section>
+
+			<AccountWithdrawalSheet
+				open={withdrawing}
+				reauthenticated={withdrawalReauthenticated}
+				reauthenticationIssue={withdrawalReauthenticationIssue}
+				expectedAccountId={withdrawalExpectedAccountId ?? userInfo.data?.id}
+				accountProvider={userInfo.data?.provider}
+				onClose={() => {
+					clearWithdrawalAccountMarker(sessionStorage);
+					setWithdrawalReauthenticationIssue(false);
+					setWithdrawing(false);
+				}}
+			/>
 		</div>
 	);
 }

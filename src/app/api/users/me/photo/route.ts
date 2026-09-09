@@ -9,8 +9,8 @@ const MAX_BYTES = 5 * 1024 * 1024;
  * 프로필 사진 전용 업로드. R2 키만 돌려주고, 화면에 쓸 주소는 프로필 저장 후
  * /api/users/me 응답이 서명된 URL로 내려준다.
  *
- * 다이어리용 /api/images/upload는 MVP에서 닫혀 있다. 그 경로를 열면 사진 업로드가
- * 통째로 열리므로, 프로필에 필요한 만큼만 여기서 따로 받는다.
+ * backend의 /api/images/profile은 인증된 user id 아래에 owner-safe key를 만든다.
+ * 탈퇴 시 해당 사용자 prefix만 정리할 수 있도록 일반 업로드 경로와 섞지 않는다.
  */
 export async function POST(request: NextRequest) {
 	const token = await getRequestAccessToken(request);
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 	upstreamForm.append("file", file);
 
 	try {
-		const response = await fetch(`${resolveBackendApiUrl()}/api/images/upload`, {
+		const response = await fetch(`${resolveBackendApiUrl()}/api/images/profile`, {
 			method: "POST",
 			headers: { Authorization: `Bearer ${token}` },
 			body: upstreamForm,

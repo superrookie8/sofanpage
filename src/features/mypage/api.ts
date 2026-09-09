@@ -1,4 +1,6 @@
 export interface UserInfo {
+	id: string;
+	provider?: string | null;
 	nickname: string;
 	profileImageUrl?: string | null;
 	createdAt?: string;

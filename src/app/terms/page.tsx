@@ -50,7 +50,7 @@ const TERMS_SECTIONS: readonly LegalSection[] = [
 	{
 		id: "deletion",
 		title: "삭제와 권리 요청",
-		content: <p>계정, 프로필, 점수 또는 과거 작성 정보의 열람·정정·삭제는 <a href={CONTACT_URL} target="_blank" rel="noopener noreferrer">제작자 소셜 계정으로 문의</a>할 수 있습니다. 현재 자동 탈퇴 기능은 없으며 운영자가 계정 소유 여부와 대상 정보를 확인하여 수동 처리합니다.</p>,
+		content: <p>마이페이지에서 소셜 계정으로 다시 인증하고 확인 문구를 입력하면 계정, 프로필, 계정과 연결된 직관일지 문서, 아케이드 점수와 랭킹 기록을 삭제할 수 있습니다. 삭제한 정보는 복구할 수 없습니다. 소유를 확인하기 어려운 기존 직관일지 사진과 과거 방명록처럼 계정과 연결할 수 없는 정보의 열람·정정·삭제는 <a href={CONTACT_URL} target="_blank" rel="noopener noreferrer">제작자 소셜 계정으로 문의</a>해 주세요.</p>,
 	},
 	{
 		id: "responsibility",

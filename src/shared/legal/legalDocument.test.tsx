@@ -20,6 +20,8 @@ describe("public legal documents", () => {
 		expect(html).toContain("프로필 사진");
 		expect(html).toContain("단방향 해시로 저장된 비밀번호");
 		expect(html).toContain("직관일지, 방명록과 일반 회원가입의 신규 접근 및 작성 기능은 현재 차단");
+		expect(html).toContain("계정과 연결된 직관일지 문서는 회원 탈퇴 때 함께 삭제");
+		expect(html).toContain("소유를 확인하기 어려운 기존 직관일지 사진");
 		expect(html).toContain("수동 처리");
 		expect(html).toContain("Google Analytics는 이 방침이 적용되는 사이트 버전부터 비활성화");
 		expect(html).toContain("Netlify");
@@ -37,6 +39,7 @@ describe("public legal documents", () => {
 		expect(html).toContain("2026년 9월 9일");
 		expect(html).toContain("이소희 선수, 소속 구단, WKBL이나 그 밖의 리그·대회를 대리하지 않습니다");
 		expect(html).toContain("닉네임, 최고 점수와 순위");
+		expect(html).toContain("계정과 연결된 직관일지 문서");
 		expect(html).toContain("운영자의 고의 또는 중대한 과실");
 		expect(html).toContain("대한민국 법률");
 		expect(html).not.toContain("비공식");
