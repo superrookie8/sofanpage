@@ -47,6 +47,7 @@ export function clearWithdrawalAccountMarker(storage: MarkerStorage) {
 const ERROR_MESSAGES: Record<number, string> = {
 	400: "확인 문구를 정확히 입력해 주세요.",
 	401: "로그인 정보가 만료되었습니다. 다시 로그인해 주세요.",
+	403: "요청 출처를 확인할 수 없습니다. 페이지를 새로고침한 뒤 다시 시도해 주세요.",
 	412: "안전한 탈퇴를 위해 소셜 계정으로 다시 인증해 주세요.",
 	503: "회원 탈퇴 기능을 준비하고 있습니다. 잠시 후 다시 시도해 주세요.",
 };

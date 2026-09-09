@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import serverAxiosService from "@/lib/server/http/axiosService";
 import { getRequestAccessToken } from "@/lib/server/http/getRequestAccessToken";
+import { rejectCrossOriginMutation } from "@/lib/admin/request";
 
 export async function GET(request: NextRequest) {
 	const token = await getRequestAccessToken(request);
@@ -70,10 +71,8 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-	const origin = request.headers.get("origin");
-	if (!origin || origin !== request.nextUrl.origin) {
-		return NextResponse.json({ message: "허용되지 않은 요청입니다" }, { status: 403 });
-	}
+	const rejected = rejectCrossOriginMutation(request);
+	if (rejected) return rejected;
 
 	const token = await getRequestAccessToken(request);
 	if (!token) {

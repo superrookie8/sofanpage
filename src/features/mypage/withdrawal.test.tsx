@@ -74,7 +74,7 @@ describe("deleteAccount", () => {
 		});
 	});
 
-	it.each([[400, "확인 문구"], [401, "로그인 정보"], [412, "다시 인증"], [503, "준비하고 있습니다"]])(
+	it.each([[400, "확인 문구"], [401, "로그인 정보"], [403, "요청 출처"], [412, "다시 인증"], [503, "준비하고 있습니다"]])(
 		"maps status %i to actionable copy",
 		async (status, message) => {
 			vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status })));
