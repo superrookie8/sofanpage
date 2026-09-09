@@ -8,6 +8,7 @@ import { getSafeCallbackUrl } from "@/features/auth/safeCallbackUrl";
 import { cn } from "@/shared/ui/cn";
 import { CHIBI } from "@/shared/ui/chibi";
 import { track, type AuthMethod } from "@/lib/analytics/events";
+import LoginLegalNotice from "@/shared/legal/loginLegalNotice";
 
 const AUTH_ERROR_MESSAGES: Record<string, string> = {
 	OAuthSignin: "로그인을 시작하지 못했습니다.",
@@ -208,6 +209,7 @@ function LoginContent() {
 				<p className="mt-5 text-center text-caption text-ink-500">
 					첫 로그인 시 닉네임만 정하면 끝
 				</p>
+				<LoginLegalNotice />
 			</div>
 		</div>
 	);

@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { sanitizeParams } from "./gtag";
 import { EVENT_NAMES } from "./events";
@@ -42,5 +43,17 @@ describe("이벤트 택소노미", () => {
 
 	it("이름이 중복되지 않는다", () => {
 		expect(new Set(EVENT_NAMES).size).toBe(EVENT_NAMES.length);
+	});
+});
+
+describe("production analytics configuration", () => {
+	it("does not configure a GA measurement id in Netlify builds", () => {
+		const config = readFileSync(
+			new URL("../../../netlify.toml", import.meta.url),
+			"utf8"
+		);
+
+		expect(config).not.toMatch(/^\s*NEXT_PUBLIC_GA_ID\s*=/m);
+		expect(config).not.toMatch(/G-[A-Z0-9]{6,}/);
 	});
 });

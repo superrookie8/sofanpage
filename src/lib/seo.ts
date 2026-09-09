@@ -15,6 +15,8 @@ export const PUBLIC_PAGES = [
 	{ path: "/events/5th", title: "5주년 팬 이벤트", description: "이소희 선수의 5주년 팬 이벤트 기록입니다." },
 	{ path: "/events/6th", title: "6주년 팬 이벤트", description: "이소희 선수의 6주년 팬 이벤트 기록입니다." },
 	{ path: "/arcade", title: "아케이드", description: "SUPER SOHEE 팬페이지의 농구 게임을 즐겨보세요." },
+	{ path: "/privacy", title: "개인정보처리방침", description: "SUPER SOHEE의 개인정보 처리 항목, 목적, 보유기간과 이용자 권리를 안내합니다." },
+	{ path: "/terms", title: "이용약관", description: "SUPER SOHEE 팬페이지의 서비스 이용 조건과 운영자 및 이용자의 책임을 안내합니다." },
 ] as const;
 
 export function pageMetadata(path: string): Metadata {

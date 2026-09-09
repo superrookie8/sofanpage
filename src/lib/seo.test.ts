@@ -15,7 +15,18 @@ describe("public SEO contract", () => {
 		const urls = sitemap().map((entry) => entry.url);
 		expect(new Set(urls).size).toBe(urls.length);
 		expect(urls).toContain(`${SITE_URL}/`);
+		expect(urls).toContain(`${SITE_URL}/privacy`);
+		expect(urls).toContain(`${SITE_URL}/terms`);
 		for (const path of ["/home", "/login", "/mypage", "/diary", "/unavailable"]) expect(urls).not.toContain(`${SITE_URL}${path}`);
 		expect(robots().sitemap).toBe(`${SITE_URL}/sitemap.xml`);
+	});
+	it("publishes indexable metadata for both legal documents", () => {
+		for (const path of ["/privacy", "/terms"] as const) {
+			const metadata = pageMetadata(path);
+			expect(metadata.alternates?.canonical).toBe(path);
+			expect(metadata.robots).not.toEqual(
+				expect.objectContaining({ index: false })
+			);
+		}
 	});
 });

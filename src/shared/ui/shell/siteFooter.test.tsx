@@ -23,6 +23,10 @@ it("renders the public-site credits and an icon-only creator link", () => {
 		"사이트에 사용된 사진, 기사 등 외부 콘텐츠의 권리는 각 원저작자에게 있습니다."
 	);
 	expect(html).toContain("© 2024–2026 SUPER SOHEE");
+	expect(html).toContain('href="/privacy"');
+	expect(html).toContain("개인정보처리방침");
+	expect(html).toContain('href="/terms"');
+	expect(html).toContain("이용약관");
 	expect(html).toContain("제작자 : ");
 	expect(html).toContain('href="https://www.instagram.com/hahanana20C/"');
 	expect(html).toContain('aria-label="제작자 소셜 계정"');
@@ -52,5 +56,7 @@ it("switches text, dividers, and the icon control to dark-shell contrast", () =>
 	expect(html).toContain("text-white");
 	expect(html).toContain("text-ink-300");
 	expect(html).toContain("bg-transparent");
+	expect(html).toContain('href="/privacy"');
+	expect(html).toContain('href="/terms"');
 	expect(footerClasses).not.toContain("bg-white");
 });

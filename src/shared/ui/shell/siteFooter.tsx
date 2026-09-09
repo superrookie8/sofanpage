@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { cn } from "../cn";
 
 export default function SiteFooter({ dark = false }: { dark?: boolean }) {
@@ -89,6 +90,10 @@ export default function SiteFooter({ dark = false }: { dark?: boolean }) {
 					dark ? "border-ink-700 text-ink-300" : "border-ink-100 text-ink-500"
 				)}
 			>
+				<nav aria-label="정책" className="mb-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+					<Link className="font-semibold underline-offset-4 hover:underline" href="/privacy">개인정보처리방침</Link>
+					<Link className="font-semibold underline-offset-4 hover:underline" href="/terms">이용약관</Link>
+				</nav>
 				<p>사이트에 사용된 사진, 기사 등 외부 콘텐츠의 권리는 각 원저작자에게 있습니다.</p>
 				<p className="mt-1">© 2024–2026 SUPER SOHEE</p>
 			</div>
