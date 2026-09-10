@@ -56,3 +56,11 @@ it('prioritizes action items and filters categories without discarding unknown r
     expect(orderedChecks(checks,'data').map(item=>item.id)).toEqual(['f','u','p']);
     expect(checkTitles['frontend-admin-privacy']).toBe('관리자 응답 검색·캐시 정책');
 });
+
+it('keeps additive repository/storage and unknown evidence compatible with schema 1', async () => {
+    vi.stubGlobal('React',React);
+    const run:AuditRun={id:'new',schemaVersion:1,startedAt:'2026-09-09T00:00:00Z',finishedAt:'2026-09-09T00:00:00Z',durationMs:0,expiresAt:'2026-10-09T00:00:00Z',environment:{backendMode:'unknown',frontendTarget:'unknown'},summary:{pass:0,warn:0,fail:0,unknown:2},checks:[{id:'repository-web-alerts',category:'repository',title:'Provider report',status:'unknown',evidenceType:'provider-api',evidence:'Token not configured.',remediation:'Review permissions.',checkedAt:'2026-09-09T00:00:00Z',durationMs:0},{id:'future-check',category:'future-category',title:'Future check',status:'unknown',evidenceType:'future-evidence' as AuditRun['checks'][number]['evidenceType'],evidence:'Not observed.',remediation:'Review manually.',checkedAt:'2026-09-09T00:00:00Z',durationMs:0}]};
+    const html=renderToStaticMarkup(<RunResult run={run}/>);
+    for(const label of ['코드 저장소','데이터·이미지 저장소','외부 서비스 API 관측','미분류 근거','웹 저장소 의존성 경고','Token not configured.']) expect(html).toContain(label);
+    expect(html).toContain('미확인');
+});

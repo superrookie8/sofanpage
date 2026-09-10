@@ -47,5 +47,5 @@ export async function POST(request: NextRequest) {
     catch {
         return NextResponse.json({ message: '점검 요청에는 추가 입력을 보낼 수 없습니다.' }, { status: 400 });
     }
-    return adminBackendFetch('/api/admin/security/runs', { method: 'POST', signal: AbortSignal.timeout(25000) });
+    return adminBackendFetch('/api/admin/security/runs', { method: 'POST', signal: AbortSignal.timeout(40000) });
 }

@@ -105,7 +105,7 @@ export default function SecurityPage() {
     return <div className="space-y-6">
   <section className="rounded-xl border bg-white p-6 space-y-4">
    <h2 className="text-xl font-bold">서비스 보안 점검</h2>
-   <p>백엔드가 고정된 항목을 점검하고 결과를 저장합니다. 이력은 30일 이내 최근 20회까지 보관합니다. 실제 운영 배포나 모든 보안 항목의 안전을 보증하지 않습니다.</p>
+   <p>웹·API 코드 저장소, 자동 수집, DB·이미지 저장소를 점검합니다. 결과는 30일 이내 최근 20회 보관합니다.</p>
    <button disabled={busy} onClick={() => void execute()} className="rounded bg-black text-white p-3">{busy ? "점검 실행 중…" : "보안 점검 실행 및 저장"}</button>
    {error && <p role="alert">{error}</p>}
    <h3 className="font-bold">저장된 실행 이력</h3>
@@ -128,8 +128,8 @@ export function RunResult({ run }: {
   <p>완료: {new Date(run.finishedAt).toLocaleString("ko-KR")} · {run.durationMs}ms</p>
   <div className="grid grid-cols-2 gap-3 md:grid-cols-4">{(["fail","warn","unknown","pass"] as const).map(status=><div key={status} className={`rounded-lg border p-3 ${tones[status]}`}><p>{auditStatusLabels[status]}</p><strong className="text-2xl">{run.summary[status]}</strong></div>)}</div>
   <label className="block">점검 분야 <select className="rounded border p-2" value={category} onChange={event=>setCategory(event.target.value)}><option value="">전체 분야</option>{Object.entries(categoryLabels).map(([key,label])=><option key={key} value={key}>{label}</option>)}</select></label>
-  <ul className="space-y-3">{orderedChecks(run.checks,category).map(check => <li key={check.id} className={`rounded border p-3 ${tones[check.status]}`}><p className="text-sm">{categoryLabels[check.category]||check.category}</p><strong>{auditStatusLabels[check.status]} · {checkTitles[check.id]||check.title}</strong>
-   <p>근거 유형: {({ configuration: "설정", 'runtime-http': "HTTP 응답 관측", 'database-read': "DB 읽기", 'manual-review': "수동 검토" })[check.evidenceType]}</p>
+  <ul className="space-y-3">{orderedChecks(run.checks,category).map(check => <li key={check.id} className={`rounded border p-3 ${tones[check.status]}`}><p className="text-sm">{categoryLabels[check.category]||"미분류"}</p><strong>{auditStatusLabels[check.status]} · {checkTitles[check.id]||check.title}</strong>
+   <p>근거 유형: {({ configuration: "설정", 'runtime-http': "HTTP 응답 관측", 'database-read': "DB 읽기", 'manual-review': "수동 검토", 'provider-api': "외부 서비스 API 관측" })[check.evidenceType] || "미분류 근거"}</p>
    <p>확인·조치: {checkGuidance(check)}</p><details className="mt-2"><summary className="cursor-pointer underline">서버 원문 근거·조치 확인</summary><p>{check.title}</p><p>{check.evidence}</p><p>{check.remediation}</p></details>
    <p className="text-sm">{new Date(check.checkedAt).toLocaleString("ko-KR")} · {check.durationMs}ms{check.observedStatus !== undefined ? ` · HTTP ${check.observedStatus}` : ""}</p>
   </li>)}</ul></section>;

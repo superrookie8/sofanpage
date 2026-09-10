@@ -3,7 +3,7 @@ export type AuditCheck = {
     category: string;
     title: string;
     status: 'pass' | 'warn' | 'fail' | 'unknown';
-    evidenceType: 'configuration' | 'runtime-http' | 'database-read' | 'manual-review';
+    evidenceType: 'configuration' | 'runtime-http' | 'database-read' | 'manual-review' | 'provider-api';
     evidence: string;
     remediation: string;
     checkedAt: string;
