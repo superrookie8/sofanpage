@@ -1,5 +1,7 @@
 "use client";
 import Image from "next/image";
+import { useState } from "react";
+import NationalProfileGallery from "./nationalProfileGallery";
 import { useProfileQuery } from "@/features/profile/queries";
 import { Skeleton } from "@/shared/ui/primitives/skeleton";
 import { ErrorState } from "@/shared/ui/primitives/states";
@@ -40,6 +42,7 @@ function MetaChips({ profile }: { profile: HeroMeta }) {
  * 데스크톱: 좌 사진 카드 / 우 이름·등번호 2컬럼.
  */
 export default function Hero() {
+	const [national, setNational] = useState(false);
 	const { data: profile, isLoading, isError, refetch } = useProfileQuery();
 
 	if (isLoading) {
@@ -58,20 +61,39 @@ export default function Hero() {
 	}
 
 	const meta: HeroMeta = {
-		team: profile.team,
+		team: national ? "대한민국 국가대표" : profile.team,
 		position: profile.position,
 		height: profile.height,
-		jerseyNumber: profile.jerseyNumber || 6,
-		nationalTeamJerseyNumber: profile.nationalTeamJerseyNumber,
+		jerseyNumber: national ? (profile.nationalTeamJerseyNumber ?? 9) : (profile.jerseyNumber || 6),
+		nationalTeamJerseyNumber: national ? null : profile.nationalTeamJerseyNumber,
 	};
 
+	const heroImage = national ? "/images/national-team/profile-4.webp" : HERO_IMAGE;
+	const heroAlt = national ? `${profile.name} 선수 국가대표 유니폼 프로필` : `${profile.name} 선수`;
+	const description = national
+		? "대한민국의 가드, 이소희. 태극마크와 등번호 9번을 달고 코트를 누빕니다."
+		: profile.features;
+
 	return (
-		<>
+		<div className="space-y-4">
+			<div role="group" aria-label="선수 프로필 선택" className="inline-flex rounded-full border border-ink-200 bg-white p-1">
+				{[{ label: "BNK 썸", value: false }, { label: "국가대표", value: true }].map((option) => (
+					<button
+						key={option.label}
+						type="button"
+						aria-pressed={national === option.value}
+						onClick={() => setNational(option.value)}
+						className={`min-h-11 rounded-full px-5 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 ${national === option.value ? "bg-ink-900 text-white" : "text-ink-600 hover:bg-ink-100"}`}
+					>
+						{option.label}
+					</button>
+				))}
+			</div>
 			{/* 모바일 */}
-			<section className="relative -mx-4 -mt-6 h-[470px] overflow-hidden lg:hidden">
+			<section className="relative -mx-4 h-[470px] overflow-hidden lg:hidden">
 				<Image
-					src={HERO_IMAGE}
-					alt={`${profile.name} 선수`}
+					src={heroImage}
+					alt={heroAlt}
 					fill
 					priority
 					sizes="100vw"
@@ -100,8 +122,8 @@ export default function Hero() {
 			<section className="hidden gap-8 lg:grid lg:grid-cols-[460px_1fr]">
 				<div className="relative min-h-[560px] overflow-hidden rounded-lg">
 					<Image
-						src={HERO_IMAGE}
-						alt={`${profile.name} 선수`}
+						src={heroImage}
+						alt={heroAlt}
 						fill
 						priority
 						sizes="460px"
@@ -130,13 +152,14 @@ export default function Hero() {
 							{meta.jerseyNumber}
 						</span>
 					</div>
-					{profile.features && (
+					{description && (
 						<p className="mt-6 max-w-[46ch] text-body-lg text-ink-700">
-							{profile.features}
+							{description}
 						</p>
 					)}
 				</div>
 			</section>
-		</>
+			{national && <NationalProfileGallery />}
+		</div>
 	);
 }
