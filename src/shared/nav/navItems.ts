@@ -3,6 +3,7 @@ import { isMvpDisabledPage } from "@/features/mvp/accessPolicy";
 export type NavIconName =
 	| "home"
 	| "news"
+	| "videos"
 	| "events"
 	| "arcade"
 	| "schedule"
@@ -28,6 +29,7 @@ export interface NavItem {
 const ALL_NAV_ITEMS: readonly NavItem[] = [
 	{ href: "/", label: "홈", icon: "home", tabPriority: 0 },
 	{ href: "/news", label: "뉴스", icon: "news", tabPriority: 1 },
+	{ href: "/videos", label: "영상", icon: "videos", tabPriority: 3 },
 	{ href: "/schedule", label: "스케줄", icon: "schedule", tabPriority: 2 },
 	{ href: "/events", label: "이벤트", icon: "events", tabPriority: 4 },
 	{ href: "/arcade", label: "아케이드", icon: "arcade", tabPriority: 5 },

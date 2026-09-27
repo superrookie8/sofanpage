@@ -1,5 +1,18 @@
 // src/features/news/api.ts
 import type { Article, NewsData, SectionData } from "./types";
+import type { NewsSource } from "./pagination";
+
+export async function fetchNewsPage(source: NewsSource, page: number, limit: number): Promise<SectionData> {
+	const params = new URLSearchParams({ page: String(page - 1), limit: String(limit) });
+	if (source !== "all") params.set("source", source);
+	const response = await fetch(`/api/news?${params}`);
+	if (!response.ok) throw new Error("기사를 불러오지 못했습니다.");
+	const data = await response.json();
+	if (!Array.isArray(data.articles) || !Number.isInteger(data.totalPages) || data.totalPages < 0) {
+		throw new Error("기사 응답을 확인할 수 없습니다.");
+	}
+	return { ...data, articles: withSource(data.articles, "뉴스") };
+}
 
 // 백엔드는 출처를 "jumpball" / "rookie" 같은 영문 슬러그로 준다.
 // 화면에는 매체명을 한글로 보여주므로 여기서 표시용 라벨로 정규화한다.

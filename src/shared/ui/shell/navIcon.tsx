@@ -1,6 +1,7 @@
 import type { NavIconName } from "@/shared/nav/navItems";
 
 const PATHS: Record<NavIconName, React.ReactNode> = {
+	videos: <><rect x="3" y="5" width="18" height="14" rx="4" /><path d="m10 9 5 3-5 3Z" /></>,
 	home: <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />,
 	news: (
 		<>

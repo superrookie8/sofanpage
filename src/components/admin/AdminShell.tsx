@@ -18,6 +18,7 @@ const navItems: Array<{ href: string; label: string; heading?: string; descripti
 	{ href: "/admin/schedule", label: "경기 일정", heading: "Manage Game Schedules", description: "시즌 스케줄", icon: "schedule" },
 	{ href: "/admin/events", label: "이벤트", heading: "Manage Events", description: "팬 이벤트", icon: "events" },
 	{ href: "/admin/news", label: "뉴스", description: "기사 관리", icon: "events" },
+	{ href: "/admin/videos", label: "영상", description: "YouTube 링크 관리", icon: "events" },
 	{ href: "/admin/security", label: "보안 점검", description: "권한·배포 설정", icon: "profile" },
 	{ href: "/admin/guestbooks", label: "방명록", description: "팬 메시지", icon: "guestbook" },
 ];

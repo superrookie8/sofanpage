@@ -2,6 +2,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/react-query/queryKeys";
 import { fetchLatestNews, fetchJumpballNews, fetchRookieNews, fetchOtherNews } from "./api";
+import { fetchNewsPage } from "./api";
+import type { NewsSource } from "./pagination";
+
+export const useNewsPageQuery = (source: NewsSource, page: number, limit: number) => useQuery({
+	queryKey: [...queryKeys.news.all, "page", source, page, limit],
+	queryFn: () => fetchNewsPage(source, page, limit),
+});
 
 // 최신 기사 조회 Query
 export const useLatestNewsQuery = () => {

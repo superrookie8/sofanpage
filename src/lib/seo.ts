@@ -10,6 +10,7 @@ export const SOCIAL_IMAGE = "/images/2026-27_profile.JPG";
 export const PUBLIC_PAGES = [
 	{ path: "/", title: SITE_TITLE, description: SITE_DESCRIPTION },
 	{ path: "/news", title: "이소희 선수 뉴스", description: "점프볼, 루키와 여러 매체의 농구선수 이소희 관련 기사를 모아보세요." },
+	{ path: "/videos", title: "이소희 선수 영상 모음", description: "대한민국 여자농구와 이소희 선수의 경기 하이라이트, 인터뷰와 현장 영상을 만나보세요." },
 	{ path: "/schedule", title: "경기 일정", description: "이소희 선수의 경기 일정과 경기 결과를 확인하세요." },
 	{ path: "/events", title: "팬 이벤트", description: "이소희 선수와 함께한 팬 이벤트와 응원 기록을 만나보세요." },
 	{ path: "/events/5th", title: "5주년 팬 이벤트", description: "이소희 선수의 5주년 팬 이벤트 기록입니다." },
