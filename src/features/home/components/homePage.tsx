@@ -1,4 +1,5 @@
 import Hero from "@/features/home/components/hero";
+import type { ProfileData } from "@/features/profile/types";
 import SeasonStats from "@/features/stats/components/seasonStats";
 import NextGameSection from "@/features/home/components/nextGameSection";
 import LatestNewsSection, {
@@ -23,13 +24,17 @@ function SectionHeading({
 	);
 }
 
-export default function HomePage() {
+export default function HomePage({
+	initialProfile,
+}: {
+	initialProfile?: ProfileData | null;
+}) {
 	return (
 		<div className="flex flex-col gap-10 lg:gap-14">
 			<h1 id="fanpage-title" className="sr-only">
 				농구선수 이소희 팬페이지 슈퍼소희(SUPER SOHEE)
 			</h1>
-			<Hero />
+			<Hero initialProfile={initialProfile} />
 
 			<section aria-labelledby="season-stats">
 				<h2 id="season-stats" className="sr-only">

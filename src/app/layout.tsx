@@ -5,7 +5,6 @@ import "./globals.css";
 import Providers from "@/components/providers/sessionProvider";
 import { getServerSession } from "next-auth";
 import { getMissingAuthEnvironmentKeys } from "@/features/auth/server/authEnvironment";
-import ScriptProvider from "@/utils/scriptProvider";
 import { LoadingProvider } from "@/context/LoadingContext";
 import LoadingSpinner from "@/shared/ui/loadingSpinner";
 import SiteSurface from "@/shared/ui/shell/siteSurface";
@@ -112,7 +111,6 @@ export default async function RootLayout({
 					rel="stylesheet"
 				/>
 			</head>
-			<ScriptProvider />
 			<body>
 				<Providers session={session}>
 					<LoadingProvider>

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useState } from "react";
 import NationalProfileGallery from "./nationalProfileGallery";
 import { useProfileQuery } from "@/features/profile/queries";
+import type { ProfileData } from "@/features/profile/types";
 import { Skeleton } from "@/shared/ui/primitives/skeleton";
 import { ErrorState } from "@/shared/ui/primitives/states";
 import Chip from "@/shared/ui/primitives/chip";
@@ -41,9 +42,16 @@ function MetaChips({ profile }: { profile: HeroMeta }) {
  * 모바일: 풀블리드 사진 + 하단 ink-50 수렴 그라디언트 + 좌하단 이름 블록.
  * 데스크톱: 좌 사진 카드 / 우 이름·등번호 2컬럼.
  */
-export default function Hero() {
+export default function Hero({
+	initialProfile,
+}: {
+	initialProfile?: ProfileData | null;
+}) {
 	const [national, setNational] = useState(false);
-	const { data: profile, isLoading, isError, refetch } = useProfileQuery();
+	const { data: profile, isLoading, isError, refetch } = useProfileQuery(
+		undefined,
+		{ initialData: initialProfile }
+	);
 
 	if (isLoading) {
 		return (
