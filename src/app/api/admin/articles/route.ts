@@ -5,7 +5,12 @@ import { rejectCrossOriginMutation } from "@/lib/admin/request";
 export async function GET(request: NextRequest) {
 	const page = Math.max(0, Number(request.nextUrl.searchParams.get("page") ?? 0));
 	const size = Math.min(100, Math.max(1, Number(request.nextUrl.searchParams.get("size") ?? 20)));
-	return adminBackendFetch(`/api/admin/articles?page=${page}&size=${size}`);
+	const query = new URLSearchParams({ page: String(page), size: String(size) });
+	const source = request.nextUrl.searchParams.get("source");
+	if (source && ["jumpball", "rookie", "other", "manual"].includes(source)) query.set("source", source);
+	const q = request.nextUrl.searchParams.get("q")?.trim();
+	if (q) query.set("q", q.slice(0, 100));
+	return adminBackendFetch(`/api/admin/articles?${query}`);
 }
 
 export async function POST(request: NextRequest) {
