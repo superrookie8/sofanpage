@@ -1,5 +1,5 @@
 // src/app/layout.tsx
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION } from "@/lib/seo";
 import "./globals.css";
 import Providers from "@/components/providers/sessionProvider";
@@ -48,10 +48,23 @@ export const metadata: Metadata = {
 		"supersohee",
 	],
 	icons: {
-		icon: "/favicon.ico",
+		icon: [
+			{ url: "/favicon.ico" },
+			{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+		],
 		shortcut: "/favicon.ico",
-		apple: "/favicon.ico",
+		apple: { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
 	},
+	// iOS에서 홈 화면에 추가하면 주소창 없이 열린다.
+	appleWebApp: {
+		capable: true,
+		title: "슈퍼소희",
+		statusBarStyle: "black",
+	},
+};
+
+export const viewport: Viewport = {
+	themeColor: "#17151a",
 };
 
 let hasReportedMissingAuthConfiguration = false;
