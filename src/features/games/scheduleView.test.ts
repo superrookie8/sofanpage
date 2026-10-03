@@ -5,6 +5,7 @@ import {
 	isHomeGame,
 	matchupLabel,
 	opponentName,
+	findLocationByName,
 	resolveGameLocation,
 	venueName,
 } from "./scheduleView";
@@ -107,5 +108,19 @@ describe("scheduleView", () => {
 		expect(isGameSchedule(schedule({ type: "event", specialGame: false }))).toBe(
 			false
 		);
+	});
+});
+
+describe("경기장 이름으로 지도 좌표 찾기", () => {
+	it("실제 경기장 이름과 상수 키를 모두 찾는다", () => {
+		expect(findLocationByName(" 용인실내체육관 ")).toMatchObject({ name: "용인실내체육관", latitude: 37.2377 });
+		expect(findLocationByName("부산 사직실내체육관")).toMatchObject({ latitude: 35.1922, longitude: 129.061 });
+		expect(findLocationByName("모르는 경기장")).toBeNull();
+		expect(findLocationByName(null)).toBeNull();
+	});
+
+	it("대회 정보가 있는 일정도 명시된 경기장 이름으로 좌표를 찾는다", () => {
+		const game = schedule({ competitionKey: "wkbl", venueName: "아산 이순신체육관", isHome: false });
+		expect(resolveGameLocation(game)).toMatchObject({ name: "아산 이순신체육관", latitude: 36.7693 });
 	});
 });

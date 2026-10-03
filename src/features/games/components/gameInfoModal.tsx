@@ -1,6 +1,6 @@
 "use client";
 import { competitionLabel, venueTypeLabel } from "../competition";
-import { matchupLabel, venueName } from "../scheduleView";
+import { findLocationByName, matchupLabel, venueName } from "../scheduleView";
 import React, { useMemo, useState } from "react";
 import { ScheduleDetailsResponse, GameLocation } from "../types";
 import { useRouter } from "next/navigation";
@@ -82,6 +82,10 @@ const GameInfoModal: React.FC<GameInfoModalProps> = ({
 				longitude: scheduleDetails.stadium.longitude,
 			} as GameLocation;
 		}
+
+		// 백엔드가 연결한 경기장에 좌표가 없으면 같은 이름의 로컬 상수 좌표를 쓴다
+		const linkedStadium = findLocationByName(scheduleDetails.stadium?.name);
+		if (linkedStadium) return linkedStadium;
 
 		if (scheduleDetails.competitionKey) return null;
 

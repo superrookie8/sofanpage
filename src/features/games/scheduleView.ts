@@ -40,6 +40,13 @@ export function venueName(schedule: ScheduleResponse): string | null {
 	return locationKey && locationKey !== "Home" ? locationKey : null;
 }
 
+/** 경기장 이름으로 지도 좌표를 찾는다. 상수 키(팀 이름)와 실제 경기장 이름을 모두 받는다. */
+export function findLocationByName(name: string | null | undefined): GameLocation | null {
+	const key = name?.trim();
+	if (!key) return null;
+	return locations[key] ?? Object.values(locations).find((location) => location.name === key) ?? null;
+}
+
 /**
  * location의 알려진 팀/경기장 키를 지도에서 쓰는 실제 경기장으로 정규화한다.
  * opponent는 상대팀 표시 필드이며 location의 대체 venue로 사용하지 않는다.
@@ -47,7 +54,7 @@ export function venueName(schedule: ScheduleResponse): string | null {
 export function resolveGameLocation(
 	schedule: ScheduleResponse
 ): GameLocation | null {
-	if (schedule.venueName?.trim()) return locations[schedule.venueName.trim()] ?? null;
+	if (schedule.venueName?.trim()) return findLocationByName(schedule.venueName);
 	if (schedule.competitionKey) return null;
 	const locationKey = isHomeGame(schedule)
 		? HOME_VENUE
