@@ -27,7 +27,7 @@ describe("아시안게임 금메달 축하 팝업", () => {
 	it("현수막 문구와 이동·닫기 버튼을 보여 준다", () => {
 		vi.stubGlobal("React", React);
 		const html = renderToStaticMarkup(<CelebrationBanner onClose={() => {}} onHideToday={() => {}} />);
-		for (const text of ["경축", "이소희 선수", "2026 아이치·나고야 아시안게임 여자농구 금메달 획득", "- 이소희 희망단 일동 -", "오늘 하루 보지 않기", "닫기"]) {
+		for (const text of ["경축", "이소희 선수", "2026 아이치·나고야 아시안게임", "여자농구 금메달 획득", "- 이소희 희망단 일동 -", "오늘 하루 보지 않기", "닫기"]) {
 			expect(html).toContain(text);
 		}
 		expect(html).toContain('href="/videos"');

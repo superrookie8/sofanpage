@@ -31,7 +31,7 @@ export function CelebrationBanner({ onClose, onHideToday }: { onClose: () => voi
 				<h2 id="celebration-title" className={styles.headline}>
 					<span className={styles.celebrate}><span className={styles.sparkle} aria-hidden="true">✦</span>경축<span className={styles.sparkle} aria-hidden="true">✦</span></span>
 					<span className={styles.player}>이소희 선수<span className={styles.ball} aria-hidden="true">🏀</span></span>
-					<span className={styles.achievement}>2026 아이치·나고야 아시안게임 여자농구 금메달 획득</span>
+					<span className={styles.achievement}><span className={styles.line}>2026 아이치·나고야 아시안게임</span> <span className={styles.line}>여자농구 금메달 획득</span></span>
 				</h2>
 				<p className={styles.signature}>- 이소희 희망단 일동 -</p>
 				<span className={styles.stamp} aria-hidden="true">12년<br />만에!</span>
