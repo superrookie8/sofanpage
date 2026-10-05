@@ -6,6 +6,7 @@ import LatestNewsSection, {
 	MoreNewsLink,
 } from "@/features/home/components/latestNewsSection";
 import InternationalResultsSection from "@/features/international-results/components/internationalResultsSection";
+import CelebrationPopup from "@/features/home/components/celebrationPopup";
 
 function SectionHeading({
 	title,
@@ -35,6 +36,7 @@ export default function HomePage({
 				농구선수 이소희 팬페이지 슈퍼소희(SUPER SOHEE)
 			</h1>
 			<Hero initialProfile={initialProfile} />
+			<CelebrationPopup />
 
 			<section aria-labelledby="season-stats">
 				<h2 id="season-stats" className="sr-only">
